@@ -34,6 +34,14 @@ return [
     'export_path' => 'openapi.json',
 
     /*
+     * Open the interactive docs (/docs/api) to anyone, not just administrators.
+     * Off by default so a real deployment keeps the API surface admin-only; the
+     * Docker demo turns it on (API_DOCS_PUBLIC=true) so a reviewer can browse it.
+     * Honoured by the `viewApiDocs` gate in OpenApiServiceProvider.
+     */
+    'docs_public' => (bool) env('API_DOCS_PUBLIC', false),
+
+    /*
      * Cache configuration for the generated OpenAPI document.
      *
      * Use `scramble:cache` to warm the cache and `scramble:clear` to invalidate it.

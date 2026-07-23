@@ -44,6 +44,8 @@ services:
       CACHE_STORE: database
       QUEUE_CONNECTION: database
       PHP_CLI_SERVER_WORKERS: "4"
+      # Open the interactive API docs (/docs/api) to reviewers in the demo.
+      API_DOCS_PUBLIC: "true"
     ports:
       - "${BACKEND_PORT}:8000"
     depends_on:

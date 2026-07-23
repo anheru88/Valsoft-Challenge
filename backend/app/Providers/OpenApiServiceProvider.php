@@ -27,7 +27,9 @@ class OpenApiServiceProvider extends ServiceProvider
             ->withOperationTransformers(DocumentDomainErrors::class);
 
         // Scramble already allows the docs in local. Beyond it, reading the API
-        // surface is an administrator's job.
-        Gate::define('viewApiDocs', fn (?User $user): bool => $user?->isAdmin() ?? false);
+        // surface is an administrator's job — unless the deployment opts to make
+        // the docs public (the Docker demo does, via API_DOCS_PUBLIC).
+        Gate::define('viewApiDocs', fn (?User $user): bool => config('scramble.docs_public')
+            || ($user?->isAdmin() ?? false));
     }
 }
