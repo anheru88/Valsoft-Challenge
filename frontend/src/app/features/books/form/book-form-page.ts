@@ -15,6 +15,7 @@ import { CategoriesApiService } from '../../categories/data/categories-api.servi
 import { PageHeader } from '../../../shared/ui/page-header';
 import { InlineAlert } from '../../../shared/ui/inline-alert';
 import { BookPayload, BooksApiService } from '../data/books-api.service';
+import { HasUnsavedChanges } from '../../../core/guards/pending-changes.guard';
 
 /** Client-side ISBN-10/13 checksum validation; the server validates again. */
 export function isbnValidator(control: AbstractControl): ValidationErrors | null {
@@ -40,7 +41,10 @@ export function isbnValidator(control: AbstractControl): ValidationErrors | null
   templateUrl: './book-form-page.html',
   styles: [`.narrow { max-width: 860px; } lib-inline-alert { display: block; margin-bottom: var(--sp-4); }`],
 })
-export class BookFormPage {
+export class BookFormPage implements HasUnsavedChanges {
+  /** The pending-changes guard asks this before letting the route go. */
+  hasUnsavedChanges(): boolean { return this.form.dirty; }
+
   private readonly fb = inject(FormBuilder);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
@@ -146,6 +150,9 @@ export class BookFormPage {
     request.subscribe({
       next: ({ data }) => {
         this.saving.set(false);
+        // The work is saved, so leaving is no longer a loss: the guard must
+        // not challenge the navigation that follows.
+        this.form.markAsPristine();
         this.snack.open(this.isEdit() ? 'Changes saved' : '«' + data.title + '» added to the catalogue',
                         undefined, { duration: 4000 });
         this.router.navigate(['/books', data.id]);
@@ -171,6 +178,8 @@ export class BookFormPage {
   }
 
   cancel(): void {
+    // Cancelling is a deliberate discard, so skip the guard's confirmation.
+    this.form.markAsPristine();
     this.router.navigate(this.bookId ? ['/books', this.bookId] : ['/books']);
   }
 }

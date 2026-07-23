@@ -13,6 +13,7 @@ import { Role, User } from '../../../core/models';
 import { PageHeader } from '../../../shared/ui/page-header';
 import { InlineAlert } from '../../../shared/ui/inline-alert';
 import { UserPayload, UsersApiService } from '../data/users-api.service';
+import { HasUnsavedChanges } from '../../../core/guards/pending-changes.guard';
 
 @Component({
   selector: 'lib-user-form-page',
@@ -22,7 +23,10 @@ import { UserPayload, UsersApiService } from '../data/users-api.service';
   templateUrl: './user-form-page.html',
   styles: [`.narrow { max-width: 760px; } lib-inline-alert { display: block; margin-bottom: var(--sp-4); }`],
 })
-export class UserFormPage {
+export class UserFormPage implements HasUnsavedChanges {
+  /** The pending-changes guard asks this before letting the route go. */
+  hasUnsavedChanges(): boolean { return this.form.dirty; }
+
   private readonly fb = inject(FormBuilder);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
@@ -88,6 +92,7 @@ export class UserFormPage {
     request.subscribe({
       next: () => {
         this.saving.set(false);
+        this.form.markAsPristine();
         this.snack.open(this.isEdit() ? 'Changes saved' : 'User created', undefined, { duration: 4000 });
         this.router.navigate(['/users']);
       },
@@ -105,5 +110,5 @@ export class UserFormPage {
     });
   }
 
-  cancel(): void { this.router.navigate(['/users']); }
+  cancel(): void { this.form.markAsPristine(); this.router.navigate(['/users']); }
 }

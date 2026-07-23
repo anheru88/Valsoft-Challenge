@@ -9,6 +9,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { apiErrorCode, fieldErrors } from '../../core/api/api-error';
 import { businessMessage } from '../../core/api/error-message';
 import { AuthStore } from '../../core/auth.store';
+import { HasUnsavedChanges } from '../../core/guards/pending-changes.guard';
 import { PageHeader } from '../../shared/ui/page-header';
 import { RoleBadge } from '../../shared/ui/role-badge';
 import { InlineAlert } from '../../shared/ui/inline-alert';
@@ -42,7 +43,10 @@ function passwordsMatch(group: AbstractControl): ValidationErrors | null {
     .form-actions { justify-content: flex-start; margin-top: var(--sp-2); }
   `],
 })
-export class ProfilePage {
+export class ProfilePage implements HasUnsavedChanges {
+  /** Guards against leaving a half-typed password change (PRD 8.4). */
+  hasUnsavedChanges(): boolean { return this.form.dirty; }
+
   private readonly fb = inject(FormBuilder);
   private readonly auth = inject(AuthStore);
   private readonly api = inject(AuthApiService);

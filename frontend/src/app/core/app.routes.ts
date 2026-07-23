@@ -2,6 +2,7 @@ import { Routes } from '@angular/router';
 import { authGuard } from './guards/auth.guard';
 import { guestGuard } from './guards/guest.guard';
 import { permissionGuard } from './guards/permission.guard';
+import { pendingChangesGuard } from './guards/pending-changes.guard';
 
 export const APP_ROUTES: Routes = [
   // The public front door. `pathMatch: 'full'` keeps it from swallowing /login.
@@ -29,9 +30,9 @@ export const APP_ROUTES: Routes = [
       { path: 'dashboard', title: 'Dashboard — Librarium', canActivate: [permissionGuard(['dashboard.view'])], loadComponent: () => import('../features/dashboard/dashboard-page').then(m => m.DashboardPage) },
 
       { path: 'books', title: 'Books — Librarium', loadComponent: () => import('../features/books/list/books-list-page').then(m => m.BooksListPage) },
-      { path: 'books/new', title: 'New book — Librarium', canActivate: [permissionGuard(['catalog.manage'])], loadComponent: () => import('../features/books/form/book-form-page').then(m => m.BookFormPage) },
+      { path: 'books/new', title: 'New book — Librarium', canActivate: [permissionGuard(['catalog.manage'])], canDeactivate: [pendingChangesGuard], loadComponent: () => import('../features/books/form/book-form-page').then(m => m.BookFormPage) },
       { path: 'books/:id', title: 'Book detail — Librarium', loadComponent: () => import('../features/books/detail/book-detail-page').then(m => m.BookDetailPage) },
-      { path: 'books/:id/edit', title: 'Edit book — Librarium', canActivate: [permissionGuard(['catalog.manage'])], loadComponent: () => import('../features/books/form/book-form-page').then(m => m.BookFormPage) },
+      { path: 'books/:id/edit', title: 'Edit book — Librarium', canActivate: [permissionGuard(['catalog.manage'])], canDeactivate: [pendingChangesGuard], loadComponent: () => import('../features/books/form/book-form-page').then(m => m.BookFormPage) },
 
       { path: 'authors', title: 'Authors — Librarium', loadComponent: () => import('../features/authors/authors-list-page').then(m => m.AuthorsListPage) },
       { path: 'categories', title: 'Categories — Librarium', loadComponent: () => import('../features/categories/categories-list-page').then(m => m.CategoriesListPage) },
@@ -41,14 +42,14 @@ export const APP_ROUTES: Routes = [
       { path: 'my-loans', title: 'My loans — Librarium', loadComponent: () => import('../features/loans/my-loans/my-loans-page').then(m => m.MyLoansPage) },
 
       { path: 'users', title: 'Users — Librarium', canActivate: [permissionGuard(['users.view-any'])], loadComponent: () => import('../features/users/list/users-list-page').then(m => m.UsersListPage) },
-      { path: 'users/new', title: 'New user — Librarium', canActivate: [permissionGuard(['users.create-any', 'users.create-member'])], loadComponent: () => import('../features/users/form/user-form-page').then(m => m.UserFormPage) },
-      { path: 'users/:id/edit', title: 'Edit user — Librarium', canActivate: [permissionGuard(['users.manage'])], loadComponent: () => import('../features/users/form/user-form-page').then(m => m.UserFormPage) },
+      { path: 'users/new', title: 'New user — Librarium', canActivate: [permissionGuard(['users.create-any', 'users.create-member'])], canDeactivate: [pendingChangesGuard], loadComponent: () => import('../features/users/form/user-form-page').then(m => m.UserFormPage) },
+      { path: 'users/:id/edit', title: 'Edit user — Librarium', canActivate: [permissionGuard(['users.manage'])], canDeactivate: [pendingChangesGuard], loadComponent: () => import('../features/users/form/user-form-page').then(m => m.UserFormPage) },
 
       { path: 'reports', title: 'Reports — Librarium', canActivate: [permissionGuard(['reports.view'])], loadComponent: () => import('../features/reports/reports-page').then(m => m.ReportsPage) },
 
       { path: 'search', title: 'Search — Librarium', loadComponent: () => import('../features/search/search-page').then(m => m.SearchPage) },
 
-      { path: 'profile', title: 'Your profile — Librarium', loadComponent: () => import('../features/profile/profile-page').then(m => m.ProfilePage) },
+      { path: 'profile', title: 'Your profile — Librarium', canDeactivate: [pendingChangesGuard], loadComponent: () => import('../features/profile/profile-page').then(m => m.ProfilePage) },
 
       { path: '', pathMatch: 'full', redirectTo: 'books' },
     ],
