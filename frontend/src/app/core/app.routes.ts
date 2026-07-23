@@ -1,14 +1,20 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './guards/auth.guard';
+import { guestGuard } from './guards/guest.guard';
 import { permissionGuard } from './guards/permission.guard';
 
 export const APP_ROUTES: Routes = [
   {
     path: '',
+    canActivate: [guestGuard],
     loadComponent: () => import('./layouts/auth-layout/auth-layout').then(m => m.AuthLayout),
     children: [
       { path: 'login', title: 'Iniciar sesión — Librarium', loadComponent: () => import('../features/auth/login/login-page').then(m => m.LoginPage) },
       { path: 'register', title: 'Crear cuenta — Librarium', loadComponent: () => import('../features/auth/register/register-page').then(m => m.RegisterPage) },
+      // A visitor with no session lands here. Without this the bare path matches
+      // the layout, finds no child, and renders an empty outlet — Angular does
+      // not fall through to the next route with the same path.
+      { path: '', pathMatch: 'full', redirectTo: 'login' },
     ],
   },
   {
