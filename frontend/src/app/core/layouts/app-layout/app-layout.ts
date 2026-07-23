@@ -1,4 +1,4 @@
-import { Component, ElementRef, HostListener, ViewChild, computed, inject, signal } from '@angular/core';
+import { Component, ElementRef, HostListener, ViewChild, inject } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
@@ -10,6 +10,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatMenuModule } from '@angular/material/menu';
 import { AuthStore } from '../../auth.store';
+import { ThemeStore } from '../../theme.store';
 import { AuthApiService } from '../../../features/auth/data/auth-api.service';
 import { RoleBadge } from '../../../shared/ui/role-badge';
 
@@ -23,6 +24,7 @@ import { RoleBadge } from '../../../shared/ui/role-badge';
 })
 export class AppLayout {
   readonly auth = inject(AuthStore);
+  private readonly theme = inject(ThemeStore);
   private readonly api = inject(AuthApiService);
   private readonly router = inject(Router);
   private readonly bp = inject(BreakpointObserver);
@@ -30,7 +32,7 @@ export class AppLayout {
   @ViewChild('searchBox') searchBox?: ElementRef<HTMLInputElement>;
 
   searchTerm = '';
-  readonly dark = signal(document.body.classList.contains('dark-theme'));
+  readonly dark = this.theme.isDark;
   readonly isHandset = toSignal(
     this.bp.observe([Breakpoints.Handset]).pipe(map(r => r.matches)),
     { initialValue: false },
@@ -51,11 +53,7 @@ export class AppLayout {
     if (q.length >= 2) this.router.navigate(['/search'], { queryParams: { q } });
   }
 
-  toggleTheme(): void {
-    document.body.classList.toggle('dark-theme');
-    this.dark.set(document.body.classList.contains('dark-theme'));
-    localStorage.setItem('librarium.theme', this.dark() ? 'dark' : 'light');
-  }
+  toggleTheme(): void { this.theme.toggle(); }
 
   /**
    * The token is revoked server-side, then the session is dropped here.
