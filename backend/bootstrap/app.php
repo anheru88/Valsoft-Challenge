@@ -2,6 +2,7 @@
 
 use App\Exceptions\ApiExceptionRenderer;
 use App\Http\Middleware\AssignTraceId;
+use App\Http\Middleware\EnsureUserIsActive;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -20,6 +21,11 @@ return Application::configure(basePath: dirname(__DIR__))
         // First in the stack, so even a request rejected by a later middleware
         // still carries a trace id (RFC 8).
         $middleware->prependToGroup('api', AssignTraceId::class);
+
+        // 60 requests/minute per authenticated user (PRD 9, Security).
+        $middleware->throttleApi();
+
+        $middleware->alias(['active' => EnsureUserIsActive::class]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->render(new ApiExceptionRenderer);

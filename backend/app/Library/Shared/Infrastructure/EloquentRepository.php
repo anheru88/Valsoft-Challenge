@@ -33,7 +33,7 @@ abstract class EloquentRepository
      * @param  Builder<TModel>  $query
      * @return LengthAwarePaginator<int, TModel>
      */
-    protected function paginate(Builder $query, PaginationParams $pagination): LengthAwarePaginator
+    protected function paginateQuery(Builder $query, PaginationParams $pagination): LengthAwarePaginator
     {
         return $query->paginate(
             perPage: $pagination->perPage,
