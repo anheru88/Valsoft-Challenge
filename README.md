@@ -83,6 +83,16 @@ frontend:8080
   └ /storybook/  the component catalogue (static)
 ```
 
+**Exploring the API.** The backend port (`:8000`) exposes interactive API
+documentation, generated from the code by Scramble:
+
+- **http://localhost:8000/docs/api** — browsable API reference, try-it-out included;
+- `http://localhost:8000/docs/api.json` — the live OpenAPI document;
+- `http://localhost:8000/api/v1/…` — the API itself (the SPA reaches it through the
+  frontend proxy at `:8080/api/v1`, same contract).
+
+The same document is committed as [`backend/openapi.json`](backend/openapi.json).
+
 Configuration lives in the root `.env` (public host, ports, database credentials,
 `APP_KEY`). If ports `8080`, `8000` or `3306` are already taken on your machine —
 for instance by the local dev servers below — change `APP_PORT`, `BACKEND_PORT` or
