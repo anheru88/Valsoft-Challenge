@@ -24,7 +24,7 @@
       <lib-stat-card label="Books added (month)" [value]="k.books_added_this_month" />
       <lib-stat-card label="Loans (month)" [value]="k.loans_this_month" />
       <lib-stat-card label="Returns (month)" [value]="k.returns_this_month" />
-      <lib-stat-card label="Socios" [value]="k.total_members" />
+      <lib-stat-card label="Members" [value]="k.total_members" />
     </div>
   }
 
@@ -33,7 +33,7 @@
     <section class="card" aria-labelledby="activity-title">
       <h2 id="activity-title" class="widget-title">Recent activity</h2>
       <ol class="activity">
-        @for (item of activity(); track item.id) {
+        @for (item of activity(); track $index) {
           <li>
             <mat-icon class="act-icon" [class.return]="item.type === 'loan_returned'" aria-hidden="true">
               {{ item.type === 'loan_returned' ? 'assignment_turned_in' : item.type === 'loan_created' ? 'swap_horiz' : 'library_add' }}
@@ -54,13 +54,13 @@
     <section class="card" aria-labelledby="cats-title">
       <h2 id="cats-title" class="widget-title">Books by category</h2>
       <ul class="bars">
-        @for (c of byCategory(); track c.name) {
+        @for (c of byCategory(); track c.category.id) {
           <li>
-            <span class="bar-label">{{ c.name }}</span>
+            <span class="bar-label">{{ c.category.name }}</span>
             <span class="bar-track" aria-hidden="true">
-              <span class="bar-fill" [style.width.%]="(c.count / maxCategoryCount()) * 100"></span>
+              <span class="bar-fill" [style.width.%]="(c.books_count / maxCategoryCount()) * 100"></span>
             </span>
-            <span class="mono">{{ c.count }}</span>
+            <span class="mono">{{ c.books_count }}</span>
           </li>
         }
       </ul>
@@ -68,14 +68,14 @@
   </div>
 
   <div class="two-col section">
-    <!-- Authors populares -->
+    <!-- Most borrowed authors -->
     <section class="card" aria-labelledby="authors-title">
       <h2 id="authors-title" class="widget-title">Most borrowed authors <span class="faint">(30 days)</span></h2>
       <table class="lib-table">
-        <thead><tr><th>Autor</th><th class="num">Loans</th></tr></thead>
+        <thead><tr><th>Author</th><th class="num">Loans</th></tr></thead>
         <tbody>
-          @for (a of popularAuthors(); track a.name) {
-            <tr><td>{{ a.name }}</td><td class="num mono">{{ a.loans }}</td></tr>
+          @for (a of popularAuthors(); track a.author.id) {
+            <tr><td>{{ a.author.name }}</td><td class="num mono">{{ a.loans_count }}</td></tr>
           }
         </tbody>
       </table>

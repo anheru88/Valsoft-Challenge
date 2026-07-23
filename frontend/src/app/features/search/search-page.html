@@ -1,8 +1,12 @@
 <div class="page">
   <lib-page-header title="Search results"
-                   [subtitle]="query() ? results().length + ' resultados para «' + query() + '»' : 'Type something to search'" />
+                   [subtitle]="query() ? total() + ' results for «' + query() + '»' : 'Type something to search'" />
 
-  @if (query() && results().length === 0) {
+  @if (loading()) {
+    <lib-skeleton variant="rows" [rows]="4" />
+  } @else if (error()) {
+    <lib-error-state title="Could not run the search" (retry)="retry()" />
+  } @else if (query() && results().length === 0) {
     <lib-empty-state icon="search_off" title="Nothing here"
                      [message]="'No results for «' + query() + '». Check the spelling, or try the ISBN.'" />
   } @else {
@@ -14,6 +18,7 @@
               <a class="title" [routerLink]="['/books', b.id]">{{ b.title }}</a>
               <div class="muted">{{ authorNames(b) }}</div>
               <div class="faint mono">{{ b.isbn }}</div>
+              @if (matchedOn(b)) { <div class="matched">Matched on {{ matchedOn(b) }}</div> }
             </div>
             <lib-availability-badge [available]="b.available_copies" [total]="b.total_copies" />
           </div>
