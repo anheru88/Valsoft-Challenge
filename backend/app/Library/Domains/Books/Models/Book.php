@@ -25,6 +25,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property string|null $cover_url
  * @property int $total_copies
  * @property int $available_copies
+ * @property-read int|null $active_loans_count aliased withCount, present on repository queries
  */
 class Book extends Model
 {

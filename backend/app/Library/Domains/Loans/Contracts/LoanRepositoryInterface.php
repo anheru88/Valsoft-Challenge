@@ -16,4 +16,9 @@ interface LoanRepositoryInterface
      * BR-LOAN-2.
      */
     public function countActiveForUser(int $userId): int;
+
+    /**
+     * Open loans against a title — the guard for BR-BOOK-4.
+     */
+    public function countActiveForBook(int $bookId): int;
 }

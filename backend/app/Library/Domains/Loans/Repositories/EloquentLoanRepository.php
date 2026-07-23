@@ -16,4 +16,12 @@ final class EloquentLoanRepository implements LoanRepositoryInterface
             ->whereNull('returned_at')
             ->count();
     }
+
+    public function countActiveForBook(int $bookId): int
+    {
+        return Loan::query()
+            ->where('book_id', $bookId)
+            ->whereNull('returned_at')
+            ->count();
+    }
 }

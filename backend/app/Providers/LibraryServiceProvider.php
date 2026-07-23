@@ -6,6 +6,18 @@ namespace App\Providers;
 
 use App\Library\Domains\Auth\Contracts\TokenIssuer;
 use App\Library\Domains\Auth\Infrastructure\SanctumTokenIssuer;
+use App\Library\Domains\Authors\Contracts\AuthorRepositoryInterface;
+use App\Library\Domains\Authors\Models\Author;
+use App\Library\Domains\Authors\Policies\AuthorPolicy;
+use App\Library\Domains\Authors\Repositories\EloquentAuthorRepository;
+use App\Library\Domains\Books\Contracts\BookRepositoryInterface;
+use App\Library\Domains\Books\Models\Book;
+use App\Library\Domains\Books\Policies\BookPolicy;
+use App\Library\Domains\Books\Repositories\EloquentBookRepository;
+use App\Library\Domains\Categories\Contracts\CategoryRepositoryInterface;
+use App\Library\Domains\Categories\Models\Category;
+use App\Library\Domains\Categories\Policies\CategoryPolicy;
+use App\Library\Domains\Categories\Repositories\EloquentCategoryRepository;
 use App\Library\Domains\Loans\Contracts\LoanRepositoryInterface;
 use App\Library\Domains\Loans\Repositories\EloquentLoanRepository;
 use App\Library\Domains\Users\Contracts\UserRepositoryInterface;
@@ -44,6 +56,9 @@ class LibraryServiceProvider extends ServiceProvider
 
         $this->app->bind(UserRepositoryInterface::class, EloquentUserRepository::class);
         $this->app->bind(LoanRepositoryInterface::class, EloquentLoanRepository::class);
+        $this->app->bind(BookRepositoryInterface::class, EloquentBookRepository::class);
+        $this->app->bind(AuthorRepositoryInterface::class, EloquentAuthorRepository::class);
+        $this->app->bind(CategoryRepositoryInterface::class, EloquentCategoryRepository::class);
     }
 
     public function boot(): void
@@ -53,6 +68,9 @@ class LibraryServiceProvider extends ServiceProvider
         Event::listen(DomainEvent::class, RecordDomainEventAudit::class);
 
         Gate::policy(User::class, UserPolicy::class);
+        Gate::policy(Book::class, BookPolicy::class);
+        Gate::policy(Author::class, AuthorPolicy::class);
+        Gate::policy(Category::class, CategoryPolicy::class);
 
         $this->registerRateLimiters();
 
