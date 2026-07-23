@@ -28,6 +28,11 @@
   border-bottom: 1px solid var(--lib-line);
 }
 
+/* Rides the topbar's lower edge so it never shifts the content beneath it. */
+.global-loading {
+  position: absolute; left: 0; right: 0; bottom: -1px;
+}
+
 .global-search {
   display: flex; align-items: center; gap: var(--sp-2);
   width: min(420px, 50vw);

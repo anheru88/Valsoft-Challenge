@@ -91,6 +91,11 @@
         <a mat-menu-item routerLink="/profile" fragment="password"><mat-icon>key</mat-icon> Change password</a>
         <button mat-menu-item (click)="logout()"><mat-icon>logout</mat-icon> Sign out</button>
       </mat-menu>
+
+      <!-- Global activity bar (PRD 8.4): any request in flight lights it. -->
+      @if (loading.active()) {
+        <mat-progress-bar class="global-loading" mode="indeterminate" aria-label="Loading" />
+      }
     </header>
 
     <main id="main" role="main">

@@ -9,8 +9,10 @@ import { MatListModule } from '@angular/material/list';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatMenuModule } from '@angular/material/menu';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { AuthStore } from '../../auth.store';
 import { ThemeStore } from '../../theme.store';
+import { LoadingStore } from '../../loading.store';
 import { AuthApiService } from '../../../features/auth/data/auth-api.service';
 import { RoleBadge } from '../../../shared/ui/role-badge';
 
@@ -18,12 +20,14 @@ import { RoleBadge } from '../../../shared/ui/role-badge';
   selector: 'lib-app-layout',
   standalone: true,
   imports: [RouterOutlet, RouterLink, RouterLinkActive, FormsModule,
-            MatSidenavModule, MatListModule, MatIconModule, MatButtonModule, MatMenuModule, RoleBadge],
+            MatSidenavModule, MatListModule, MatIconModule, MatButtonModule, MatMenuModule,
+            MatProgressBarModule, RoleBadge],
   templateUrl: './app-layout.html',
   styleUrl: './app-layout.scss',
 })
 export class AppLayout {
   readonly auth = inject(AuthStore);
+  readonly loading = inject(LoadingStore);
   private readonly theme = inject(ThemeStore);
   private readonly api = inject(AuthApiService);
   private readonly router = inject(Router);
