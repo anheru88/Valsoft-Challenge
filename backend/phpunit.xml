@@ -23,6 +23,12 @@
         <env name="BCRYPT_ROUNDS" value="4"/>
         <env name="BROADCAST_CONNECTION" value="null"/>
         <env name="CACHE_STORE" value="array"/>
+        <!--
+            The suite runs on SQLite for speed and zero setup. MariaDB-only
+            features (FULLTEXT, CHECK constraints, SELECT ... FOR UPDATE) are
+            guarded by driver checks, so they are exercised by pointing these
+            two values at a MariaDB `librarium_test` database in CI.
+        -->
         <env name="DB_CONNECTION" value="sqlite"/>
         <env name="DB_DATABASE" value=":memory:"/>
         <env name="DB_URL" value=""/>

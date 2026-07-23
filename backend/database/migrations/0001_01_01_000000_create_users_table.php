@@ -17,8 +17,18 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
+            // FR-PERM-1: a single role enum, deliberately chosen over role/permission
+            // tables for the MVP (ADR-3).
+            $table->enum('role', ['admin', 'librarian', 'member'])->default('member');
+            // FR-USER-6: deactivated users cannot authenticate.
+            $table->boolean('is_active')->default(true);
             $table->rememberToken();
+            // FR-USER-4: soft deletes keep historical loans referentially intact.
+            $table->softDeletes();
             $table->timestamps();
+
+            // FR-USER-1: the admin user list filters by role and status.
+            $table->index(['role', 'is_active']);
         });
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {
