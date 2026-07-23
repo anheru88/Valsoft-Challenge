@@ -7,7 +7,8 @@ the API in `../backend`.
 
 ```bash
 npm install
-npm start           # http://localhost:4200
+npm start                  # http://localhost:4200
+npm start -- --port 4300   # if something else already holds 4200
 ```
 
 `ng serve` proxies to `http://localhost:8000` (see `proxy.conf.json`), so with

@@ -19,10 +19,11 @@ php artisan migrate --seed
 php artisan serve
 ```
 
-`.env.example` points at MariaDB, the production engine. For a zero-setup local
-run, set `DB_CONNECTION=sqlite` and `touch database/database.sqlite` — the
-migrations apply MariaDB-only features (FULLTEXT, CHECK constraints) behind
-driver checks, so the schema builds on both.
+`.env.example` defaults to SQLite so a clone runs with no external services:
+`touch database/database.sqlite` and migrate. MariaDB is the production engine —
+uncomment its block in the env file to use it. The migrations apply the
+MariaDB-only features (FULLTEXT indexes, CHECK constraints) behind driver
+checks, so the schema builds on both.
 
 The demo seeder builds a small library with a year of history behind it: 81
 titles by 57 authors across 8 categories, 38 accounts and ~340 loans spread over
