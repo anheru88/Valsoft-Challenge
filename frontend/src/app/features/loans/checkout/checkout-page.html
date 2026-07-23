@@ -1,13 +1,13 @@
 <div class="page narrow">
   <lib-page-header title="Lend a book"
-                   subtitle="Flujo de mostrador: socio, libro y fecha en menos de 30 segundos" />
+                   subtitle="The desk flow: member, book and date in under 30 seconds" />
 
   <form class="card card-pad" [formGroup]="form" (ngSubmit)="submit()" novalidate>
 
-    <!-- 1 · Socio -->
-    <h2 class="step">1 · Socio</h2>
+    <!-- 1 · Member -->
+    <h2 class="step">1 · Member</h2>
     <mat-form-field appearance="outline" class="full">
-      <mat-label>Find a member por nombre o correo</mat-label>
+      <mat-label>Find a member by name or email</mat-label>
       <input matInput formControlName="memberQuery" [matAutocomplete]="memberAuto" />
       <mat-icon matSuffix>person_search</mat-icon>
       <mat-autocomplete #memberAuto="matAutocomplete" (optionSelected)="selectMember($event.option.value)"
@@ -22,24 +22,24 @@
       <div class="member-summary" [class.blocked]="memberBlocked()">
         <div class="row">
           <strong>{{ m.name }}</strong>
-          <span class="mono muted">{{ m.active_loans_count }}/5 loans</span>
+          <span class="mono muted">{{ m.active_loans_count }}/{{ loanLimit }} loans</span>
         </div>
         @if (memberOverdue()) {
           <lib-inline-alert tone="danger">
-            Este socio tiene loans vencidos. Debe devolverlos antes de llevarse otro libro.
+            This member has overdue loans. They must return them before taking another book.
           </lib-inline-alert>
         } @else if (memberAtLimit()) {
           <lib-inline-alert tone="danger">
-            This member already holds 5 active loans (the limit). They must return one before taking another.
+            This member already holds {{ loanLimit }} active loans (the limit). They must return one before taking another.
           </lib-inline-alert>
-        } @else if (m.active_loans_count === 4) {
+        } @else if (m.active_loans_count === loanLimit - 1) {
           <lib-inline-alert tone="warn">One loan left before they reach the limit.</lib-inline-alert>
         }
       </div>
     }
 
-    <!-- 2 · Libro -->
-    <h2 class="step">2 · Libro</h2>
+    <!-- 2 · Book -->
+    <h2 class="step">2 · Book</h2>
     <mat-form-field appearance="outline" class="full">
       <mat-label>Search by title or ISBN (barcode scanner friendly)</mat-label>
       <input matInput formControlName="bookQuery" [matAutocomplete]="bookAuto" class="mono-input" />
@@ -50,7 +50,7 @@
           <mat-option [value]="b" [disabled]="b.available_copies === 0">
             {{ b.title }}
             <span class="faint mono">· {{ b.isbn }}</span>
-            <span class="faint">· {{ b.available_copies }} disp.</span>
+            <span class="faint">· {{ b.available_copies }} free</span>
           </mat-option>
         }
       </mat-autocomplete>
@@ -65,6 +65,11 @@
         </div>
         <lib-availability-badge [available]="b.available_copies" [total]="b.total_copies" />
       </div>
+      @if (b.available_copies === 0) {
+        <lib-inline-alert tone="danger">
+          No copies of this title are available right now.
+        </lib-inline-alert>
+      }
       @if (duplicateTitle()) {
         <lib-inline-alert tone="danger">
           The member already has a copy of this title on loan. They cannot take two of the same.
@@ -88,7 +93,7 @@
     @if (serverError()) { <lib-inline-alert tone="danger">{{ serverError() }}</lib-inline-alert> }
 
     <div class="form-actions">
-      <button mat-button type="button" (click)="reset()">Limpiar</button>
+      <button mat-button type="button" (click)="reset()">Clear</button>
       <button mat-flat-button color="primary" type="submit"
               [disabled]="!canSubmit() || saving()">
         Record the loan

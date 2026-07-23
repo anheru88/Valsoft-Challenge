@@ -6,11 +6,14 @@ import { Loan } from '../../../core/models';
 import { PageHeader } from '../../../shared/ui/page-header';
 import { DueStamp } from '../../../shared/ui/due-stamp';
 import { EmptyState } from '../../../shared/ui/empty-state';
+import { ErrorState } from '../../../shared/ui/error-state';
+import { Skeleton } from '../../../shared/ui/skeleton';
+import { LoansApiService } from '../data/loans-api.service';
 
 @Component({
   selector: 'lib-my-loans-page',
   standalone: true,
-  imports: [RouterLink, DatePipe, MatTabsModule, PageHeader, DueStamp, EmptyState],
+  imports: [RouterLink, DatePipe, MatTabsModule, PageHeader, DueStamp, EmptyState, ErrorState, Skeleton],
   templateUrl: './my-loans-page.html',
   styles: [`
     .loan-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: var(--sp-4); padding-top: var(--sp-4); }
@@ -22,26 +25,44 @@ import { EmptyState } from '../../../shared/ui/empty-state';
 })
 export class MyLoansPage {
   private readonly router = inject(Router);
+  private readonly api = inject(LoansApiService);
 
-  // TODO API: GET /api/v1/loans — el API lo limita al socio autenticado
-  // (FR-LOAN-5), and ?status=returned gives the history. Demo data for now:
-  readonly loans = signal<Loan[]>([
-    { id: 601, status: 'active', loaned_at: '2026-07-14', due_date: '2026-07-28', returned_at: null, days_overdue: 0,
-      user: { id: 34, name: 'Marta Ruiz', email: 'marta@example.com' },
-      book: { id: 1, title: 'One Hundred Years of Solitude', isbn: '9780307474728' } },
-    { id: 600, status: 'overdue', loaned_at: '2026-06-30', due_date: '2026-07-14', returned_at: null, days_overdue: 8,
-      user: { id: 34, name: 'Marta Ruiz', email: 'marta@example.com' },
-      book: { id: 7, title: 'La ciudad y sus muros inciertos', isbn: '9788411074278' } },
-    { id: 590, status: 'returned', loaned_at: '2026-05-02', due_date: '2026-05-16', returned_at: '2026-05-12', days_overdue: 0,
-      user: { id: 34, name: 'Marta Ruiz', email: 'marta@example.com' },
-      book: { id: 3, title: 'Matilda', isbn: '9788420482880' } },
-  ]);
+  readonly loading = signal(true);
+  readonly error = signal(false);
+  readonly loans = signal<Loan[]>([]);
 
   readonly activeLoans = computed(() => this.loans().filter(l => l.status !== 'returned'));
   readonly history = computed(() => this.loans().filter(l => l.status === 'returned'));
 
+  constructor() {
+    this.load();
+  }
+
+  /**
+   * `GET /loans` is scoped by the server to the signed-in member (FR-LOAN-5),
+   * so there is no user id to send — and no way to ask for someone else's.
+   * A member is capped at five active loans, so one page holds everything that
+   * matters; the history is capped at a sensible page rather than paginated.
+   */
+  load(): void {
+    this.loading.set(true);
+    this.error.set(false);
+
+    this.api.list({ sort: 'due_date', direction: 'asc', per_page: 50 }).subscribe({
+      next: page => {
+        this.loans.set(page.data);
+        this.loading.set(false);
+      },
+      error: () => {
+        this.loading.set(false);
+        this.error.set(true);
+      },
+    });
+  }
+
   daysLeft(l: Loan): number {
     return Math.max(0, Math.ceil((new Date(l.due_date).getTime() - Date.now()) / 86_400_000));
   }
+
   goCatalog(): void { this.router.navigate(['/books']); }
 }

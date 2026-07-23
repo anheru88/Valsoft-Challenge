@@ -1,4 +1,4 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
@@ -6,75 +6,92 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { Loan, LoanStatus } from '../../../core/models';
+import { businessMessage } from '../../../core/api/error-message';
+import { Loan } from '../../../core/models';
 import { PageHeader } from '../../../shared/ui/page-header';
-import { SearchInput } from '../../../shared/ui/search-input';
 import { DueStamp } from '../../../shared/ui/due-stamp';
 import { StatusChip } from '../../../shared/ui/status-chip';
+import { InlineAlert } from '../../../shared/ui/inline-alert';
 import { Skeleton } from '../../../shared/ui/skeleton';
 import { EmptyState } from '../../../shared/ui/empty-state';
 import { ErrorState } from '../../../shared/ui/error-state';
-
-type StatusFilter = LoanStatus | 'all';
+import { LoansApiService } from '../data/loans-api.service';
+import { LoansStore, StatusFilter } from '../data/loans.store';
 
 @Component({
   selector: 'lib-loans-list-page',
   standalone: true,
   imports: [RouterLink, DatePipe, MatButtonModule, MatIconModule, MatTabsModule, MatPaginatorModule,
-            PageHeader, SearchInput, DueStamp, StatusChip, Skeleton, EmptyState, ErrorState],
+            PageHeader, DueStamp, StatusChip, InlineAlert, Skeleton, EmptyState, ErrorState],
+  providers: [LoansStore],
   templateUrl: './loans-list-page.html',
   styleUrl: './loans-list-page.scss',
 })
 export class LoansListPage {
   private readonly router = inject(Router);
   private readonly snack = inject(MatSnackBar);
+  private readonly store = inject(LoansStore);
+  private readonly api = inject(LoansApiService);
 
   readonly tabs: { value: StatusFilter; label: string }[] = [
     { value: 'all', label: 'All' }, { value: 'active', label: 'Active' },
     { value: 'overdue', label: 'Overdue' }, { value: 'returned', label: 'Returned' },
   ];
 
-  readonly loading = signal(false);
-  readonly error = signal(false);
-  readonly statusFilter = signal<StatusFilter>('all');
+  readonly loading = this.store.loading;
+  readonly error = this.store.error;
+  readonly loans = this.store.loans;
+  readonly meta = this.store.meta;
+  readonly statusFilter = this.store.statusFilter;
+
   readonly returningId = signal<number | null>(null);
-  readonly meta = signal({ current_page: 1, per_page: 15, total: 3, last_page: 1 });
+  readonly actionError = signal<string | null>(null);
 
-  // Demo data — GET /api/v1/loans?status&q&page (due_date ascending by default: the urgent ones first)
-  readonly allLoans = signal<Loan[]>([
-    { id: 501, status: 'overdue', loaned_at: '2026-06-26', due_date: '2026-07-10', returned_at: null, days_overdue: 12,
-      user: { id: 21, name: 'Lucía Gómez', email: 'lucia@example.com' },
-      book: { id: 2, title: 'El infinito en un junco', isbn: '9788417860790' } },
-    { id: 502, status: 'active', loaned_at: '2026-07-14', due_date: '2026-07-28', returned_at: null, days_overdue: 0,
-      user: { id: 34, name: 'Marta Ruiz', email: 'marta@example.com' },
-      book: { id: 1, title: 'One Hundred Years of Solitude', isbn: '9780307474728' } },
-    { id: 503, status: 'returned', loaned_at: '2026-06-20', due_date: '2026-07-04', returned_at: '2026-07-01', days_overdue: 0,
-      user: { id: 40, name: 'Jorge Peña', email: 'jorge@example.com' },
-      book: { id: 3, title: 'Matilda', isbn: '9788420482880' } },
-  ]);
+  /**
+   * The badge counts every late loan in the library, not the late ones on this
+   * page — which is why it is its own request rather than a filter over `loans`.
+   */
+  readonly overdueCount = signal(0);
 
-  readonly loans = computed(() => {
-    const f = this.statusFilter();
-    return f === 'all' ? this.allLoans() : this.allLoans().filter(l => l.status === f);
-  });
-  readonly overdueCount = computed(() => this.allLoans().filter(l => l.status === 'overdue').length);
-
-  setStatus(s: StatusFilter): void { this.statusFilter.set(s); this.load(); }
-  onSearch(q: string): void { void q; this.load(); }
-  onPage(e: PageEvent): void {
-    this.meta.update(m => ({ ...m, current_page: e.pageIndex + 1, per_page: e.pageSize }));
-    this.load();
+  constructor() {
+    this.countOverdue();
   }
+
+  setStatus(s: StatusFilter): void { this.store.setStatus(s); }
+
+  onPage(e: PageEvent): void { this.store.setPage(e.pageIndex + 1, e.pageSize); }
+
   goCheckout(): void { this.router.navigate(['/loans/checkout']); }
 
   /** One-click check-in: the most frequent action at the desk. */
   checkIn(l: Loan): void {
     this.returningId.set(l.id);
-    // TODO API: POST /api/v1/loans/{id}/return
-    //  200 → toast and refresh; 409 LOAN_ALREADY_RETURNED → refresh the row (another librarian got there first).
-    this.snack.open('«' + l.book.title + '» devuelto', undefined, { duration: 4000 });
-    this.returningId.set(null);
+    this.actionError.set(null);
+
+    this.api.checkIn(l.id).subscribe({
+      next: () => {
+        this.returningId.set(null);
+        this.snack.open('«' + l.book.title + '» checked in', undefined, { duration: 4000 });
+        this.store.reload();
+        this.countOverdue();
+      },
+      error: (err: unknown) => {
+        this.returningId.set(null);
+        // 409 LOAN_ALREADY_RETURNED means another librarian got there first, so
+        // the row on screen is stale: say so and refresh it.
+        this.actionError.set(businessMessage(err));
+        this.store.reload();
+      },
+    });
   }
 
-  load(): void { /* TODO API */ }
+  load(): void {
+    this.store.reload();
+    this.countOverdue();
+  }
+
+  private countOverdue(): void {
+    this.api.list({ status: 'overdue', per_page: 1 })
+      .subscribe({ next: page => this.overdueCount.set(page.meta.total), error: () => this.overdueCount.set(0) });
+  }
 }

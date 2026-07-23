@@ -1,57 +1,63 @@
 <div class="page">
-  <lib-page-header title="My loans" [subtitle]="activeLoans().length + ' de 5 loans en uso'" />
+  <lib-page-header title="My loans" [subtitle]="activeLoans().length + ' of 5 loans in use'" />
 
-  <mat-tab-group>
-    <mat-tab label="Active">
-      @if (activeLoans().length === 0) {
-        <lib-empty-state icon="menu_book" title="You have no books on loan"
-                         message="Browse the catalogue and ask for your next book at the desk."
-                         actionLabel="Browse the catalogue" (action)="goCatalog()" />
-      } @else {
-        <div class="loan-cards">
-          @for (l of activeLoans(); track l.id) {
-            <article class="card card-pad loan-card" [class.overdue]="l.status === 'overdue'">
-              <div class="row">
-                <div class="grow">
-                  <a class="strong" [routerLink]="['/books', l.book.id]">{{ l.book.title }}</a>
-                  <div class="faint mono">{{ l.book.isbn }}</div>
+  @if (loading()) {
+    <lib-skeleton variant="rows" [rows]="3" />
+  } @else if (error()) {
+    <lib-error-state title="Could not load your loans" (retry)="load()" />
+  } @else {
+    <mat-tab-group>
+      <mat-tab label="Active">
+        @if (activeLoans().length === 0) {
+          <lib-empty-state icon="menu_book" title="You have no books on loan"
+                           message="Browse the catalogue and ask for your next book at the desk."
+                           actionLabel="Browse the catalogue" (action)="goCatalog()" />
+        } @else {
+          <div class="loan-cards">
+            @for (l of activeLoans(); track l.id) {
+              <article class="card card-pad loan-card" [class.overdue]="l.status === 'overdue'">
+                <div class="row">
+                  <div class="grow">
+                    <a class="strong" [routerLink]="['/books', l.book.id]">{{ l.book.title }}</a>
+                    <div class="faint mono">{{ l.book.isbn }}</div>
+                  </div>
+                  <lib-due-stamp [status]="l.status" [dueDate]="l.due_date" [daysOverdue]="l.days_overdue" />
                 </div>
-                <lib-due-stamp [status]="l.status" [dueDate]="l.due_date" [daysOverdue]="l.days_overdue" />
-              </div>
-              <p class="muted small">
-                Prestado el {{ l.loaned_at | date: 'd MMMM' }} ·
-                @if (l.status === 'overdue') {
-                  <span class="danger-text">Please return it at the desk as soon as you can.</span>
-                } @else {
-                  Quedan {{ daysLeft(l) }} days.
-                }
-              </p>
-            </article>
-          }
-        </div>
-      }
-    </mat-tab>
+                <p class="muted small">
+                  Borrowed on {{ l.loaned_at | date: 'd MMMM' }} ·
+                  @if (l.status === 'overdue') {
+                    <span class="danger-text">Please return it at the desk as soon as you can.</span>
+                  } @else {
+                    {{ daysLeft(l) }} days left.
+                  }
+                </p>
+              </article>
+            }
+          </div>
+        }
+      </mat-tab>
 
-    <mat-tab label="History">
-      @if (history().length === 0) {
-        <lib-empty-state icon="history" title="You have not returned a book yet"
-                         message="Your reading history will show up here." />
-      } @else {
-        <div class="card hist">
-          <table class="lib-table" aria-label="History de loans">
-            <thead><tr><th>Libro</th><th>Prestado</th><th>Devuelto</th></tr></thead>
-            <tbody>
-              @for (l of history(); track l.id) {
-                <tr>
-                  <td><a [routerLink]="['/books', l.book.id]">{{ l.book.title }}</a></td>
-                  <td class="mono muted">{{ l.loaned_at | date: 'd MMM y' }}</td>
-                  <td><lib-due-stamp status="returned" [dueDate]="l.due_date" [returnedAt]="l.returned_at" /></td>
-                </tr>
-              }
-            </tbody>
-          </table>
-        </div>
-      }
-    </mat-tab>
-  </mat-tab-group>
+      <mat-tab label="History">
+        @if (history().length === 0) {
+          <lib-empty-state icon="history" title="You have not returned a book yet"
+                           message="Your reading history will show up here." />
+        } @else {
+          <div class="card hist">
+            <table class="lib-table" aria-label="Loan history">
+              <thead><tr><th>Book</th><th>Borrowed</th><th>Returned</th></tr></thead>
+              <tbody>
+                @for (l of history(); track l.id) {
+                  <tr>
+                    <td><a [routerLink]="['/books', l.book.id]">{{ l.book.title }}</a></td>
+                    <td class="mono muted">{{ l.loaned_at | date: 'd MMM y' }}</td>
+                    <td><lib-due-stamp status="returned" [dueDate]="l.due_date" [returnedAt]="l.returned_at" /></td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+      </mat-tab>
+    </mat-tab-group>
+  }
 </div>

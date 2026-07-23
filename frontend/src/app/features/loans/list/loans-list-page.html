@@ -5,8 +5,9 @@
     </button>
   </lib-page-header>
 
-  <!-- Status tabs, plus a search by member or book -->
-  <nav mat-tab-nav-bar [tabPanel]="panel" aria-label="Filtrar por estado">
+  <!-- Status tabs; the filter is applied by the server, so the counts are the
+       library's and not this page's. -->
+  <nav mat-tab-nav-bar [tabPanel]="panel" aria-label="Filter by status">
     @for (t of tabs; track t.value) {
       <a mat-tab-link [active]="statusFilter() === t.value" (click)="setStatus(t.value)">
         {{ t.label }}
@@ -18,9 +19,9 @@
   </nav>
   <mat-tab-nav-panel #panel />
 
-  <div class="toolbar">
-    <lib-search-input placeholder="Member, title or ISBN…" (changed)="onSearch($event)" />
-  </div>
+  @if (actionError()) {
+    <lib-inline-alert tone="danger">{{ actionError() }}</lib-inline-alert>
+  }
 
   <div class="card">
     @if (loading()) {
@@ -30,13 +31,17 @@
     } @else if (loans().length === 0) {
       @switch (statusFilter()) {
         @case ('overdue') {
-          <lib-empty-state icon="task_alt" title="Nada vencido"
+          <lib-empty-state icon="task_alt" title="Nothing overdue"
                            message="Every loan is up to date. Good work." />
         }
         @case ('active') {
-          <lib-empty-state icon="swap_horiz" title="No loans activos"
+          <lib-empty-state icon="swap_horiz" title="No active loans"
                            message="Once you lend a book it will show up here."
                            actionLabel="Lend a book" (action)="goCheckout()" />
+        }
+        @case ('returned') {
+          <lib-empty-state icon="assignment_turned_in" title="Nothing returned yet"
+                           message="Checked-in loans are kept here as history." />
         }
         @default {
           <lib-empty-state icon="swap_horiz" title="No loans yet"
@@ -45,11 +50,11 @@
         }
       }
     } @else {
-      <table class="lib-table" aria-label="Listado de loans">
+      <table class="lib-table" aria-label="Loan list">
         <thead>
           <tr>
             <th>Member</th><th>Book</th><th>Lent</th><th>Due</th><th>Status</th>
-            <th class="actions-col"><span class="cdk-visually-hidden">Acciones</span></th>
+            <th class="actions-col"><span class="cdk-visually-hidden">Actions</span></th>
           </tr>
         </thead>
         <tbody>
