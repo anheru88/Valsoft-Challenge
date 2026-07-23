@@ -1,3 +1,4 @@
+import { provideHttpClient } from '@angular/common/http';
 import { Provider } from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { applicationConfig } from '@storybook/angular';
@@ -7,9 +8,10 @@ import { Permission, Role, User } from '../../core/models';
 /**
  * Shared scaffolding for the page stories.
  *
- * A page is not an isolated piece: it needs a router, and it reads the session
- * to decide what it offers. Seeding a concrete session here is what lets the
- * same screen be reviewed as an administrator, a librarian or a member.
+ * A page is not an isolated piece: it needs a router and an HTTP client, and it
+ * reads the session to decide what it offers. Seeding a concrete session here is
+ * what lets the same screen be reviewed as an administrator, a librarian or a
+ * member.
  */
 const PERMISSIONS: Record<Role, Permission[]> = {
   member: ['catalog.view'],
@@ -63,6 +65,12 @@ function authStoreFor(role: Role): Provider {
  */
 export function asRole(role: Role) {
   return applicationConfig({
-    providers: [provideRouter([{ path: '**', children: [] }]), authStoreFor(role)],
+    providers: [
+      provideRouter([{ path: '**', children: [] }]),
+      // Pages that talk to the API inject a service that needs it; the stories
+      // render their states from props and never fire a request.
+      provideHttpClient(),
+      authStoreFor(role),
+    ],
   });
 }

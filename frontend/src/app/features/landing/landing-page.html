@@ -1,0 +1,107 @@
+<header class="topbar">
+  <div class="wrap nav">
+    <a class="brand" routerLink="/"><span class="brand-mark">L</span> Librarium</a>
+    <nav class="nav-links" aria-label="Secciones">
+      <a href="#funciones">Funciones</a>
+      <a href="#roles">Para quién</a>
+    </nav>
+    <div class="nav-actions">
+      <a class="btn btn-ghost" routerLink="/login">Entrar</a>
+      <a class="btn btn-primary" routerLink="/register">Empezar</a>
+    </div>
+  </div>
+</header>
+
+<main>
+  <section class="hero">
+    <div class="wrap">
+      <span class="due-stamp">DEVOLVER · 24 JUL</span>
+      <h1>Tu biblioteca, <em>al día</em> y sin fichas de papel</h1>
+      <p class="lead">
+        Librarium reúne catálogo, préstamos y socios en un solo mostrador digital.
+        Presta un libro en menos de 30 segundos y no vuelvas a perder de vista un vencimiento.
+      </p>
+      <div class="hero-cta">
+        <a class="btn btn-primary" routerLink="/register">Crear mi biblioteca</a>
+        <a class="btn btn-ghost" href="#funciones">Ver cómo funciona</a>
+      </div>
+      <p class="hero-note">Sin tarjeta de crédito · Listo en una tarde</p>
+
+      <!-- Decorativa: enseña el sello de vencimiento, el elemento firma del sistema. -->
+      <div class="card-demo" aria-hidden="true">
+        @for (loan of sampleLoans; track loan.isbn) {
+          <div class="row">
+            <div>
+              <strong>{{ loan.title }}</strong>
+              <div class="sub mono">ISBN {{ loan.isbn }}</div>
+            </div>
+            <span class="due-stamp" [class]="loan.status">{{ loan.stamp }}</span>
+          </div>
+        }
+      </div>
+    </div>
+  </section>
+
+  <section id="funciones">
+    <div class="wrap">
+      <span class="eyebrow">Funciones</span>
+      <h2 class="section-title">Todo lo que pasa en el mostrador, en una pantalla</h2>
+      <p class="section-lead">
+        Pensado para bibliotecas pequeñas y medianas que quieren dejar atrás las hojas
+        de cálculo sin complicarse la vida.
+      </p>
+
+      <div class="features">
+        @for (feature of features; track feature.title) {
+          <article class="feature">
+            <div class="icon" aria-hidden="true">{{ feature.icon }}</div>
+            <h3>{{ feature.title }}</h3>
+            <p>{{ feature.body }}</p>
+          </article>
+        }
+      </div>
+    </div>
+  </section>
+
+  <section id="roles" class="roles">
+    <div class="wrap">
+      <span class="eyebrow">Para quién</span>
+      <h2 class="section-title">Un rol para cada persona de la biblioteca</h2>
+      <p class="section-lead">
+        Los permisos vienen configurados de serie, y la administración puede componer
+        roles nuevos sin tocar el código: nadie borra un catálogo por accidente.
+      </p>
+
+      <div class="roles-grid">
+        @for (role of roles; track role.tag) {
+          <article class="role" [class]="role.tone">
+            <span class="tag">{{ role.tag }}</span>
+            <h3>{{ role.verb }}</h3>
+            <ul>
+              @for (item of role.can; track item) {
+                <li>{{ item }}</li>
+              }
+            </ul>
+          </article>
+        }
+      </div>
+    </div>
+  </section>
+
+  <section id="empezar" class="cta">
+    <div class="wrap">
+      <div class="panel">
+        <h2>Abre tu mostrador digital hoy</h2>
+        <p>Importa tu catálogo, invita a tu equipo y registra el primer préstamo esta misma tarde.</p>
+        <a class="btn" routerLink="/register">Crear mi biblioteca</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>© {{ year }} Librarium</span>
+    <span class="mono">hecho para bibliotecas que prestan mucho</span>
+  </div>
+</footer>

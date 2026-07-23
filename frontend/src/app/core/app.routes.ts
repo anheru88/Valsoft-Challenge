@@ -4,6 +4,14 @@ import { guestGuard } from './guards/guest.guard';
 import { permissionGuard } from './guards/permission.guard';
 
 export const APP_ROUTES: Routes = [
+  // The public front door. `pathMatch: 'full'` keeps it from swallowing /login.
+  {
+    path: '',
+    pathMatch: 'full',
+    title: 'Librarium — El mostrador digital de tu biblioteca',
+    canActivate: [guestGuard],
+    loadComponent: () => import('../features/landing/landing-page').then(m => m.LandingPage),
+  },
   {
     path: '',
     canActivate: [guestGuard],
@@ -11,10 +19,6 @@ export const APP_ROUTES: Routes = [
     children: [
       { path: 'login', title: 'Iniciar sesión — Librarium', loadComponent: () => import('../features/auth/login/login-page').then(m => m.LoginPage) },
       { path: 'register', title: 'Crear cuenta — Librarium', loadComponent: () => import('../features/auth/register/register-page').then(m => m.RegisterPage) },
-      // A visitor with no session lands here. Without this the bare path matches
-      // the layout, finds no child, and renders an empty outlet — Angular does
-      // not fall through to the next route with the same path.
-      { path: '', pathMatch: 'full', redirectTo: 'login' },
     ],
   },
   {
