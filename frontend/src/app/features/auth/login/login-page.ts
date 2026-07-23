@@ -10,12 +10,13 @@ import { apiErrorCode } from '../../../core/api/api-error';
 import { AuthStore } from '../../../core/auth.store';
 import { InlineAlert } from '../../../shared/ui/inline-alert';
 import { AuthApiService } from '../data/auth-api.service';
+import { DemoAccount, DemoAccounts } from '../demo-accounts';
 
 @Component({
   selector: 'lib-login-page',
   standalone: true,
   imports: [ReactiveFormsModule, RouterLink, MatFormFieldModule, MatInputModule,
-            MatButtonModule, MatIconModule, MatProgressSpinnerModule, InlineAlert],
+            MatButtonModule, MatIconModule, MatProgressSpinnerModule, InlineAlert, DemoAccounts],
   templateUrl: './login-page.html',
   styles: [`
     h2 { margin: 0 0 var(--sp-4); }
@@ -42,6 +43,16 @@ export class LoginPage {
     email: ['', [Validators.required, Validators.email]],
     password: ['', Validators.required],
   });
+
+  /**
+   * Fills the form with a seeded account. It stops short of submitting: the
+   * reviewer sees the credentials that were used and presses the button
+   * themselves.
+   */
+  fillWith(account: DemoAccount): void {
+    this.errorMessage.set(null);
+    this.form.setValue({ email: account.email, password: account.password });
+  }
 
   submit(): void {
     this.errorMessage.set(null);

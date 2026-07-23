@@ -121,21 +121,10 @@
 
       <div class="demo-accounts">
         <h3>Sign in and look around</h3>
-        <p>Every account uses the password <code class="mono">password</code>.</p>
-        <table>
-          <thead>
-            <tr><th>Role</th><th>Email</th><th>What you will see</th></tr>
-          </thead>
-          <tbody>
-            @for (account of demoAccounts; track account.email) {
-              <tr>
-                <td>{{ account.role }}</td>
-                <td class="mono">{{ account.email }}</td>
-                <td>{{ account.sees }}</td>
-              </tr>
-            }
-          </tbody>
-        </table>
+        <p>
+          The seeded accounts are listed under the sign-in form, each with a button that
+          fills it in for you. Every one of them uses the password <code class="mono">password</code>.
+        </p>
         <a class="btn btn-primary" routerLink="/login">Sign in</a>
       </div>
     </div>

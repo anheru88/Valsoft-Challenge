@@ -1,8 +1,8 @@
 <div class="card card-pad">
-  <h2>Iniciar sesión</h2>
+  <h2>Sign in</h2>
 
   @if (sessionExpired()) {
-    <lib-inline-alert tone="info">Tu sesión ha caducado. Vuelve a iniciar sesión.</lib-inline-alert>
+    <lib-inline-alert tone="info">Your session has expired. Please sign in again.</lib-inline-alert>
   }
   @if (errorMessage()) {
     <lib-inline-alert tone="danger">{{ errorMessage() }}</lib-inline-alert>
@@ -10,30 +10,32 @@
 
   <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
     <mat-form-field appearance="outline" class="full">
-      <mat-label>Correo electrónico</mat-label>
+      <mat-label>Email</mat-label>
       <input matInput type="email" formControlName="email" autocomplete="email" />
-      @if (form.controls.email.hasError('required')) { <mat-error>Escribe tu correo.</mat-error> }
-      @if (form.controls.email.hasError('email')) { <mat-error>El correo no es válido.</mat-error> }
+      @if (form.controls.email.hasError('required')) { <mat-error>Enter your email.</mat-error> }
+      @if (form.controls.email.hasError('email')) { <mat-error>That email is not valid.</mat-error> }
     </mat-form-field>
 
     <mat-form-field appearance="outline" class="full">
-      <mat-label>Contraseña</mat-label>
+      <mat-label>Password</mat-label>
       <input matInput [type]="showPassword() ? 'text' : 'password'"
              formControlName="password" autocomplete="current-password" />
       <button mat-icon-button matSuffix type="button" (click)="showPassword.set(!showPassword())"
-              [attr.aria-label]="showPassword() ? 'Ocultar contraseña' : 'Mostrar contraseña'">
+              [attr.aria-label]="showPassword() ? 'Hide password' : 'Show password'">
         <mat-icon>{{ showPassword() ? 'visibility_off' : 'visibility' }}</mat-icon>
       </button>
-      @if (form.controls.password.hasError('required')) { <mat-error>Escribe tu contraseña.</mat-error> }
+      @if (form.controls.password.hasError('required')) { <mat-error>Enter your password.</mat-error> }
     </mat-form-field>
 
     <button mat-flat-button color="primary" class="full" type="submit" [disabled]="loading()">
       @if (loading()) { <mat-spinner diameter="18" class="btn-spinner" /> }
-      Entrar
+      Sign in
     </button>
   </form>
 
   <p class="alt muted">
-    ¿No tienes cuenta? <a routerLink="/register">Crea una cuenta de socio</a>
+    No account yet? <a routerLink="/register">Create a member account</a>
   </p>
+
+  <lib-demo-accounts (use)="fillWith($event)" />
 </div>

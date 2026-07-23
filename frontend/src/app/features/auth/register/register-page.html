@@ -1,40 +1,40 @@
 <div class="card card-pad">
-  <h2>Crear cuenta de socio</h2>
-  <p class="muted intro">Con tu cuenta puedes consultar el catálogo y seguir tus préstamos.</p>
+  <h2>Create a member account</h2>
+  <p class="muted intro">Your account lets you browse the catalogue and follow your loans.</p>
 
   @if (errorMessage()) { <lib-inline-alert tone="danger">{{ errorMessage() }}</lib-inline-alert> }
 
   <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
     <mat-form-field appearance="outline" class="full">
-      <mat-label>Nombre completo</mat-label>
+      <mat-label>Full name</mat-label>
       <input matInput formControlName="name" autocomplete="name" />
-      @if (form.controls.name.hasError('required')) { <mat-error>Escribe tu nombre.</mat-error> }
+      @if (form.controls.name.hasError('required')) { <mat-error>Enter your name.</mat-error> }
     </mat-form-field>
 
     <mat-form-field appearance="outline" class="full">
-      <mat-label>Correo electrónico</mat-label>
+      <mat-label>Email</mat-label>
       <input matInput type="email" formControlName="email" autocomplete="email" />
-      @if (form.controls.email.hasError('email')) { <mat-error>El correo no es válido.</mat-error> }
+      @if (form.controls.email.hasError('email')) { <mat-error>That email is not valid.</mat-error> }
       @if (serverErrors()['email']) { <mat-error>{{ serverErrors()['email'] }}</mat-error> }
     </mat-form-field>
 
     <mat-form-field appearance="outline" class="full">
-      <mat-label>Contraseña</mat-label>
+      <mat-label>Password</mat-label>
       <input matInput type="password" formControlName="password" autocomplete="new-password" />
-      <mat-hint>Mínimo 8 caracteres, con letras y números.</mat-hint>
-      @if (form.controls.password.hasError('minlength')) { <mat-error>Debe tener al menos 8 caracteres.</mat-error> }
+      <mat-hint>At least 8 characters, with letters and numbers.</mat-hint>
+      @if (form.controls.password.hasError('minlength')) { <mat-error>Must be at least 8 characters.</mat-error> }
     </mat-form-field>
 
     <mat-form-field appearance="outline" class="full">
-      <mat-label>Repite la contraseña</mat-label>
+      <mat-label>Repeat the password</mat-label>
       <input matInput type="password" formControlName="password_confirmation" autocomplete="new-password" />
-      @if (form.hasError('mismatch')) { <mat-error>Las contraseñas no coinciden.</mat-error> }
+      @if (form.hasError('mismatch')) { <mat-error>The passwords do not match.</mat-error> }
     </mat-form-field>
 
     <button mat-flat-button color="primary" class="full" type="submit" [disabled]="loading()">
-      Crear cuenta
+      Create account
     </button>
   </form>
 
-  <p class="alt muted">¿Ya tienes cuenta? <a routerLink="/login">Inicia sesión</a></p>
+  <p class="alt muted">Already have an account? <a routerLink="/login">Sign in</a></p>
 </div>

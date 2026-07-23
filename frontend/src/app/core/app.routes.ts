@@ -8,7 +8,7 @@ export const APP_ROUTES: Routes = [
   {
     path: '',
     pathMatch: 'full',
-    title: 'Librarium — El mostrador digital de tu biblioteca',
+    title: 'Librarium — The digital desk for your library',
     canActivate: [guestGuard],
     loadComponent: () => import('../features/landing/landing-page').then(m => m.LandingPage),
   },
@@ -17,8 +17,8 @@ export const APP_ROUTES: Routes = [
     canActivate: [guestGuard],
     loadComponent: () => import('./layouts/auth-layout/auth-layout').then(m => m.AuthLayout),
     children: [
-      { path: 'login', title: 'Iniciar sesión — Librarium', loadComponent: () => import('../features/auth/login/login-page').then(m => m.LoginPage) },
-      { path: 'register', title: 'Crear cuenta — Librarium', loadComponent: () => import('../features/auth/register/register-page').then(m => m.RegisterPage) },
+      { path: 'login', title: 'Sign in — Librarium', loadComponent: () => import('../features/auth/login/login-page').then(m => m.LoginPage) },
+      { path: 'register', title: 'Create account — Librarium', loadComponent: () => import('../features/auth/register/register-page').then(m => m.RegisterPage) },
     ],
   },
   {
