@@ -10,36 +10,39 @@
       <span class="brand-name">Librarium</span>
     </div>
 
+    <!-- Cada entrada se abre con la misma capacidad que exige su ruta: así el
+         menú nunca ofrece un destino que el guard va a rechazar. -->
     <mat-nav-list>
-      @if (auth.isStaff()) {
+      @if (auth.can('dashboard.view')) {
         <a mat-list-item routerLink="/dashboard" routerLinkActive="active-link">
           <mat-icon matListItemIcon>space_dashboard</mat-icon> Panel
         </a>
       }
       <a mat-list-item routerLink="/books" routerLinkActive="active-link">
-        <mat-icon matListItemIcon>menu_book</mat-icon> {{ auth.isStaff() ? 'Libros' : 'Catálogo' }}
+        <mat-icon matListItemIcon>menu_book</mat-icon> {{ auth.can('catalog.manage') ? 'Libros' : 'Catálogo' }}
       </a>
-      @if (auth.isStaff()) {
+      @if (auth.can('catalog.manage')) {
         <a mat-list-item routerLink="/authors" routerLinkActive="active-link">
           <mat-icon matListItemIcon>history_edu</mat-icon> Autores
         </a>
         <a mat-list-item routerLink="/categories" routerLinkActive="active-link">
           <mat-icon matListItemIcon>category</mat-icon> Categorías
         </a>
+      }
+      @if (auth.can('loans.view-any')) {
         <a mat-list-item routerLink="/loans" routerLinkActive="active-link">
           <mat-icon matListItemIcon>swap_horiz</mat-icon> Préstamos
         </a>
-      }
-      @if (!auth.isStaff()) {
+      } @else {
         <a mat-list-item routerLink="/my-loans" routerLinkActive="active-link">
           <mat-icon matListItemIcon>bookmark</mat-icon> Mis préstamos
         </a>
       }
-      @if (auth.isAdmin()) {
+      @if (auth.can('users.view-any')) {
         <a mat-list-item routerLink="/users" routerLinkActive="active-link">
           <mat-icon matListItemIcon>group</mat-icon> Usuarios
         </a>
-      } @else if (auth.isStaff()) {
+      } @else if (auth.can('users.create-member')) {
         <a mat-list-item routerLink="/users/new" routerLinkActive="active-link">
           <mat-icon matListItemIcon>person_add</mat-icon> Alta de socio
         </a>

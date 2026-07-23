@@ -28,7 +28,7 @@
           <tr [class.inactive]="!u.is_active">
             <td class="strong">{{ u.name }}</td>
             <td class="muted">{{ u.email }}</td>
-            <td><lib-role-badge [role]="u.role" /></td>
+            <td><lib-role-badge [role]="u.roles[0]" /></td>
             <td class="mono">{{ u.active_loans_count ?? 0 }}</td>
             <td>
               @if (u.is_active) { <span class="state ok">Activa</span> }

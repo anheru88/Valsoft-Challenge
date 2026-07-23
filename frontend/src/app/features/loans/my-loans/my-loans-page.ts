@@ -23,7 +23,8 @@ import { EmptyState } from '../../../shared/ui/empty-state';
 export class MyLoansPage {
   private readonly router = inject(Router);
 
-  // Demostración — GET /api/v1/my/loans (activos) y ?status=returned (historial)
+  // TODO API: GET /api/v1/loans — el API lo limita al socio autenticado
+  // (FR-LOAN-5), y ?status=returned da el historial. Demostración por ahora:
   readonly loans = signal<Loan[]>([
     { id: 601, status: 'active', loaned_at: '2026-07-14', due_date: '2026-07-28', returned_at: null, days_overdue: 0,
       user: { id: 34, name: 'Marta Ruiz', email: 'marta@example.com' },

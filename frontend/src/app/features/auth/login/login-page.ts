@@ -50,7 +50,7 @@ export class LoginPage {
     //   next: ({ token, user }) => {
     //     this.auth.startSession(token, user);
     //     const redirect = this.route.snapshot.queryParamMap.get('redirect');
-    //     this.router.navigateByUrl(redirect ?? (user.role === 'member' ? '/books' : '/dashboard'));
+    //     this.router.navigateByUrl(redirect ?? (this.auth.can('dashboard.view') ? '/dashboard' : '/books'));
     //   },
     //   error: (e) => {
     //     this.loading.set(false);

@@ -35,23 +35,23 @@ export class UsersListPage {
 
   // Demostración — GET /api/v1/users?role&q&page
   readonly users = signal<User[]>([
-    { id: 1,  name: 'Alicia Ferrer', email: 'alicia@biblioteca.org', role: 'admin', is_active: true, active_loans_count: 0, created_at: '2024-01-05' },
-    { id: 9,  name: 'Luis Prado', email: 'luis@biblioteca.org', role: 'librarian', is_active: true, active_loans_count: 1, created_at: '2024-06-12' },
-    { id: 34, name: 'Marta Ruiz', email: 'marta@example.com', role: 'member', is_active: true, active_loans_count: 2, created_at: '2025-01-10' },
-    { id: 55, name: 'Iván Costa', email: 'ivan@example.com', role: 'member', is_active: false, active_loans_count: 0, created_at: '2025-03-22' },
+    { id: 1,  name: 'Alicia Ferrer', email: 'alicia@biblioteca.org', roles: ['admin'], permissions: [], is_active: true, active_loans_count: 0, created_at: '2024-01-05' },
+    { id: 9,  name: 'Luis Prado', email: 'luis@biblioteca.org', roles: ['librarian'], permissions: [], is_active: true, active_loans_count: 1, created_at: '2024-06-12' },
+    { id: 34, name: 'Marta Ruiz', email: 'marta@example.com', roles: ['member'], permissions: [], is_active: true, active_loans_count: 2, created_at: '2025-01-10' },
+    { id: 55, name: 'Iván Costa', email: 'ivan@example.com', roles: ['member'], permissions: [], is_active: false, active_loans_count: 0, created_at: '2025-03-22' },
   ]);
 
   readonly filteredUsers = computed(() => {
     const role = this.roleFilter(); const q = this.q().toLowerCase();
     return this.users().filter(u =>
-      (!role || u.role === role) &&
+      (!role || u.roles.includes(role)) &&
       (!q || u.name.toLowerCase().includes(q) || u.email.toLowerCase().includes(q)));
   });
 
   onSearch(q: string): void { this.q.set(q); }
 
   toggleActive(u: User): void {
-    // TODO API: PATCH /users/{id} { is_active }
+    // TODO API: PATCH /users/{id}/status { is_active }
     // 409 LAST_ADMIN_PROTECTED → 'No puedes desactivar al único administrador.'
     this.snack.open(u.is_active ? 'Cuenta desactivada' : 'Cuenta reactivada', undefined, { duration: 4000 });
   }

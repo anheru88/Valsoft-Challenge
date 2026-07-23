@@ -44,9 +44,9 @@ export class CheckoutPage {
 
   // Resultados de autocompletar — sustituir por búsquedas al API con debounce
   readonly memberResults = signal<(User & { has_overdue?: boolean; active_titles?: number[] })[]>([
-    { id: 34, name: 'Marta Ruiz', email: 'marta@example.com', role: 'member', is_active: true,
+    { id: 34, name: 'Marta Ruiz', email: 'marta@example.com', roles: ['member'], permissions: [], is_active: true,
       active_loans_count: 2, has_overdue: false, active_titles: [7], created_at: '2025-01-10' },
-    { id: 21, name: 'Lucía Gómez', email: 'lucia@example.com', role: 'member', is_active: true,
+    { id: 21, name: 'Lucía Gómez', email: 'lucia@example.com', roles: ['member'], permissions: [], is_active: true,
       active_loans_count: 3, has_overdue: true, active_titles: [2], created_at: '2024-11-02' },
   ]);
   readonly bookResults = signal<Book[]>([
