@@ -4,7 +4,7 @@ import { PagedStore } from '../../../core/api/paged-store';
 import { Book, Paginated } from '../../../core/models';
 import { BookQuery, BooksApiService } from './books-api.service';
 
-const DEFAULT_QUERY: BookQuery = { sort: 'title', direction: 'asc', page: 1, per_page: 15 };
+export const DEFAULT_BOOK_QUERY: BookQuery = { sort: 'title', direction: 'asc', page: 1, per_page: 15 };
 
 /**
  * The catalogue list (RFC 15.2: a store per feature, signals out, RxJS in).
@@ -21,12 +21,17 @@ export class BooksStore extends PagedStore<Book, BookQuery> {
   readonly hasActiveFilters = computed(() => {
     const query = this.query();
 
-    return !!query.q || query.category_id != null || query.available === true;
+    return !!query.q
+      || query.category_id != null
+      || query.author_id != null
+      || query.year_from != null
+      || query.year_to != null
+      || query.available === true;
   });
 
   constructor() {
     super();
-    this.start({ ...DEFAULT_QUERY });
+    this.start({ ...DEFAULT_BOOK_QUERY });
   }
 
   protected fetch(query: BookQuery): Observable<Paginated<Book>> {
@@ -34,7 +39,7 @@ export class BooksStore extends PagedStore<Book, BookQuery> {
   }
 
   clearFilters(): void {
-    this.setQuery({ ...DEFAULT_QUERY, per_page: this.query().per_page });
+    this.setQuery({ ...DEFAULT_BOOK_QUERY, per_page: this.query().per_page });
   }
 
   /** Sorting on a column already sorted flips its direction. */

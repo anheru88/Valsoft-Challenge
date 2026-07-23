@@ -8,31 +8,49 @@
     }
   </lib-page-header>
 
-  <!-- Filter bar -->
-  <div class="toolbar" role="search">
+  <!-- Filters live in the URL, so this view can be shared as a link -->
+  <lib-filter-bar label="Catalogue filters" [active]="hasActiveFilters()" (cleared)="clearFilters()">
     <lib-search-input placeholder="Title, ISBN, author…" [initial]="filters().q"
-                      (changed)="setFilter({ q: $event })" />
+                      (changed)="setQ($event)" />
 
     <mat-form-field appearance="outline" class="compact">
       <mat-label>Category</mat-label>
-      <mat-select [value]="filters().categoryId" (selectionChange)="setFilter({ categoryId: $event.value })">
+      <mat-select [value]="filters().categoryId" (selectionChange)="setCategory($event.value)">
         <mat-option [value]="null">All</mat-option>
         @for (c of categories(); track c.id) { <mat-option [value]="c.id">{{ c.name }}</mat-option> }
       </mat-select>
     </mat-form-field>
 
+    <lib-entity-autocomplete class="compact" label="Author"
+                             placeholder="Start typing a name…"
+                             [search]="searchAuthors" [primaryText]="authorName"
+                             (selected)="setAuthor($event)" />
+
+    <mat-form-field appearance="outline" class="year">
+      <mat-label>Year from</mat-label>
+      <input matInput type="number" min="1450" [max]="currentYear"
+             [value]="filters().yearFrom ?? ''" (change)="setYear('year_from', $any($event.target).value)" />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="year">
+      <mat-label>Year to</mat-label>
+      <input matInput type="number" min="1450" [max]="currentYear"
+             [value]="filters().yearTo ?? ''" (change)="setYear('year_to', $any($event.target).value)" />
+    </mat-form-field>
+
     <mat-slide-toggle [checked]="filters().onlyAvailable"
-                      (change)="setFilter({ onlyAvailable: $event.checked })">
+                      (change)="setAvailable($event.checked)">
       Available only
     </mat-slide-toggle>
-
-    @if (hasActiveFilters()) {
-      <button mat-button (click)="clearFilters()">Clear filters</button>
-    }
-  </div>
+  </lib-filter-bar>
 
   @if (actionError()) {
-    <lib-inline-alert tone="danger">{{ actionError() }}</lib-inline-alert>
+    <lib-inline-alert tone="danger">
+      {{ actionError() }}
+      @if (blockedBook(); as b) {
+        <a [routerLink]="['/loans']" [queryParams]="{ book_id: b.id, status: 'active' }">See its open loans</a>
+      }
+    </lib-inline-alert>
   }
 
   <div class="card">
@@ -54,51 +72,47 @@
                          message="Come back soon: the library is still adding titles." />
       }
     } @else {
-      <table class="lib-table" aria-label="Book list">
-        <thead>
-          <tr>
-            <th><button class="sort-btn" (click)="toggleSort('title')">Title {{ sortIndicator('title') }}</button></th>
-            <th>Authors</th>
-            <th>Categories</th>
-            <th>ISBN</th>
-            <th><button class="sort-btn" (click)="toggleSort('available_copies')">Availability {{ sortIndicator('available_copies') }}</button></th>
-            <th class="actions-col"><span class="cdk-visually-hidden">Actions</span></th>
-          </tr>
-        </thead>
-        <tbody>
-          @for (b of books(); track b.id) {
-            <tr>
-              <td><a [routerLink]="['/books', b.id]" class="title-link">{{ b.title }}</a></td>
-              <td class="muted">{{ authorNames(b) }}</td>
-              <td>
-                @for (c of b.categories; track c.id) { <span class="cat-chip">{{ c.name }}</span> }
-              </td>
-              <td class="mono">{{ b.isbn }}</td>
-              <td><lib-availability-badge [available]="b.available_copies" [total]="b.total_copies" /></td>
-              <td class="actions-col">
-                @if (isStaff()) {
-                  <button mat-icon-button [matMenuTriggerFor]="rowMenu"
-                          [attr.aria-label]="'Actions for ' + b.title">
-                    <mat-icon>more_vert</mat-icon>
-                  </button>
-                  <mat-menu #rowMenu="matMenu">
-                    <button mat-menu-item [routerLink]="['/books', b.id, 'edit']"><mat-icon>edit</mat-icon> Edit</button>
-                    <button mat-menu-item routerLink="/loans/checkout" [queryParams]="{ bookId: b.id }"
-                            [disabled]="b.available_copies === 0">
-                      <mat-icon>swap_horiz</mat-icon> Lend
-                    </button>
-                    <button mat-menu-item class="danger-text" (click)="confirmDelete(b)"><mat-icon>delete</mat-icon> Delete</button>
-                  </mat-menu>
-                }
-              </td>
-            </tr>
-          }
-        </tbody>
-      </table>
+      <lib-data-table label="Book list" [columns]="columns" [rows]="books()" [meta]="meta()"
+                      [sort]="sort()" [trackBy]="trackById"
+                      (sorted)="toggleSort($event)" (paged)="onPage($event)">
+        <ng-template libCell="title" let-b>
+          <a [routerLink]="['/books', b.id]" class="title-cell">
+            <lib-book-cover class="thumb" [url]="b.cover_url" [title]="b.title" />
+            <span class="title-link">{{ b.title }}</span>
+          </a>
+        </ng-template>
 
-      <mat-paginator [length]="meta().total" [pageIndex]="meta().current_page - 1"
-                     [pageSize]="meta().per_page" [pageSizeOptions]="[15, 30, 50]"
-                     (page)="onPage($event)" aria-label="Book pagination" />
+        <ng-template libCell="authors" let-b>
+          <span class="muted">{{ authorNames(b) }}</span>
+        </ng-template>
+
+        <ng-template libCell="categories" let-b>
+          @for (c of b.categories; track c.id) { <span class="cat-chip">{{ c.name }}</span> }
+        </ng-template>
+
+        <ng-template libCell="isbn" let-b><span class="mono">{{ b.isbn }}</span></ng-template>
+
+        <ng-template libCell="availability" let-b>
+          <lib-availability-badge [available]="b.available_copies" [total]="b.total_copies" />
+        </ng-template>
+
+        <ng-template libCell="actions" let-b>
+          @if (isStaff()) {
+            <button mat-icon-button [matMenuTriggerFor]="rowMenu"
+                    [attr.aria-label]="'Actions for ' + b.title">
+              <mat-icon>more_vert</mat-icon>
+            </button>
+            <mat-menu #rowMenu="matMenu">
+              <button mat-menu-item [routerLink]="['/books', b.id, 'edit']"><mat-icon>edit</mat-icon> Edit</button>
+              <button mat-menu-item routerLink="/loans/checkout" [queryParams]="{ bookId: b.id }"
+                      [disabled]="b.available_copies === 0">
+                <mat-icon>swap_horiz</mat-icon> Lend
+              </button>
+              <button mat-menu-item class="danger-text" (click)="confirmDelete(b)"><mat-icon>delete</mat-icon> Delete</button>
+            </mat-menu>
+          }
+        </ng-template>
+      </lib-data-table>
     }
   </div>
 </div>
