@@ -49,7 +49,7 @@ final class EloquentDashboardRepository implements DashboardRepositoryInterface
             'available_copies' => (int) $catalog->available_copies,
             'borrowed_now' => (int) $circulation->borrowed_now,
             'overdue_now' => (int) $circulation->overdue_now,
-            'total_members' => User::query()->where('role', UserRole::Member)->where('is_active', true)->count(),
+            'total_members' => User::query()->role(UserRole::Member->value)->where('is_active', true)->count(),
             'books_added_this_month' => (int) $catalog->books_added_this_month,
             'loans_this_month' => (int) $circulation->loans_this_month,
             'returns_this_month' => (int) $circulation->returns_this_month,

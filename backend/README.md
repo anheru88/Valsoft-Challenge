@@ -6,8 +6,8 @@ service implements them.
 
 ## Stack
 
-Laravel 12 · PHP 8.2+ · MariaDB · Sanctum token auth · Pest · Pint · PHPStan
-(larastan) level 8.
+Laravel 12 · PHP 8.2+ · MariaDB · Sanctum token auth · spatie/laravel-permission
+· Pest · Pint · PHPStan (larastan) level 8.
 
 ## Getting started
 
@@ -108,6 +108,19 @@ envelope via a document transformer, and each endpoint's business refusals via
 - `openapi.json` — the committed contract. `composer openapi` regenerates it,
   and a test fails if it drifts from the code, which is the breaking-change
   detection RFC-001 §13 asks for.
+
+## Authorization
+
+Roles and capabilities are data, not code (ADR-11). Policies ask for a
+capability — `$actor->can('catalog.manage')` — and which role carries which
+capability lives in the `spatie/laravel-permission` tables, seeded by a
+migration from `App\Library\Domains\Users\Enums\Permission`. Composing a new
+role is an insert; no policy changes.
+
+A user carries exactly one role: writes take a single `role`, reads return
+`roles[]` plus the effective `permissions[]`, which lets a client hide actions
+it cannot perform. Role changes and deactivation revoke every token the account
+holds, so privileges cannot outlive the decision.
 
 ## Configuration
 

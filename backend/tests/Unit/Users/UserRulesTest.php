@@ -10,14 +10,20 @@ use App\Library\Domains\Users\Exceptions\LastAdminProtectedException;
 use App\Library\Domains\Users\Exceptions\UserHasActiveLoansException;
 use App\Library\Domains\Users\Models\User;
 use Illuminate\Events\Dispatcher;
+use Spatie\Permission\Models\Role;
 use Tests\Support\Doubles\FakeLoanRepository;
 use Tests\Support\Doubles\InMemoryUserRepository;
 use Tests\Support\Doubles\RecordingTokenIssuer;
 
+/**
+ * Builds a user with its role relation already populated, so the rules can be
+ * exercised without a database (RFC 13).
+ */
 function makeUser(int $id, UserRole $role, bool $isActive = true): User
 {
-    $user = new User(['name' => 'User '.$id, 'email' => "user{$id}@librarium.test", 'role' => $role, 'is_active' => $isActive]);
+    $user = new User(['name' => 'User '.$id, 'email' => "user{$id}@librarium.test", 'is_active' => $isActive]);
     $user->id = $id;
+    $user->setRelation('roles', collect([new Role(['name' => $role->value, 'guard_name' => 'web'])]));
 
     return $user;
 }
@@ -43,7 +49,7 @@ it('allows demoting an administrator when another active one remains', function 
     $other = makeUser(2, UserRole::Admin);
     $action = new UpdateUserAction(new InMemoryUserRepository([$admin, $other]), new RecordingTokenIssuer, new Dispatcher);
 
-    expect($action($admin, new UpdateUserData(role: UserRole::Member))->role)->toBe(UserRole::Member);
+    expect($action($admin, new UpdateUserData(role: UserRole::Member))->role())->toBe(UserRole::Member);
 });
 
 it('does not count an already inactive administrator as the last one', function () {

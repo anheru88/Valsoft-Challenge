@@ -53,6 +53,7 @@ flowchart LR
 | **Laravel 12 / PHP 8.4** | Mature ecosystem for exactly this app class: auth (Sanctum), validation, policies, queues, testing. PHP 8.4 property hooks/readonly classes make DTOs & VOs clean. Team fluency. | Symfony (more explicit, slower to ship), NestJS (fine, but PHP fits assessment context). Trade-off: framework gravity — countered by the Library layer. |
 | **MariaDB** | ACID relational fit for a ledger-like domain (loans, availability); mature FULLTEXT + generated columns; ubiquitous ops knowledge. | PostgreSQL nearly equal (would also be fine); MongoDB rejected — relational integrity is the core requirement. |
 | **Sanctum** | First-party, lightweight token auth for SPA/API; no OAuth server complexity. | Passport (OAuth2) overkill for first-party client; JWT libs add key-rotation burden without benefit here. |
+| **spatie/laravel-permission** | Roles and capabilities as data (ADR-11): a new role is configuration, not a deployment. Mature caching, guard resolution and model traits. | A hand-rolled permission table re-implements all of that; the role enum of ADR-3 made every role change a code change. |
 | **Redis (prepared, not enabled)** | Cache/queue-ready via config switch; MVP uses `database` queue + no cache to keep infra minimal. | Enabling Redis day-1 adds an infra dependency before any measured need. |
 | **Swagger/OpenAPI 3.1** (generated via attributes) | Contract-first collaboration with frontend; committed spec = CI diff on breaking changes. | Hand-written spec drifts; attributes keep spec adjacent to code. |
 | **Laravel Pint + PHPStan lvl 8 + Pest** | Style, static safety, expressive tests as CI gates. | — |
@@ -138,7 +139,7 @@ sequenceDiagram
 - **Repository Pattern — why here:** not dogma; three concrete payoffs: (1) unit tests of Actions with in-memory fakes (no DB → millisecond suites for rule logic), (2) a seam for future storage changes (read replicas, search engine for queries), (3) query logic centralization (no scattered `where` chains). Kept honest: repositories return domain-meaningful methods (`findActiveLoansForUser`), never leak query builders outward.
 - **DTO usage:** every boundary crossing is a typed immutable object (`readonly` promoted-property classes). Benefits: refactoring safety (rename a field = compiler-visible), self-documenting signatures, no "mystery array keys". `FromRequest` factory methods live on DTOs, keeping FormRequests thin.
 - **API Resources:** single place per entity defining public JSON; conditional inclusion (`when($user->isStaff(), ...)`) implements role-scoped fields; guarantees DB column renames never leak into the contract.
-- **Policies / Authorization flow:** middleware authenticates; controller's first statement authorizes via Policy; Policies read only `role` (+ ownership where relevant: members may view their own loans). One matrix (PRD §8.3), one implementation locus, tested per role per ability.
+- **Policies / Authorization flow:** middleware authenticates; controller's first statement authorizes via Policy; Policies ask for a **capability** (`$actor->can('catalog.manage')`) plus ownership where relevant — members may view their own loans. The role→capability mapping is data (ADR-11), so one matrix (PRD §8.3) has one implementation locus, tested per role per ability.
 - **Validation flow:** syntax in FormRequests (types, formats, existence) → semantics in Domain (business rules). Rationale: `422` = "your input is malformed"; `409` = "your input is fine, the world disagrees". Clean split keeps rules testable without HTTP.
 - **Authentication flow:** Sanctum tokens; login issues token (+ ability claims unused in MVP); middleware `auth:sanctum` resolves user; deactivation/logout revoke tokens (DB-backed → immediate).
 
@@ -291,7 +292,7 @@ Parent→child `input()` signals; child→parent `output()`; sibling/cross-page 
 |---|---|---|
 | ADR-1 | Modular monolith over microservices | Accepted |
 | ADR-2 | DDD-Lite under `app/Library`, framework-thin edges | Accepted |
-| ADR-3 | Single-column role enum (3 roles) over permission tables | Accepted (revisit at custom-roles demand) |
+| ADR-3 | Single-column role enum (3 roles) over permission tables | **Superseded by ADR-11** |
 | ADR-4 | Maintained `available_copies` counter + reconciliation | Accepted |
 | ADR-5 | Row-lock transactional checkout | Accepted |
 | ADR-6 | DB-native search behind contract; Meilisearch later | Accepted |
@@ -299,6 +300,27 @@ Parent→child `input()` signals; child→parent `output()`; sibling/cross-page 
 | ADR-8 | URI versioning `/api/v1` | Accepted |
 | ADR-9 | Angular signals-first, no NgRx | Accepted |
 | ADR-10 | Page-based pagination, cursor later where needed | Accepted |
+| ADR-11 | Roles and permissions in tables via `spatie/laravel-permission` | Accepted (supersedes ADR-3) |
+
+## 17. ADR-11 — Roles and permissions as data
+
+**Decision:** authorization is expressed as named capabilities (`catalog.manage`, `loans.manage`, `users.manage`, …) held in the `spatie/laravel-permission` tables. Roles are bundles of capabilities; policies ask for a capability, never for a role name. The `users.role` column is removed, so the pivot is the single source of truth.
+
+**Why (rationale):**
+1. **The trigger ADR-3 named arrived.** ADR-3 accepted the enum "revisit at custom-roles demand". Composing a role — a cataloguer who curates the catalogue but runs no circulation — is now possible without a migration or a deployment.
+2. **Policies stop encoding the matrix.** `$actor->can('catalog.manage')` moves the question from "who are you" to "what may you do", so granting a capability is an insert, not a code change.
+3. **One source of truth.** Dropping the column removes the class of bug where a row and a pivot disagree.
+
+**Alternatives considered:**
+| Alternative | Why rejected |
+|---|---|
+| Keep the enum (ADR-3) | Every new role is a code change: enum case, policy branches, tests. |
+| Enum column plus permission tables, kept in sync | Two sources of truth for the same fact, and nothing to stop them drifting. |
+| Hand-rolled permission tables | Re-implements caching, guard resolution, and the model traits that a mature package already provides. |
+
+**Trade-offs accepted:** an authorization dependency in the domain vocabulary, one extra join on user reads (mitigated by eager loading roles and permissions in the repository), and a permission cache to invalidate when the matrix changes. The MVP still assigns exactly one role per user, so the API keeps taking a single `role` on write while returning `roles[]` and effective `permissions[]` on read.
+
+**Where the matrix lives:** `App\Library\Domains\Users\Enums\Permission` names the capabilities and maps them to roles; a migration seeds them, so every migrated database — production, local, CI — starts able to authorize.
 
 ---
 *End of Architecture RFC.*

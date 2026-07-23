@@ -24,7 +24,7 @@ final class EloquentUserRepository extends EloquentRepository implements UserRep
      */
     public function paginate(UserFilters $filters): LengthAwarePaginator
     {
-        $query = User::query()
+        $query = $this->withAuthorization(User::query())
             // withCount is a subquery: the list never loads loan collections
             // to display a number (RFC 10).
             ->withCount(['loans as active_loans_count' => fn (Builder $loans) => $loans->whereNull('returned_at')]);
@@ -37,7 +37,9 @@ final class EloquentUserRepository extends EloquentRepository implements UserRep
         }
 
         if ($filters->role !== null) {
-            $query->where('role', $filters->role);
+            // Spatie's scope resolves the pivot; the role name never reaches
+            // the query as raw input.
+            $query->role($filters->role->value);
         }
 
         if ($filters->isActive !== null) {
@@ -49,25 +51,28 @@ final class EloquentUserRepository extends EloquentRepository implements UserRep
 
     public function findById(int $id): ?User
     {
-        return User::query()
+        return $this->withAuthorization(User::query())
             ->withCount(['loans as active_loans_count' => fn (Builder $loans) => $loans->whereNull('returned_at')])
             ->find($id);
     }
 
     public function findByEmail(string $email): ?User
     {
-        return User::query()->where('email', $email)->first();
+        return $this->withAuthorization(User::query())->where('email', $email)->first();
     }
 
     public function create(CreateUserData $data): User
     {
-        return User::query()->create([
+        $user = User::query()->create([
             'name' => $data->name,
             'email' => $data->email,
             'password' => $data->password,
-            'role' => $data->role,
             'is_active' => true,
         ]);
+
+        $user->syncRoles([$data->role->value]);
+
+        return $user->load(['roles.permissions', 'permissions']);
     }
 
     public function update(User $user, UpdateUserData $data): User
@@ -75,7 +80,13 @@ final class EloquentUserRepository extends EloquentRepository implements UserRep
         $user->fill($data->toAttributes());
         $user->save();
 
-        return $user;
+        if ($data->role !== null) {
+            // A user carries exactly one role in this product, so assigning is
+            // a replacement.
+            $user->syncRoles([$data->role->value]);
+        }
+
+        return $user->load(['roles.permissions', 'permissions']);
     }
 
     public function delete(User $user): void
@@ -86,9 +97,21 @@ final class EloquentUserRepository extends EloquentRepository implements UserRep
     public function countActiveAdmins(?int $excludingUserId = null): int
     {
         return User::query()
-            ->where('role', UserRole::Admin)
+            ->role(UserRole::Admin->value)
             ->where('is_active', true)
             ->when($excludingUserId !== null, fn (Builder $query) => $query->whereKeyNot($excludingUserId))
             ->count();
+    }
+
+    /**
+     * Roles and their permissions are part of every user payload, so they are
+     * eager loaded rather than resolved per row (RFC 10).
+     *
+     * @param  Builder<User>  $query
+     * @return Builder<User>
+     */
+    private function withAuthorization(Builder $query): Builder
+    {
+        return $query->with(['roles.permissions', 'permissions']);
     }
 }

@@ -13,19 +13,27 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Laravel\Sanctum\HasApiTokens;
+use Spatie\Permission\Traits\HasRoles;
 
 /**
  * @property int $id
  * @property string $name
  * @property string $email
  * @property string $password
- * @property UserRole $role
  * @property bool $is_active
  */
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
-    use HasApiTokens, HasFactory, SoftDeletes;
+    use HasApiTokens, HasFactory, HasRoles, SoftDeletes;
+
+    /**
+     * Roles and permissions are resolved against the `web` guard. Sanctum
+     * authenticates the request, but the authorization vocabulary is guard
+     * agnostic, and pinning it keeps role lookups from depending on which guard
+     * happened to resolve the user.
+     */
+    protected string $guard_name = 'web';
 
     /**
      * Writes go through DTOs in the application layer, never through
@@ -37,7 +45,6 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'role',
         'is_active',
     ];
 
@@ -57,7 +64,6 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
-            'role' => UserRole::class,
             'is_active' => 'boolean',
         ];
     }
@@ -70,14 +76,25 @@ class User extends Authenticatable
         return $this->hasMany(Loan::class);
     }
 
+    /**
+     * The account's role. The API contract gives a user exactly one, so this
+     * reads the first assigned role rather than the whole collection.
+     */
+    public function role(): ?UserRole
+    {
+        $name = $this->roles->first()?->getAttribute('name');
+
+        return is_string($name) ? UserRole::tryFrom($name) : null;
+    }
+
     public function isStaff(): bool
     {
-        return $this->role->isStaff();
+        return $this->role()?->isStaff() ?? false;
     }
 
     public function isAdmin(): bool
     {
-        return $this->role->isAdmin();
+        return $this->role()?->isAdmin() ?? false;
     }
 
     /**

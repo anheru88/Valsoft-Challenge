@@ -165,24 +165,27 @@ Each requirement is uniquely identified (`FR-*`) and testable.
 - **FR-USER-6:** Deactivated users (`is_active = false`) SHALL be unable to authenticate; existing tokens are revoked on deactivation.
 
 ### 8.3 Roles & Permissions (FR-PERM)
-- **FR-PERM-1:** Exactly three roles exist in MVP: `admin`, `librarian`, `member`, stored as an enum on the user record. (Single-role model chosen deliberately for MVP simplicity; a `roles`/`permissions` table is a documented future migration.)
-- **FR-PERM-2:** Authorization SHALL be enforced server-side by Laravel Policies on every controller action; the permission matrix below is the source of truth.
+- **FR-PERM-1:** Three roles ship with the MVP — `admin`, `librarian`, `member` — held in role/permission tables rather than on the user record (ADR-11). A user carries exactly one role; a role carries a set of named capabilities. New roles can be composed from existing capabilities without a code change.
+- **FR-PERM-2:** Authorization SHALL be enforced server-side by Laravel Policies on every controller action. Policies SHALL ask for a capability, never for a role name; the matrix below defines which capability each role carries and is the source of truth.
 - **FR-PERM-3:** Authorization failures SHALL return `403` with the standard error envelope; unauthenticated access to protected routes returns `401`.
 
-**Permission matrix (MVP):**
+**Permission matrix (MVP):** each row is a named capability, granted to a role as data.
 
-| Capability | Admin | Librarian | Member |
-|---|---|---|---|
-| View catalog / search | ✅ | ✅ | ✅ |
-| Create/edit books, authors, categories | ✅ | ✅ | ❌ |
-| Delete books/authors/categories | ✅ | ✅ | ❌ |
-| Check out / check in loans | ✅ | ✅ | ❌ |
-| View any member's loans | ✅ | ✅ | ❌ |
-| View own loans | ✅ | ✅ | ✅ |
-| List/create users (any role) | ✅ | ❌ | ❌ |
-| Create member users | ✅ | ✅ | ❌ |
-| Edit/delete users, change roles | ✅ | ❌ | ❌ |
-| View dashboard & reports | ✅ | ✅ | ❌ |
+| Capability | Name | Admin | Librarian | Member |
+|---|---|---|---|---|
+| View catalog / search | `catalog.view` | ✅ | ✅ | ✅ |
+| Create/edit/delete books, authors, categories | `catalog.manage` | ✅ | ✅ | ❌ |
+| Check out / check in loans | `loans.manage` | ✅ | ✅ | ❌ |
+| View any member's loans | `loans.view-any` | ✅ | ✅ | ❌ |
+| Read a user account | `users.view` | ✅ | ✅ | ❌ |
+| List every user account | `users.view-any` | ✅ | ❌ | ❌ |
+| Create users with any role | `users.create-any` | ✅ | ❌ | ❌ |
+| Create member users | `users.create-member` | ✅ | ✅ | ❌ |
+| Edit/delete users, change roles and status | `users.manage` | ✅ | ❌ | ❌ |
+| View dashboard | `dashboard.view` | ✅ | ✅ | ❌ |
+| View reports | `reports.view` | ✅ | ❌ | ❌ |
+
+Viewing one's own loans and editing one's own profile are ownership checks, not capabilities: every authenticated user may do both.
 
 ### 8.4 Books (FR-BOOK)
 - **FR-BOOK-1:** A book SHALL have: `title` (req, ≤255), `isbn` (req, unique, ISBN-10 or ISBN-13 checksum-validated), `description` (opt, ≤5000), `publisher` (opt, ≤255), `publication_year` (opt, 1450..current year), `cover_url` (opt, valid URL), `total_copies` (req, ≥1), `available_copies` (derived/maintained, 0..total), authors (≥1), categories (≥1).

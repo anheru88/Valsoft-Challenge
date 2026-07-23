@@ -4,9 +4,14 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this repository is
 
-Documentation-only, for now. There is no source code, build system, test runner, or package manifest — only `docs/`. Do not invent build/lint/test commands; if implementation starts, the stack below dictates them (Laravel: `php artisan test` / `vendor/bin/pest`, `vendor/bin/pint`, `vendor/bin/phpstan`; Angular: `ng test`, `ng build`, `storybook`).
+**Librarium**, an MVP library management system (Senior Backend Engineer assessment). Two directories:
 
-The docs specify **Librarium**, an MVP library management system (Senior Backend Engineer assessment). The originating brief is `docs/Prompt.md`; the four numbered docs are its output and are the authoritative spec.
+- `docs/` — the specification, and the authoritative one. The originating brief is `docs/Prompt.md`; the four numbered docs are its output.
+- `backend/` — the Laravel 12 API implementing it. See `backend/README.md` for setup; commands are `vendor/bin/pest`, `composer lint`, `composer analyse`, `composer openapi`.
+
+The Angular SPA of `docs/02-prd-frontend.md` is not implemented yet.
+
+When code and docs disagree, that is a bug in one of them: fix the code, or amend the doc with rationale the way the RFC's own ADRs do (ADR-11 is the worked example).
 
 | Doc | Role |
 |---|---|
@@ -18,7 +23,7 @@ The docs specify **Librarium**, an MVP library management system (Senior Backend
 ## Cross-document conventions
 
 - Requirements are ID-addressable: `FR-<DOMAIN>-<n>` (functional), `BR-<DOMAIN>-<n>` (business rule), `ADR-<n>` (decision). Reference these IDs instead of restating rules; when adding requirements, keep the numbering scheme and the "every rule is testable" property.
-- The permission matrix (`01-prd-backend.md` §8.3) is the single source of truth for authorization; the API spec marks each endpoint 🅰 admin / 🅻 librarian / 🅼 member.
+- The permission matrix (`01-prd-backend.md` §8.3) is the single source of truth for authorization. Roles and capabilities live in the `spatie/laravel-permission` tables (ADR-11, which supersedes ADR-3's role enum): policies ask `$actor->can('catalog.manage')`, never for a role name, and `App\Library\Domains\Users\Enums\Permission` maps capabilities to roles. The API spec marks each endpoint 🅰 admin / 🅻 librarian / 🅼 member.
 - Every architecture claim in the RFC carries rationale + alternatives + trade-offs. Match that standard in edits; unjustified assertions are out of style here.
 - Mermaid is used for flow/sequence/ER diagrams.
 
@@ -34,11 +39,18 @@ The docs specify **Librarium**, an MVP library management system (Senior Backend
 - Loan status (`active`/`overdue`/`returned`) is derived, never stored.
 - Deletes are soft (books, users) to preserve loan history; deletion is blocked while active loans/references exist.
 - The system must always retain ≥1 active Administrator.
+- A user carries exactly one role: writes take a single `role`, reads return `roles[]` plus effective `permissions[]`. Role changes and deactivation revoke every token immediately.
 
 **Error and validation split** — one envelope `{"error":{code,message,details,trace_id}}`; `422` = malformed input (FormRequests), `409` = valid input rejected by business state (domain exceptions carrying stable codes). Codes are registered in `04-api-specification.md` §10; keep that registry, the `BR-*` rules, and the exception mapping table in the RFC §7 in sync.
 
-**Deliberately deferred** (do not slip into MVP scope): Redis caching (seam prepared, dependency absent), Meilisearch/Scout (DB-native FULLTEXT behind `BookSearchInterface`), permission tables (single role enum), and all AI features — those belong only under "Future Enhancements".
+**Deliberately deferred** (do not slip into MVP scope): Redis caching (seam prepared, dependency absent), Meilisearch/Scout (DB-native FULLTEXT behind `BookSearchInterface`), and all AI features — those belong only under "Future Enhancements".
+
+## Backend specifics
+
+- Local development and the test suite run on **SQLite**; MariaDB is the production target. Migrations guard MariaDB-only features (FULLTEXT, CHECK constraints) behind driver checks, and tests that need them (the check-out row lock) skip themselves rather than pretending to pass.
+- The OpenAPI document is generated from the code by Scramble and committed as `backend/openapi.json`. A test fails if it drifts — run `composer openapi` after changing a route, FormRequest or Resource.
+- Business constants (loan limit, loan window, pagination caps, minimum search length) live in `backend/config/library.php`, not in the rules.
 
 ## Commits
 
-Conventional-commit prefixes (`docs:` so far), imperative subject, body explaining what and why.
+Conventional-commit prefixes (`docs:`, `feat(backend):`, `chore(backend):`), imperative subject, body explaining what and why. Always English.

@@ -192,7 +192,18 @@ POST /api/v1/loans  { "user_id": 42, "book_id": 9 }
 
 ## 7. Users
 
-**Resource:** `{ "id", "name", "email", "role", "is_active", "active_loans_count", "created_at", "updated_at" }`
+**Resource:** `{ "id", "name", "email", "roles", "permissions", "is_active", "active_loans_count", "created_at", "updated_at" }`
+
+```json
+{ "id": 42, "name": "Luis Ruiz", "email": "luis@librarium.test",
+  "roles": ["librarian"],
+  "permissions": ["catalog.manage", "catalog.view", "dashboard.view",
+                  "loans.manage", "loans.view-any", "users.create-member", "users.view"],
+  "is_active": true, "active_loans_count": 0,
+  "created_at": "…", "updated_at": "…" }
+```
+
+`permissions` lists the effective capabilities of the account — from its role plus anything granted directly — so a client can hide an action it may not perform. Writes still take a single `role` (ADR-11: one role per user in the MVP).
 
 | Method & route | Roles | Notes |
 |---|---|---|

@@ -15,11 +15,11 @@ it('registers a member and returns a bearer token', function () {
 
     $response->assertCreated()
         ->assertJsonPath('data.token_type', 'Bearer')
-        ->assertJsonPath('data.user.role', 'member')
+        ->assertJsonPath('data.user.roles', ['member'])
         ->assertJsonPath('data.user.email', 'marta@example.com')
-        ->assertJsonStructure(['data' => ['token', 'token_type', 'user' => ['id', 'name', 'email', 'role', 'is_active']]]);
+        ->assertJsonStructure(['data' => ['token', 'token_type', 'user' => ['id', 'name', 'email', 'roles', 'permissions', 'is_active']]]);
 
-    expect(User::where('email', 'marta@example.com')->first()->role)->toBe(UserRole::Member);
+    expect(User::where('email', 'marta@example.com')->first()->role())->toBe(UserRole::Member);
 });
 
 it('never lets a registration choose its own role', function () {
@@ -29,7 +29,7 @@ it('never lets a registration choose its own role', function () {
         'password' => 's3curePass',
         'password_confirmation' => 's3curePass',
         'role' => 'admin',
-    ])->assertCreated()->assertJsonPath('data.user.role', 'member');
+    ])->assertCreated()->assertJsonPath('data.user.roles', ['member']);
 });
 
 it('rejects weak passwords and duplicate emails', function () {

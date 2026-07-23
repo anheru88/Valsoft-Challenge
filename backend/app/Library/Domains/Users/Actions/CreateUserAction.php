@@ -21,7 +21,7 @@ final readonly class CreateUserAction
     {
         $user = $this->users->create($data);
 
-        $this->events->dispatch(new UserCreated($user->id, $user->email, $user->role));
+        $this->events->dispatch(new UserCreated($user->id, $user->email, $data->role));
 
         return $user;
     }

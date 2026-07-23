@@ -29,25 +29,39 @@ class UserFactory extends Factory
             'email' => fake()->unique()->safeEmail(),
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
-            'role' => UserRole::Member,
             'is_active' => true,
             'remember_token' => Str::random(10),
         ];
     }
 
+    /**
+     * The role is a pivot row, so it is assigned once the user exists. A later
+     * withRole() call registers its own hook and replaces this default, since
+     * syncRoles is a replacement rather than an addition.
+     */
+    public function configure(): static
+    {
+        return $this->withRole(UserRole::Member);
+    }
+
     public function admin(): static
     {
-        return $this->state(fn (array $attributes) => ['role' => UserRole::Admin]);
+        return $this->withRole(UserRole::Admin);
     }
 
     public function librarian(): static
     {
-        return $this->state(fn (array $attributes) => ['role' => UserRole::Librarian]);
+        return $this->withRole(UserRole::Librarian);
     }
 
     public function member(): static
     {
-        return $this->state(fn (array $attributes) => ['role' => UserRole::Member]);
+        return $this->withRole(UserRole::Member);
+    }
+
+    public function withRole(UserRole $role): static
+    {
+        return $this->afterCreating(fn (User $user) => $user->syncRoles([$role->value]));
     }
 
     public function inactive(): static

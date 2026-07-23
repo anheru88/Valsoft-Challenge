@@ -35,6 +35,9 @@ final readonly class UpdateUserData
     }
 
     /**
+     * The column-backed fields only. The role is a pivot assignment, applied by
+     * the repository rather than filled onto the row.
+     *
      * @return array<string, mixed>
      */
     public function toAttributes(): array
@@ -43,7 +46,6 @@ final readonly class UpdateUserData
             'name' => $this->name,
             'email' => $this->email,
             'password' => $this->password,
-            'role' => $this->role,
             'is_active' => $this->isActive,
         ], fn (mixed $value): bool => $value !== null);
     }

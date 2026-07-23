@@ -12,6 +12,7 @@ use App\Library\Domains\Users\Enums\UserRole;
 use App\Library\Domains\Users\Models\User;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use RuntimeException;
+use Spatie\Permission\Models\Role;
 
 /**
  * The payoff of the repository contract (RFC 6): rule tests run against this
@@ -57,10 +58,12 @@ final class InMemoryUserRepository implements UserRepositoryInterface
             'name' => $data->name,
             'email' => $data->email,
             'password' => $data->password,
-            'role' => $data->role,
             'is_active' => true,
         ]);
         $user->id = count($this->users) + 1;
+        // The role is a relation, populated here so the in-memory user answers
+        // role() the way a persisted one does.
+        $user->setRelation('roles', collect([new Role(['name' => $data->role->value, 'guard_name' => 'web'])]));
 
         $this->users[] = $user;
 
@@ -70,6 +73,10 @@ final class InMemoryUserRepository implements UserRepositoryInterface
     public function update(User $user, UpdateUserData $data): User
     {
         $user->fill($data->toAttributes());
+
+        if ($data->role !== null) {
+            $user->setRelation('roles', collect([new Role(['name' => $data->role->value, 'guard_name' => 'web'])]));
+        }
 
         return $user;
     }
@@ -86,7 +93,7 @@ final class InMemoryUserRepository implements UserRepositoryInterface
     {
         return count(array_filter(
             $this->users,
-            fn (User $user): bool => $user->role === UserRole::Admin
+            fn (User $user): bool => $user->role() === UserRole::Admin
                 && $user->is_active
                 && $user->id !== $excludingUserId,
         ));

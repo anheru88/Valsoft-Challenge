@@ -12,7 +12,7 @@ it('lets an administrator list users with the standard envelope', function () {
     $this->withBearerToken(token($admin))->getJson('/api/v1/users?per_page=2')
         ->assertOk()
         ->assertJsonStructure([
-            'data' => [['id', 'name', 'email', 'role', 'is_active', 'active_loans_count']],
+            'data' => [['id', 'name', 'email', 'roles', 'permissions', 'is_active', 'active_loans_count']],
             'meta' => ['current_page', 'per_page', 'total', 'last_page'],
             'links' => ['first', 'last', 'prev', 'next'],
         ])
@@ -65,7 +65,11 @@ it('lets an administrator create a user with any role', function () {
         'password' => 's3curePass',
         'role' => 'librarian',
     ])->assertCreated()
-        ->assertJsonPath('data.role', 'librarian')
+        ->assertJsonPath('data.roles', ['librarian'])
+        // The effective capabilities travel with the account, so a client can
+        // hide what it cannot do.
+        ->assertJsonPath('data.permissions', fn (array $permissions): bool => in_array('catalog.manage', $permissions, true)
+            && ! in_array('users.manage', $permissions, true))
         ->assertHeader('Location');
 });
 
@@ -115,7 +119,7 @@ it('revokes the tokens of a user whose role changed', function () {
 
     $this->withBearerToken(token($admin))->putJson("/api/v1/users/{$member->id}", ['role' => 'librarian'])
         ->assertOk()
-        ->assertJsonPath('data.role', 'librarian');
+        ->assertJsonPath('data.roles', ['librarian']);
 
     $this->withBearerToken($memberToken)->getJson('/api/v1/auth/me')->assertUnauthorized();
 });
@@ -179,7 +183,7 @@ it('allows demoting an administrator while another one remains', function () {
 
     $this->withBearerToken(token($admin))->putJson("/api/v1/users/{$secondAdmin->id}", ['role' => 'member'])
         ->assertOk()
-        ->assertJsonPath('data.role', 'member');
+        ->assertJsonPath('data.roles', ['member']);
 });
 
 it('lets a librarian read a user for desk service', function () {

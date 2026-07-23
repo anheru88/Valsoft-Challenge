@@ -23,14 +23,14 @@ final readonly class UpdateUserAction
 
     public function __invoke(User $user, UpdateUserData $data): User
     {
-        $previousRole = $user->role;
+        $previousRole = $user->role();
 
         $this->guardLastAdmin($user, $data);
 
         $updated = $this->users->update($user, $data);
 
-        if ($data->changesRole() && $data->role !== $previousRole) {
-            $this->events->dispatch(new UserRoleChanged($updated->id, $previousRole, $updated->role));
+        if ($data->changesRole() && $data->role !== $previousRole && $previousRole !== null && $data->role !== null) {
+            $this->events->dispatch(new UserRoleChanged($updated->id, $previousRole, $data->role));
 
             // Privileges just changed, so tokens minted under the old role must
             // not survive.

@@ -5,11 +5,12 @@ declare(strict_types=1);
 namespace App\Library\Domains\Loans\Policies;
 
 use App\Library\Domains\Loans\Models\Loan;
+use App\Library\Domains\Users\Enums\Permission;
 use App\Library\Domains\Users\Models\User;
 
 /**
- * PRD 8.3: staff run circulation; members read their own history and nothing
- * else. BR-LOAN-6 — members never self-checkout in the MVP.
+ * PRD 8.3: whoever holds `loans.manage` runs circulation; everybody reads their
+ * own history. BR-LOAN-6 — members never self-checkout in the MVP.
  */
 final class LoanPolicy
 {
@@ -24,17 +25,17 @@ final class LoanPolicy
 
     public function view(User $actor, Loan $loan): bool
     {
-        return $actor->isStaff() || $loan->user_id === $actor->id;
+        return $loan->user_id === $actor->id || $actor->can(Permission::ViewAnyLoan->value);
     }
 
     public function create(User $actor): bool
     {
-        return $actor->isStaff();
+        return $actor->can(Permission::ManageLoans->value);
     }
 
     public function return(User $actor): bool
     {
-        return $actor->isStaff();
+        return $actor->can(Permission::ManageLoans->value);
     }
 
     /**
@@ -42,6 +43,6 @@ final class LoanPolicy
      */
     public function viewHistoryOf(User $actor, User $member): bool
     {
-        return $actor->isStaff() || $actor->is($member);
+        return $actor->is($member) || $actor->can(Permission::ViewAnyLoan->value);
     }
 }

@@ -3650,8 +3650,18 @@
                     "email": {
                         "type": "string"
                     },
-                    "role": {
-                        "type": "string"
+                    "roles": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "permissions": {
+                        "type": "array",
+                        "description": "Everything the account can do, whether it came from the role or\nwas granted directly.",
+                        "items": {
+                            "type": "string"
+                        }
                     },
                     "is_active": {
                         "type": "boolean"
@@ -3677,7 +3687,6 @@
                     "id",
                     "name",
                     "email",
-                    "role",
                     "is_active",
                     "created_at",
                     "updated_at"
