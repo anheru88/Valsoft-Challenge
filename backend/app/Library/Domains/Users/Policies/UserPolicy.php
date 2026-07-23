@@ -19,9 +19,19 @@ use App\Library\Domains\Users\Models\User;
  */
 final class UserPolicy
 {
+    /**
+     * Reading the list is a desk capability; how much of it is returned is not
+     * decided here.
+     *
+     * `users.view` opens the list scoped to members, which is what the
+     * check-out screen needs to find the person at the counter; `users.view-any`
+     * opens it whole. The controller applies that scope, because a policy
+     * answers whether an action is allowed, not which rows it may see.
+     */
     public function viewAny(User $actor): bool
     {
-        return $actor->can(Permission::ViewAnyUser->value);
+        return $actor->can(Permission::ViewAnyUser->value)
+            || $actor->can(Permission::ViewUser->value);
     }
 
     /**

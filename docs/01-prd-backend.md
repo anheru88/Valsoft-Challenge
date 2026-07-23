@@ -177,8 +177,8 @@ Each requirement is uniquely identified (`FR-*`) and testable.
 | Create/edit/delete books, authors, categories | `catalog.manage` | ✅ | ✅ | ❌ |
 | Check out / check in loans | `loans.manage` | ✅ | ✅ | ❌ |
 | View any member's loans | `loans.view-any` | ✅ | ✅ | ❌ |
-| Read a user account | `users.view` | ✅ | ✅ | ❌ |
-| List every user account | `users.view-any` | ✅ | ❌ | ❌ |
+| Read a user account, and list member accounts | `users.view` | ✅ | ✅ | ❌ |
+| List every user account, staff included | `users.view-any` | ✅ | ❌ | ❌ |
 | Create users with any role | `users.create-any` | ✅ | ❌ | ❌ |
 | Create member users | `users.create-member` | ✅ | ✅ | ❌ |
 | Edit/delete users, change roles and status | `users.manage` | ✅ | ❌ | ❌ |
@@ -186,6 +186,8 @@ Each requirement is uniquely identified (`FR-*`) and testable.
 | View reports | `reports.view` | ✅ | ❌ | ❌ |
 
 Viewing one's own loans and editing one's own profile are ownership checks, not capabilities: every authenticated user may do both.
+
+**Amendment — `users.view` opens a member-scoped list.** The capability originally covered reading one account by id. The check-out flow (PRD frontend §4.5) starts by finding the person standing at the counter by name or email, and the person running it is the librarian: with a read-by-id capability alone, the desk cannot reach the desk's own screen. `users.view` therefore also opens `GET /users`, scoped to member accounts — whatever the `role` filter asks for — while `users.view-any` remains what it says: the whole list, staff included. *Alternatives considered:* letting a librarian search staff too, rejected because the roster of colleagues is not desk information and the capability split would lose its meaning; and answering `403` when a librarian sends `role=admin`, rejected because the scope is a property of the actor, not a fault in the request. *Trade-off accepted:* a librarian can enumerate the library's members, which is the same population they already read one by one at the counter.
 
 ### 8.4 Books (FR-BOOK)
 - **FR-BOOK-1:** A book SHALL have: `title` (req, ≤255), `isbn` (req, unique, ISBN-10 or ISBN-13 checksum-validated), `description` (opt, ≤5000), `publisher` (opt, ≤255), `publication_year` (opt, 1450..current year), `cover_url` (opt, valid URL), `total_copies` (req, ≥1), `available_copies` (derived/maintained, 0..total), authors (≥1), categories (≥1).

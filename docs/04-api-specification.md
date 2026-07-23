@@ -207,7 +207,7 @@ POST /api/v1/loans  { "user_id": 42, "book_id": 9 }
 
 | Method & route | Roles | Notes |
 |---|---|---|
-| `GET /users` | 🅰 | Filters: `q` (name/email), `role`, `is_active`; sort `name`/`email`/`created_at`. |
+| `GET /users` | 🅰 (all accounts) 🅻 (members only) | Filters: `q` (name/email), `role`, `is_active`; sort `name`/`email`/`created_at`. A librarian's list is scoped to members whatever `role` says — the lookup the check-out desk runs (PRD §8.3 amendment). |
 | `GET /users/{id}` | 🅰🅻 | Librarian: read access for desk service. |
 | `POST /users` | 🅰 (any role) 🅻 (member only) | `{ name*, email* unique, password* min:8, role* in admin|librarian|member }`. 🅻 sending non-member role → `403`. → `201`. |
 | `PUT /users/{id}` | 🅰 (any field) · self (name/email) | Role change 🅰-only. `409 LAST_ADMIN_PROTECTED` on demoting last admin. |

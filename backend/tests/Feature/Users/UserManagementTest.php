@@ -20,13 +20,35 @@ it('lets an administrator list users with the standard envelope', function () {
         ->assertJsonPath('meta.total', 4);
 });
 
-it('keeps the user list out of reach of librarians and members', function (string $role) {
-    $actor = User::factory()->{$role}()->create();
+it('keeps the user list out of reach of members', function () {
+    $member = User::factory()->member()->create();
 
-    $this->withBearerToken(token($actor))->getJson('/api/v1/users')
+    $this->withBearerToken(token($member))->getJson('/api/v1/users')
         ->assertForbidden()
         ->assertJsonPath('error.code', 'FORBIDDEN');
-})->with(['librarian', 'member']);
+});
+
+it('scopes the user list to members for a librarian', function () {
+    $librarian = User::factory()->librarian()->create();
+    User::factory()->admin()->create(['name' => 'Alicia']);
+    User::factory()->member()->create(['name' => 'Marta']);
+
+    $this->withBearerToken(token($librarian))->getJson('/api/v1/users')
+        ->assertOk()
+        ->assertJsonCount(1, 'data')
+        ->assertJsonPath('data.0.name', 'Marta');
+});
+
+it('ignores a role filter that would widen a librarian past members', function () {
+    $librarian = User::factory()->librarian()->create();
+    User::factory()->admin()->create(['name' => 'Alicia']);
+    User::factory()->member()->create(['name' => 'Marta']);
+
+    $this->withBearerToken(token($librarian))->getJson('/api/v1/users?role=admin')
+        ->assertOk()
+        ->assertJsonCount(1, 'data')
+        ->assertJsonPath('data.0.name', 'Marta');
+});
 
 it('filters and sorts the user list', function () {
     $admin = User::factory()->admin()->create(['name' => 'Alicia']);

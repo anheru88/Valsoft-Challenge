@@ -20,6 +20,23 @@ final readonly class UserFilters
         public SortParams $sort,
     ) {}
 
+    /**
+     * The same query, narrowed to member accounts.
+     *
+     * Used for an actor who may read accounts for desk service but not survey
+     * the staff: whatever `role` the request asked for, the answer is members.
+     */
+    public function scopedToMembers(): self
+    {
+        return new self(
+            q: $this->q,
+            role: UserRole::Member,
+            isActive: $this->isActive,
+            pagination: $this->pagination,
+            sort: $this->sort,
+        );
+    }
+
     public static function fromRequest(Request $request): self
     {
         $role = $request->string('role')->toString();

@@ -11,6 +11,7 @@ use App\Library\Domains\Users\Contracts\UserRepositoryInterface;
 use App\Library\Domains\Users\DTOs\CreateUserData;
 use App\Library\Domains\Users\DTOs\UpdateUserData;
 use App\Library\Domains\Users\DTOs\UserFilters;
+use App\Library\Domains\Users\Enums\Permission;
 use App\Library\Domains\Users\Models\User;
 use App\Library\Domains\Users\Requests\ChangeUserStatusRequest;
 use App\Library\Domains\Users\Requests\IndexUserRequest;
@@ -28,13 +29,20 @@ final class UserController
     /**
      * List users.
      *
-     * Administrators only.
+     * Administrators see every account. A librarian sees members only — the
+     * lookup the check-out desk runs — whatever the `role` filter asks for.
      */
     public function index(IndexUserRequest $request, UserRepositoryInterface $users): AnonymousResourceCollection
     {
         Gate::authorize('viewAny', User::class);
 
-        return UserResource::collection($users->paginate(UserFilters::fromRequest($request)));
+        $filters = UserFilters::fromRequest($request);
+
+        if ($request->user()?->cannot(Permission::ViewAnyUser->value)) {
+            $filters = $filters->scopedToMembers();
+        }
+
+        return UserResource::collection($users->paginate($filters));
     }
 
     /**

@@ -2441,7 +2441,7 @@
         "/users": {
             "get": {
                 "operationId": "users.index",
-                "description": "Administrators only.",
+                "description": "Administrators see every account. A librarian sees members only \u2014 the\nlookup the check-out desk runs \u2014 whatever the `role` filter asks for.",
                 "summary": "List users",
                 "tags": [
                     "User"
