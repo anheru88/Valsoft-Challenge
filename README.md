@@ -10,6 +10,40 @@ backend/    Laravel 12 REST API                        — complete
 frontend/   Angular 20 SPA                             — complete, reading and writing the API
 ```
 
+## The assignment
+
+The brief asked for a mini library management system. This is what was built
+against it — stated plainly, including what was deliberately left for later.
+
+**Minimum features — all done.**
+
+| Feature | How it is met |
+|---|---|
+| Book management (add / edit / delete + metadata) | Full CRUD at `/books` with rich metadata — title, ISBN, description, publisher, year, cover, authors and categories, plus a system-managed copy count. Deletes are soft, to preserve loan history (`BR-*`, RFC-001). |
+| Check-in / check-out | The loan lifecycle: a check-out takes a pessimistic row lock so the last copy can't be oversold, a return frees it, and `available_copies` is a maintained counter mutated only inside that transaction. Loan status (active / overdue / returned) is derived, never stored. |
+| Search by title, author, or other fields | Search-anything (title fragment, ISBN, author) behind `BookSearchInterface` — DB-native FULLTEXT on MariaDB, LIKE on SQLite. |
+
+**Requirements — met.** A working product on a real stack (Laravel 12 API +
+Angular 20 SPA + MariaDB), all source in this repo, and a README with a
+one-command run (`./run.sh`).
+
+**Bonus — partly.**
+
+| Bonus | Status |
+|---|---|
+| Deploy with a live URL | One-command containerized deploy (`./run.sh`) that serves the whole stack. It runs locally on `:8080`; it is **not** yet hosted at a public URL. |
+| Auth with roles & permissions | Done — Sanctum token auth with **capability-based** authorization: three roles (administrator, librarian, member) whose permissions live in data (`spatie/laravel-permission`), so a new role is configuration, not code (ADR-11). **SSO** (Google/OAuth) is not implemented. |
+| AI features | Not yet — designed and written up as the next step: an MCP server inside Laravel exposing the domain as tools, consumed by agents, plus scheduled (cron) agents. See [What's left](#whats-left). |
+| Extra valuable features | A dashboard (live metrics, recent activity, category mix), overdue and popularity reports, a Storybook catalogue of the UI, a generated-and-checked OpenAPI document, accessibility work, and a demo seed with a year of history. Backend: 157 tests, PHPStan level 8, Pint clean. |
+
+**On the evaluation criteria.** *Completeness* — the three core features work and
+are tested end to end. *Creativity* — the dashboard, reports, capability-based
+authorization, generated API contract and the AI roadmap go past the minimum.
+*Product quality* — a modular monolith with DDD-Lite on the backend, a
+signals-first Angular tree on the front, and docs kept as the source of truth.
+*Usability* — role-aware navigation, search by anything, seeded demo accounts and
+data so the app is immediately explorable (see [Screenshots](#screenshots)).
+
 ## Running it with Docker
 
 One command builds and serves the whole system — MariaDB, the Laravel API and the
