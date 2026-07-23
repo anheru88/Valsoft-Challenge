@@ -1,13 +1,14 @@
 <header class="topbar">
   <div class="wrap nav">
     <a class="brand" routerLink="/"><span class="brand-mark">L</span> Librarium</a>
-    <nav class="nav-links" aria-label="Secciones">
-      <a href="#funciones">Funciones</a>
-      <a href="#roles">Para quién</a>
+    <nav class="nav-links" aria-label="Sections">
+      <a href="#features">Features</a>
+      <a href="#roles">Who it is for</a>
+      <a href="#scope">About this build</a>
     </nav>
     <div class="nav-actions">
-      <a class="btn btn-ghost" routerLink="/login">Entrar</a>
-      <a class="btn btn-primary" routerLink="/register">Empezar</a>
+      <a class="btn btn-ghost" routerLink="/login">Sign in</a>
+      <a class="btn btn-primary" href="#scope">Try the demo</a>
     </div>
   </div>
 </header>
@@ -15,19 +16,19 @@
 <main>
   <section class="hero">
     <div class="wrap">
-      <span class="due-stamp">DEVOLVER · 24 JUL</span>
-      <h1>Tu biblioteca, <em>al día</em> y sin fichas de papel</h1>
+      <span class="due-stamp">DUE · 24 JUL</span>
+      <h1>Your library, <em>up to date</em> and free of paper cards</h1>
       <p class="lead">
-        Librarium reúne catálogo, préstamos y socios en un solo mostrador digital.
-        Presta un libro en menos de 30 segundos y no vuelvas a perder de vista un vencimiento.
+        Librarium brings the catalogue, the loans and the members together at one digital
+        desk. Lend a book in under thirty seconds and never lose sight of a due date again.
       </p>
       <div class="hero-cta">
-        <a class="btn btn-primary" routerLink="/register">Crear mi biblioteca</a>
-        <a class="btn btn-ghost" href="#funciones">Ver cómo funciona</a>
+        <a class="btn btn-primary" href="#scope">Try the demo</a>
+        <a class="btn btn-ghost" href="#features">See how it works</a>
       </div>
-      <p class="hero-note">Sin tarjeta de crédito · Listo en una tarde</p>
+      <p class="hero-note">Built as a technical assessment · Seeded with a year of library history</p>
 
-      <!-- Decorativa: enseña el sello de vencimiento, el elemento firma del sistema. -->
+      <!-- Decorative: shows the due-date stamp, the signature element of the system. -->
       <div class="card-demo" aria-hidden="true">
         @for (loan of sampleLoans; track loan.isbn) {
           <div class="row">
@@ -42,13 +43,13 @@
     </div>
   </section>
 
-  <section id="funciones">
+  <section id="features">
     <div class="wrap">
-      <span class="eyebrow">Funciones</span>
-      <h2 class="section-title">Todo lo que pasa en el mostrador, en una pantalla</h2>
+      <span class="eyebrow">Features</span>
+      <h2 class="section-title">Everything that happens at the desk, on one screen</h2>
       <p class="section-lead">
-        Pensado para bibliotecas pequeñas y medianas que quieren dejar atrás las hojas
-        de cálculo sin complicarse la vida.
+        Built for small and medium libraries that want to leave spreadsheets behind
+        without taking on a complicated system.
       </p>
 
       <div class="features">
@@ -65,11 +66,11 @@
 
   <section id="roles" class="roles">
     <div class="wrap">
-      <span class="eyebrow">Para quién</span>
-      <h2 class="section-title">Un rol para cada persona de la biblioteca</h2>
+      <span class="eyebrow">Who it is for</span>
+      <h2 class="section-title">A role for everyone who works the desk</h2>
       <p class="section-lead">
-        Los permisos vienen configurados de serie, y la administración puede componer
-        roles nuevos sin tocar el código: nadie borra un catálogo por accidente.
+        Permissions ship configured, and administration can compose new roles without a
+        deployment: nobody deletes a catalogue by accident.
       </p>
 
       <div class="roles-grid">
@@ -88,12 +89,54 @@
     </div>
   </section>
 
-  <section id="empezar" class="cta">
+  <!-- What this build is and, just as importantly, what it is not. -->
+  <section id="scope" class="scope">
     <div class="wrap">
-      <div class="panel">
-        <h2>Abre tu mostrador digital hoy</h2>
-        <p>Importa tu catálogo, invita a tu equipo y registra el primer préstamo esta misma tarde.</p>
-        <a class="btn" routerLink="/register">Crear mi biblioteca</a>
+      <span class="eyebrow">About this build</span>
+      <h2 class="section-title">A technical assessment, not a product on sale</h2>
+      <p class="section-lead">
+        Librarium was built as a Senior Backend Engineer assessment. It implements the
+        scope the brief asked for and stops there — the marketing above describes what
+        the system does, not a company standing behind it.
+      </p>
+
+      <div class="scope-grid">
+        <article class="scope-card">
+          <h3>Built and working</h3>
+          <ul>
+            @for (item of delivered; track item) {
+              <li>{{ item }}</li>
+            }
+          </ul>
+        </article>
+        <article class="scope-card out">
+          <h3>Deliberately out of scope</h3>
+          <ul>
+            @for (item of outOfScope; track item) {
+              <li>{{ item }}</li>
+            }
+          </ul>
+        </article>
+      </div>
+
+      <div class="demo-accounts">
+        <h3>Sign in and look around</h3>
+        <p>Every account uses the password <code class="mono">password</code>.</p>
+        <table>
+          <thead>
+            <tr><th>Role</th><th>Email</th><th>What you will see</th></tr>
+          </thead>
+          <tbody>
+            @for (account of demoAccounts; track account.email) {
+              <tr>
+                <td>{{ account.role }}</td>
+                <td class="mono">{{ account.email }}</td>
+                <td>{{ account.sees }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+        <a class="btn btn-primary" routerLink="/login">Sign in</a>
       </div>
     </div>
   </section>
@@ -101,7 +144,7 @@
 
 <footer>
   <div class="wrap">
-    <span>© {{ year }} Librarium</span>
-    <span class="mono">hecho para bibliotecas que prestan mucho</span>
+    <span>© {{ year }} Librarium — technical assessment</span>
+    <span class="mono">built for libraries that lend a lot</span>
   </div>
 </footer>

@@ -113,3 +113,38 @@ footer .wrap { display: flex; justify-content: space-between; gap: var(--sp-4); 
 @media (prefers-reduced-motion: reduce) {
   .due-stamp { transform: none; }
 }
+
+/* The honest part of the page: what this build is, and what it is not. */
+.scope-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--sp-5); }
+.scope-card {
+  background: var(--lib-surface); border: 1px solid var(--lib-line);
+  border-radius: 12px; padding: 26px;
+}
+.scope-card h3 { font-size: 18px; margin-bottom: var(--sp-4); }
+.scope-card ul { list-style: none; padding: 0; margin: 0; display: grid; gap: var(--sp-3); font-size: 14px; color: var(--lib-ink-soft); }
+.scope-card li { display: flex; gap: var(--sp-2); }
+.scope-card li::before { content: '✓'; color: var(--lib-green); font-weight: 600; flex: none; }
+.scope-card.out li::before { content: '—'; color: var(--lib-ink-faint); font-weight: 400; }
+
+.demo-accounts {
+  margin-top: var(--sp-8); padding: 26px;
+  background: var(--lib-brass-soft); border: 1px solid var(--lib-line); border-radius: 12px;
+}
+.demo-accounts h3 { font-size: 18px; margin-bottom: var(--sp-2); }
+.demo-accounts p { font-size: 14px; color: var(--lib-ink-soft); margin-bottom: var(--sp-4); }
+.demo-accounts code { background: var(--lib-surface); padding: 2px 6px; border-radius: var(--lib-radius-sm); font-size: 13px; }
+.demo-accounts table { width: 100%; border-collapse: collapse; font-size: 14px; margin-bottom: var(--sp-5); }
+.demo-accounts th {
+  text-align: left; font-size: 12px; text-transform: uppercase; letter-spacing: .06em;
+  color: var(--lib-ink-faint); font-weight: 600; padding-bottom: var(--sp-2);
+}
+.demo-accounts td { padding: var(--sp-3) var(--sp-3) var(--sp-3) 0; border-top: 1px solid var(--lib-line); color: var(--lib-ink-soft); }
+.demo-accounts td:first-child { color: var(--lib-ink); font-weight: 600; }
+
+@media (max-width: 820px) {
+  .scope-grid { grid-template-columns: 1fr; }
+  .demo-accounts table, .demo-accounts thead, .demo-accounts tbody, .demo-accounts tr, .demo-accounts td { display: block; width: 100%; }
+  .demo-accounts thead { display: none; }
+  .demo-accounts tr + tr { margin-top: var(--sp-4); }
+  .demo-accounts td { border-top: none; padding: 2px 0; }
+}
