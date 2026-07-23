@@ -39,6 +39,7 @@ vendor/bin/pest                  # test suite
 vendor/bin/pest --filter=Loans   # one directory or test name
 composer lint                    # Pint (PSR-12)
 composer analyse                 # PHPStan level 8
+composer openapi                 # regenerate openapi.json
 ```
 
 The suite runs on SQLite by default. To exercise the MariaDB-only guards —
@@ -91,6 +92,22 @@ response carries `X-Request-Id`, honouring an inbound one, so a user report maps
 to its logs.
 
 `php artisan route:list --path=api` prints the current surface.
+
+## OpenAPI
+
+The specification is generated from the code by
+[Scramble](https://scramble.dedoc.co/): FormRequests become request bodies, API
+Resources become response schemas, so it cannot drift the way a hand-written
+document does. What inference cannot see is declared explicitly — the error
+envelope via a document transformer, and each endpoint's business refusals via
+`#[DomainErrors([...])]` on the controller method.
+
+- `/docs/api` — interactive documentation. Open to everyone in local; elsewhere
+  it needs an authenticated administrator.
+- `/docs/api.json` — the live document.
+- `openapi.json` — the committed contract. `composer openapi` regenerates it,
+  and a test fails if it drifts from the code, which is the breaking-change
+  detection RFC-001 §13 asks for.
 
 ## Configuration
 

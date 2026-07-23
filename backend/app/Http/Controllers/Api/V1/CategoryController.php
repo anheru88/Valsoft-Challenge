@@ -14,6 +14,7 @@ use App\Library\Domains\Categories\Models\Category;
 use App\Library\Domains\Categories\Requests\IndexCategoryRequest;
 use App\Library\Domains\Categories\Requests\StoreCategoryRequest;
 use App\Library\Domains\Categories\Resources\CategoryResource;
+use App\Support\OpenApi\DomainErrors;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Response;
@@ -21,6 +22,9 @@ use Illuminate\Support\Facades\Gate;
 
 final class CategoryController
 {
+    /**
+     * List categories.
+     */
     public function index(IndexCategoryRequest $request, CategoryRepositoryInterface $categories): AnonymousResourceCollection
     {
         Gate::authorize('viewAny', Category::class);
@@ -28,6 +32,9 @@ final class CategoryController
         return CategoryResource::collection($categories->paginate(CategoryFilters::fromRequest($request)));
     }
 
+    /**
+     * Show a category.
+     */
     public function show(int $category, CategoryRepositoryInterface $categories): CategoryResource
     {
         Gate::authorize('view', Category::class);
@@ -39,6 +46,11 @@ final class CategoryController
         return new CategoryResource($model);
     }
 
+    /**
+     * Create a category.
+     *
+     * The slug is derived from the name, never accepted from the client.
+     */
     public function store(StoreCategoryRequest $request, CreateCategoryAction $createCategory): JsonResponse
     {
         Gate::authorize('create', Category::class);
@@ -51,6 +63,9 @@ final class CategoryController
             ->header('Location', route('categories.show', $created));
     }
 
+    /**
+     * Update a category.
+     */
     public function update(StoreCategoryRequest $request, Category $category, UpdateCategoryAction $updateCategory): CategoryResource
     {
         Gate::authorize('update', Category::class);
@@ -58,6 +73,10 @@ final class CategoryController
         return new CategoryResource($updateCategory($category, CategoryData::fromRequest($request)));
     }
 
+    /**
+     * Delete a category.
+     */
+    #[DomainErrors(['CATEGORY_IN_USE'])]
     public function destroy(Category $category, DeleteCategoryAction $deleteCategory): Response
     {
         Gate::authorize('delete', Category::class);

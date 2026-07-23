@@ -18,6 +18,7 @@ use App\Library\Domains\Users\Contracts\UserRepositoryInterface;
 use App\Library\Domains\Users\DTOs\CreateUserData;
 use App\Library\Domains\Users\Models\User;
 use App\Library\Domains\Users\Resources\UserResource;
+use App\Support\OpenApi\DomainErrors;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -28,6 +29,12 @@ use Illuminate\Http\Response;
  */
 final class AuthController
 {
+    /**
+     * Register a member account.
+     *
+     * Public. The role is decided by the server: registration never mints
+     * privileges (FR-AUTH-2). Rate limited to 5 requests a minute.
+     */
     public function register(RegisterRequest $request, RegisterUserAction $register): JsonResponse
     {
         $session = $register(CreateUserData::forRegistration($request));
@@ -37,11 +44,25 @@ final class AuthController
             ->setStatusCode(Response::HTTP_CREATED);
     }
 
+    /**
+     * Log in.
+     *
+     * Public. An unknown email and a wrong password answer identically, so the
+     * endpoint cannot be used to enumerate accounts. Rate limited to 5 requests
+     * a minute per email and IP.
+     */
+    #[DomainErrors(['INVALID_CREDENTIALS'], status: 422, description: 'The credentials do not match any account.')]
+    #[DomainErrors(['USER_INACTIVE'], status: 403, description: 'The account exists but has been deactivated.')]
     public function login(LoginRequest $request, LoginAction $login): AuthenticatedSessionResource
     {
         return new AuthenticatedSessionResource($login(LoginData::fromRequest($request)));
     }
 
+    /**
+     * Log out.
+     *
+     * Revokes the token that authenticated this request, and only that one.
+     */
     public function logout(Request $request, TokenIssuer $tokens): Response
     {
         /** @var User $user */
@@ -52,6 +73,9 @@ final class AuthController
         return response()->noContent();
     }
 
+    /**
+     * Show the authenticated account.
+     */
     public function me(Request $request, UserRepositoryInterface $users): UserResource
     {
         /** @var User $user */
@@ -62,6 +86,12 @@ final class AuthController
         return new UserResource($users->findById($user->id) ?? $user);
     }
 
+    /**
+     * Change the password.
+     *
+     * Requires the current password and revokes every other session.
+     */
+    #[DomainErrors(['CURRENT_PASSWORD_INVALID'], status: 422, description: 'The supplied current password is wrong.')]
     public function changePassword(ChangePasswordRequest $request, ChangePasswordAction $changePassword): Response
     {
         /** @var User $user */

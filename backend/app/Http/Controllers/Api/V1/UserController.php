@@ -17,6 +17,7 @@ use App\Library\Domains\Users\Requests\IndexUserRequest;
 use App\Library\Domains\Users\Requests\StoreUserRequest;
 use App\Library\Domains\Users\Requests\UpdateUserRequest;
 use App\Library\Domains\Users\Resources\UserResource;
+use App\Support\OpenApi\DomainErrors;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Response;
@@ -24,6 +25,11 @@ use Illuminate\Support\Facades\Gate;
 
 final class UserController
 {
+    /**
+     * List users.
+     *
+     * Administrators only.
+     */
     public function index(IndexUserRequest $request, UserRepositoryInterface $users): AnonymousResourceCollection
     {
         Gate::authorize('viewAny', User::class);
@@ -31,6 +37,11 @@ final class UserController
         return UserResource::collection($users->paginate(UserFilters::fromRequest($request)));
     }
 
+    /**
+     * Show a user.
+     *
+     * Staff read any account for desk service; a member reads only their own.
+     */
     public function show(User $user): UserResource
     {
         Gate::authorize('view', $user);
@@ -38,6 +49,12 @@ final class UserController
         return new UserResource($user->loadCount(['loans as active_loans_count' => fn ($loans) => $loans->whereNull('returned_at')]));
     }
 
+    /**
+     * Create a user.
+     *
+     * Administrators create any role; librarians create members only, and a
+     * librarian asking for another role gets 403.
+     */
     public function store(StoreUserRequest $request, CreateUserAction $createUser): JsonResponse
     {
         // The requested role is part of the authorization question: a librarian
@@ -52,6 +69,13 @@ final class UserController
             ->header('Location', route('users.show', $user));
     }
 
+    /**
+     * Update a user.
+     *
+     * Role and status changes are administrator-only and revoke the account's
+     * tokens immediately.
+     */
+    #[DomainErrors(['LAST_ADMIN_PROTECTED'])]
     public function update(UpdateUserRequest $request, User $user, UpdateUserAction $updateUser): UserResource
     {
         Gate::authorize('update', $user);
@@ -65,6 +89,12 @@ final class UserController
         return new UserResource($updateUser($user, $data));
     }
 
+    /**
+     * Activate or deactivate a user.
+     *
+     * Deactivation revokes every token the account holds.
+     */
+    #[DomainErrors(['LAST_ADMIN_PROTECTED'])]
     public function changeStatus(ChangeUserStatusRequest $request, User $user, UpdateUserAction $updateUser): UserResource
     {
         Gate::authorize('changeStatus', User::class);
@@ -72,6 +102,12 @@ final class UserController
         return new UserResource($updateUser($user, new UpdateUserData(isActive: $request->boolean('is_active'))));
     }
 
+    /**
+     * Delete a user.
+     *
+     * Soft delete, so the loan history stays intact.
+     */
+    #[DomainErrors(['USER_HAS_ACTIVE_LOANS', 'LAST_ADMIN_PROTECTED'])]
     public function destroy(User $user, DeleteUserAction $deleteUser): Response
     {
         Gate::authorize('delete', User::class);
