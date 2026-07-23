@@ -27,3 +27,11 @@ it('honours an inbound X-Request-Id so an existing trace is not broken', functio
     $response->assertJsonPath('error.trace_id', 'spa-abc-123');
     expect($response->headers->get(AssignTraceId::HEADER))->toBe('spa-abc-123');
 });
+
+it('answers 401 rather than failing on a missing login route', function () {
+    // A client that forgets the Accept header still gets the error envelope: an
+    // API-only application has no login page to redirect a guest to.
+    $response = $this->get('/api/v1/books');
+
+    $response->assertUnauthorized()->assertJsonPath('error.code', 'UNAUTHENTICATED');
+});

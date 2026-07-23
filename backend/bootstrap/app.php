@@ -6,6 +6,7 @@ use App\Http\Middleware\EnsureUserIsActive;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Http\Request;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -26,6 +27,12 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->throttleApi();
 
         $middleware->alias(['active' => EnsureUserIsActive::class]);
+
+        // This application has no login page to redirect to. Returning null lets
+        // the auth middleware throw, so an unauthenticated API call answers 401
+        // with the error envelope whatever Accept header it carried — instead of
+        // failing on a route that does not exist.
+        $middleware->redirectGuestsTo(fn (Request $request): ?string => null);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->render(new ApiExceptionRenderer);
