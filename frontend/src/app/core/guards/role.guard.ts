@@ -4,11 +4,11 @@ import { AuthStore } from '../auth.store';
 import { Role } from '../models';
 
 /**
- * Protege una ruta por nombre de rol.
+ * Guards a route by role name.
  *
- * Prefiere `permissionGuard`: preguntar por capacidad hace que un rol nuevo
- * creado en el servidor funcione sin desplegar el cliente. Esto queda para los
- * pocos casos en que la pantalla es de un rol concreto por definición.
+ * Prefer `permissionGuard`: asking for a capability lets a role created on the
+ * server work without deploying the client. This stays for the few screens that
+ * belong to one named role by definition.
  */
 export function roleGuard(allowed: Role[]): CanActivateFn {
   return () => {

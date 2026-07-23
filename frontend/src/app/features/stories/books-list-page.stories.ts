@@ -5,13 +5,13 @@ import { Book } from '../../core/models';
 import { asRole } from './page-harness';
 
 /**
- * El catálogo, la pantalla más visitada del sistema. Las historias recorren los
- * cuatro estados que el PRD 5 exige de cualquier listado: cargando con
- * esqueleto, cargado, vacío —distinguiendo catálogo vacío de filtro sin
- * resultados— y error con reintento.
+ * The catalogue, the most visited screen in the system. These stories walk the
+ * four states PRD 5 requires of any list: loading with a skeleton, loaded,
+ * empty — telling an empty catalogue apart from a filter with no results — and
+ * error with retry.
  */
 const meta: Meta<BooksListPage> = {
-  title: 'Pages/Libros/Listado',
+  title: 'Pages/Books/List',
   component: BooksListPage,
   decorators: [asRole('librarian')],
   parameters: { layout: 'fullscreen' },
@@ -22,19 +22,19 @@ type S = StoryObj<BooksListPage>;
 
 const empty = { books: signal<Book[]>([]), meta: signal({ current_page: 1, per_page: 15, total: 0, last_page: 1 }) };
 
-export const Cargado: S = {};
+export const Loaded: S = {};
 
-export const Cargando: S = {
+export const Loading: S = {
   render: () => ({ props: { loading: signal(true) } }),
 };
 
-export const CatalogoVacio: S = {
-  name: 'Catálogo vacío',
+export const EmptyCatalogue: S = {
+  name: 'Empty catalogue',
   render: () => ({ props: { ...empty } }),
 };
 
-export const SinResultadosDeFiltro: S = {
-  name: 'Sin resultados de filtro',
+export const NoFilterResults: S = {
+  name: 'No results for these filters',
   render: () => ({
     props: {
       ...empty,
@@ -47,8 +47,8 @@ export const Error: S = {
   render: () => ({ props: { error: signal(true) } }),
 };
 
-/** Un socio ve el mismo catálogo sin las acciones de curaduría. */
-export const ComoSocio: S = {
-  name: 'Como socio',
+/** A member sees the same catalogue without the curation actions. */
+export const AsMember: S = {
+  name: 'As a member',
   decorators: [asRole('member')],
 };

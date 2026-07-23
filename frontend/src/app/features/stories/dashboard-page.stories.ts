@@ -4,12 +4,12 @@ import { DashboardPage } from '../dashboard/dashboard-page';
 import { asRole } from './page-harness';
 
 /**
- * El panel de mostrador. Los KPI cargan por separado del resto de widgets, así
- * que su esqueleto y su error son estados propios: un fallo del panel nunca
- * bloquea la circulación (PRD 9, disponibilidad).
+ * The desk dashboard. The KPIs load separately from the other widgets, so their
+ * skeleton and their error are states of their own: a dashboard failure never
+ * blocks circulation (PRD 9, availability).
  */
 const meta: Meta<DashboardPage> = {
-  title: 'Pages/Panel',
+  title: 'Pages/Dashboard',
   component: DashboardPage,
   decorators: [asRole('librarian')],
   parameters: { layout: 'fullscreen' },
@@ -18,21 +18,21 @@ export default meta;
 
 type S = StoryObj<DashboardPage>;
 
-export const Cargado: S = {};
+export const Loaded: S = {};
 
-export const CargandoKpis: S = {
-  name: 'Cargando KPIs',
+export const LoadingKpis: S = {
+  name: 'Loading KPIs',
   render: () => ({ props: { loadingKpis: signal(true) } }),
 };
 
-export const ErrorDeKpis: S = {
-  name: 'Error de KPIs',
+export const KpiError: S = {
+  name: 'KPI error',
   render: () => ({ props: { kpisError: signal(true) } }),
 };
 
-/** Biblioteca recién puesta en marcha: nada que contar todavía. */
-export const SinActividad: S = {
-  name: 'Sin actividad',
+/** A library that has just opened: nothing to report yet. */
+export const NoActivity: S = {
+  name: 'No activity',
   render: () => ({
     props: {
       kpis: signal({

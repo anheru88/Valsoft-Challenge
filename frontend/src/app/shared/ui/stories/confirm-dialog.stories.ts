@@ -23,4 +23,4 @@ const meta: Meta<ConfirmDialog> = {
   ],
 };
 export default meta;
-export const Destructivo: StoryObj<ConfirmDialog> = {};
+export const Destructive: StoryObj<ConfirmDialog> = {};

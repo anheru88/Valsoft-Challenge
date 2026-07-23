@@ -1,14 +1,14 @@
 import type { Meta, StoryObj } from '@storybook/angular';
 
 /**
- * La paleta, leída de los tokens. Ninguna feature escribe un color literal: si
- * un valor cambia aquí, cambia en todo el sistema, incluido el modo oscuro.
+ * The palette, read from the tokens. No feature writes a literal colour: change
+ * a value here and it changes system-wide, dark mode included.
  */
 const meta: Meta = {
-  title: 'Design System/Colores',
+  title: 'Design System/Colours',
   tags: ['autodocs'],
   parameters: {
-    docs: { description: { component: 'Superficies, tinta y marca. Cambia el tema en la barra superior para ver los mismos tokens en oscuro.' } },
+    docs: { description: { component: 'Surfaces, ink and brand. Flip the theme in the toolbar to see the same tokens in dark.' } },
   },
 };
 export default meta;
@@ -17,29 +17,29 @@ type Swatch = { token: string; name: string; note?: string };
 
 const GROUPS: { group: string; swatches: Swatch[] }[] = [
   {
-    group: 'Superficies',
+    group: 'Surfaces',
     swatches: [
-      { token: '--lib-paper', name: 'paper', note: 'fondo de la aplicación' },
-      { token: '--lib-surface', name: 'surface', note: 'tarjetas y tablas' },
-      { token: '--lib-surface-2', name: 'surface-2', note: 'hover de fila, chips neutros' },
-      { token: '--lib-line', name: 'line', note: 'bordes hairline' },
+      { token: '--lib-paper', name: 'paper', note: 'application background' },
+      { token: '--lib-surface', name: 'surface', note: 'cards and tables' },
+      { token: '--lib-surface-2', name: 'surface-2', note: 'row hover, neutral chips' },
+      { token: '--lib-line', name: 'line', note: 'hairline borders' },
     ],
   },
   {
-    group: 'Tinta',
+    group: 'Ink',
     swatches: [
-      { token: '--lib-ink', name: 'ink', note: 'texto principal' },
-      { token: '--lib-ink-soft', name: 'ink-soft', note: 'texto secundario' },
-      { token: '--lib-ink-faint', name: 'ink-faint', note: 'metadatos' },
+      { token: '--lib-ink', name: 'ink', note: 'primary text' },
+      { token: '--lib-ink-soft', name: 'ink-soft', note: 'secondary text' },
+      { token: '--lib-ink-faint', name: 'ink-faint', note: 'metadata' },
     ],
   },
   {
-    group: 'Marca',
+    group: 'Brand',
     swatches: [
-      { token: '--lib-green', name: 'green', note: 'primario' },
-      { token: '--lib-green-strong', name: 'green-strong', note: 'préstamo activo' },
-      { token: '--lib-brass', name: 'brass', note: 'acento' },
-      { token: '--lib-stamp', name: 'stamp', note: 'vencidos y acciones destructivas' },
+      { token: '--lib-green', name: 'green', note: 'primary' },
+      { token: '--lib-green-strong', name: 'green-strong', note: 'active loan' },
+      { token: '--lib-brass', name: 'brass', note: 'accent' },
+      { token: '--lib-stamp', name: 'stamp', note: 'overdue and destructive actions' },
     ],
   },
 ];
@@ -63,4 +63,4 @@ const template = `
   </div>
 `;
 
-export const Paleta: StoryObj = { render: () => ({ template }) };
+export const Palette: StoryObj = { render: () => ({ template }) };

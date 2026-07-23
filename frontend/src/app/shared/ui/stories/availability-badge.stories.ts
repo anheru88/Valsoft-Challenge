@@ -9,6 +9,6 @@ const meta: Meta<AvailabilityBadge> = {
 export default meta;
 type S = StoryObj<AvailabilityBadge>;
 
-export const Disponible: S =    { args: { available: 3, total: 5 } };
-export const UltimaCopia: S =   { args: { available: 1, total: 4 } };
-export const SinEjemplares: S = { args: { available: 0, total: 5 } };
+export const Available: S =    { args: { available: 3, total: 5 } };
+export const LastCopy: S =   { args: { available: 1, total: 4 } };
+export const NoCopiesLeft: S = { args: { available: 0, total: 5 } };

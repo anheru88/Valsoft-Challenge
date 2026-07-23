@@ -5,11 +5,11 @@ import { Author } from '../../core/models';
 import { asRole } from './page-harness';
 
 /**
- * Autores: alta y edición ocurren en diálogo, así que la página solo tiene tres
- * estados propios — cargando, con datos y vacía.
+ * Authors: creating and editing happen in a dialog, so the page itself has only
+ * three states — loading, populated and empty.
  */
 const meta: Meta<AuthorsListPage> = {
-  title: 'Pages/Autores',
+  title: 'Pages/Authors',
   component: AuthorsListPage,
   decorators: [asRole('librarian')],
   parameters: { layout: 'fullscreen' },
@@ -18,11 +18,11 @@ export default meta;
 
 type S = StoryObj<AuthorsListPage>;
 
-export const Cargado: S = {};
+export const Loaded: S = {};
 
-export const Cargando: S = { render: () => ({ props: { loading: signal(true) } }) };
+export const Loading: S = { render: () => ({ props: { loading: signal(true) } }) };
 
-export const Vacio: S = {
-  name: 'Vacío',
+export const Empty: S = {
+  name: 'Empty',
   render: () => ({ props: { authors: signal<Author[]>([]) } }),
 };

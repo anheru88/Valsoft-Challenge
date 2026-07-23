@@ -1,15 +1,15 @@
 import type { Meta, StoryObj } from '@storybook/angular';
 
-/** La escala de espaciado y los radios que usan tarjetas, tablas y diálogos. */
+/** The spacing scale used by cards, tables and dialogs. */
 const meta: Meta = {
-  title: 'Design System/Espaciado',
+  title: 'Design System/Spacing',
   tags: ['autodocs'],
 };
 export default meta;
 
 const STEPS = ['--sp-1', '--sp-2', '--sp-3', '--sp-4', '--sp-5', '--sp-6'];
 
-export const Escala: StoryObj = {
+export const Scale: StoryObj = {
   render: () => ({
     template: `
       <div style="display: grid; gap: 10px;">

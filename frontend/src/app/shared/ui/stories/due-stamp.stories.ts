@@ -6,12 +6,12 @@ const meta: Meta<DueStamp> = {
   component: DueStamp,
   tags: ['autodocs'],
   parameters: { docs: { description: { component:
-    'Sello de fecha estilo ficha de préstamo. Elemento firma del sistema: monoespaciada, mayúsculas y ligera rotación de tampón.' } } },
+    'A due-date stamp in the style of a loan card. The system\'s signature element: monospaced, uppercase, with a slight inked rotation.' } } },
 };
 export default meta;
 type S = StoryObj<DueStamp>;
 
-export const Activo: S =   { args: { status: 'active',   dueDate: '2026-07-24' } };
-export const Vencido: S =  { args: { status: 'overdue',  dueDate: '2026-07-10', daysOverdue: 12 } };
-export const VencidoUnDia: S = { args: { status: 'overdue', dueDate: '2026-07-21', daysOverdue: 1 } };
-export const Devuelto: S = { args: { status: 'returned', dueDate: '2026-07-10', returnedAt: '2026-07-08' } };
+export const Active: S =   { args: { status: 'active',   dueDate: '2026-07-24' } };
+export const Overdue: S =  { args: { status: 'overdue',  dueDate: '2026-07-10', daysOverdue: 12 } };
+export const OverdueByOneDay: S = { args: { status: 'overdue', dueDate: '2026-07-21', daysOverdue: 1 } };
+export const Returned: S = { args: { status: 'returned', dueDate: '2026-07-10', returnedAt: '2026-07-08' } };

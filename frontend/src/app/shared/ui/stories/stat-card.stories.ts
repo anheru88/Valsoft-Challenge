@@ -5,6 +5,6 @@ const meta: Meta<StatCard> = { title: 'Shared UI/StatCard', component: StatCard,
 export default meta;
 type S = StoryObj<StatCard>;
 
-export const Basico: S = { args: { label: 'Libros en catálogo', value: 1240 } };
-export const ConPista: S = { args: { label: 'Prestados ahora', value: 520, hint: '15% del fondo' } };
-export const Alerta: S = { args: { label: 'Vencidos', value: 34, tone: 'alert', hint: 'Requieren seguimiento' } };
+export const Basic: S = { args: { label: 'Libros en catálogo', value: 1240 } };
+export const WithHint: S = { args: { label: 'Prestados ahora', value: 520, hint: '15% del fondo' } };
+export const Alert: S = { args: { label: 'Vencidos', value: 34, tone: 'alert', hint: 'Requieren seguimiento' } };

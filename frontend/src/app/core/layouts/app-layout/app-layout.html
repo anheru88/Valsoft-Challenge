@@ -10,8 +10,8 @@
       <span class="brand-name">Librarium</span>
     </div>
 
-    <!-- Cada entrada se abre con la misma capacidad que exige su ruta: así el
-         menú nunca ofrece un destino que el guard va a rechazar. -->
+    <!-- Every entry opens on the same capability its route requires, so the
+         menu never offers a destination the guard will refuse. -->
     <mat-nav-list>
       @if (auth.can('dashboard.view')) {
         <a mat-list-item routerLink="/dashboard" routerLinkActive="active-link">

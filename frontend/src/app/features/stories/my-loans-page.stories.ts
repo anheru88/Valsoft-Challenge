@@ -4,9 +4,9 @@ import { MyLoansPage } from '../loans/my-loans/my-loans-page';
 import { Loan } from '../../core/models';
 import { asRole } from './page-harness';
 
-/** La vista del socio: qué tiene en casa y para cuándo. */
+/** The member's view: what they have at home, and until when. */
 const meta: Meta<MyLoansPage> = {
-  title: 'Pages/Mis préstamos',
+  title: 'Pages/My loans',
   component: MyLoansPage,
   decorators: [asRole('member')],
   parameters: { layout: 'fullscreen' },
@@ -15,9 +15,9 @@ export default meta;
 
 type S = StoryObj<MyLoansPage>;
 
-export const ConVencido: S = { name: 'Con un vencido' };
+export const WithAnOverdue: S = { name: 'With an overdue loan' };
 
-export const SinPrestamos: S = {
-  name: 'Sin préstamos',
+export const NoLoans: S = {
+  name: 'No loans',
   render: () => ({ props: { loans: signal<Loan[]>([]) } }),
 };

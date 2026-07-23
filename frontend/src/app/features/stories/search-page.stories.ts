@@ -4,11 +4,11 @@ import { SearchPage } from '../search/search-page';
 import { asRole } from './page-harness';
 
 /**
- * La búsqueda global. Sin término no muestra una lista vacía sino una
- * invitación: el estado inicial y el "sin resultados" dicen cosas distintas.
+ * Global search. With no term it shows an invitation rather than an empty list:
+ * the initial state and "no results" say different things.
  */
 const meta: Meta<SearchPage> = {
-  title: 'Pages/Búsqueda',
+  title: 'Pages/Search',
   component: SearchPage,
   decorators: [asRole('member')],
   parameters: { layout: 'fullscreen' },
@@ -17,9 +17,9 @@ export default meta;
 
 type S = StoryObj<SearchPage>;
 
-export const EstadoInicial: S = { name: 'Estado inicial' };
+export const InitialState: S = { name: 'Initial state' };
 
-export const SinResultados: S = {
-  name: 'Sin resultados',
+export const NoResults: S = {
+  name: 'No results',
   render: () => ({ props: { query: signal('zzzz'), results: signal([]) } }),
 };

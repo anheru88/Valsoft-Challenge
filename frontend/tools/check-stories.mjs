@@ -1,12 +1,12 @@
 /**
- * Prueba de humo del catálogo: abre cada historia en un navegador real y falla
- * si alguna no pinta nada o escupe un error de consola.
+ * Smoke test for the catalogue: opens every story in a real browser and fails if
+ * any of them renders nothing or logs a console error.
  *
- * Compilar no es renderizar — una plantilla puede compilar y romperse al
- * ejecutarse (un pipe sin importar, un guard que aborta el arranque). Esto es lo
- * que convierte a Storybook en el contrato de componente que pide el PRD 8.5.
+ * Compiling is not rendering — a template can compile and still break at runtime
+ * (a pipe that was never imported, a guard that aborts the bootstrap). This is
+ * what makes Storybook the component contract PRD 8.5 asks for.
  *
- * Uso: arranca `npm run storybook` y lanza `npm run stories:check`.
+ * Usage: start `npm run storybook`, then run `npm run stories:check`.
  */
 import { chromium } from 'playwright-core';
 
@@ -29,10 +29,10 @@ for (const { id, title, name } of ids) {
   page.on('console', onErr);
   page.on('pageerror', onPageErr);
 
-  // networkidle nunca llega: el servidor mantiene abierto el socket de HMR.
+  // networkidle never fires: the dev server keeps the HMR socket open.
   await page.goto(`${base}/iframe.html?id=${id}&viewMode=story`, { waitUntil: 'domcontentloaded', timeout: 30000 });
-  // Espera a que la historia pinte algo, o a que Storybook muestre su panel de
-  // error (que existe siempre en el DOM: solo cuenta si el body lo revela).
+  // Wait for the story to paint something, or for Storybook to reveal its error
+  // panel (which is always in the DOM: it only counts once the body shows it).
   await page.waitForFunction(
     () => {
       const root = document.querySelector('#storybook-root');
@@ -54,9 +54,9 @@ for (const { id, title, name } of ids) {
   else ok++;
 }
 
-console.log(`\nRenderizan: ${ok}/${ids.length}`);
+console.log(`\nRendered: ${ok}/${ids.length}`);
 if (failures.length) {
-  console.log('\nFallos:');
+  console.log('\nFailures:');
   for (const f of failures) console.log(`  ✗ ${f.title} › ${f.name} (${f.chars} chars) ${f.errors.join(' | ')}`);
 }
 await browser.close();

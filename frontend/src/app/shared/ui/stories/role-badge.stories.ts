@@ -6,5 +6,5 @@ export default meta;
 type S = StoryObj<RoleBadge>;
 
 export const Admin: S =         { args: { role: 'admin' } };
-export const Bibliotecario: S = { args: { role: 'librarian' } };
-export const Socio: S =         { args: { role: 'member' } };
+export const Librarian: S = { args: { role: 'librarian' } };
+export const Member: S =         { args: { role: 'member' } };

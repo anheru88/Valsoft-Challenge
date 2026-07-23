@@ -40,11 +40,11 @@ const preview: Preview = {
       description: 'Light or dark, the way the topbar toggle switches it',
       defaultValue: 'light',
       toolbar: {
-        title: 'Tema',
+        title: 'Theme',
         icon: 'circlehollow',
         items: [
-          { value: 'light', icon: 'sun', title: 'Claro' },
-          { value: 'dark', icon: 'moon', title: 'Oscuro' },
+          { value: 'light', icon: 'sun', title: 'Light' },
+          { value: 'dark', icon: 'moon', title: 'Dark' },
         ],
         dynamicTitle: true,
       },

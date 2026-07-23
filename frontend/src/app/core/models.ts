@@ -3,9 +3,9 @@ export type Role = 'admin' | 'librarian' | 'member';
 export type LoanStatus = 'active' | 'overdue' | 'returned';
 
 /**
- * Las capacidades del sistema (matriz de permisos, PRD 8.3). El API las asigna
- * a roles como datos, así que un rol nuevo no obliga a tocar este tipo; lo que
- * la UI necesita saber es qué puede hacer la cuenta, no cómo se llama su rol.
+ * The system's capabilities (permission matrix, PRD 8.3). The API assigns them
+ * to roles as data, so a new role does not force a change here: what the UI
+ * needs to know is what the account can do, not what its role is called.
  */
 export type Permission =
   | 'catalog.view'
@@ -22,9 +22,9 @@ export type Permission =
 
 export interface User {
   id: number; name: string; email: string;
-  /** Una cuenta lleva exactamente un rol, pero el API lo entrega como lista. */
+  /** An account carries exactly one role, but the API sends it as a list. */
   roles: Role[];
-  /** Capacidades efectivas: las del rol más lo concedido directamente. */
+  /** Effective capabilities: the role's, plus anything granted directly. */
   permissions: Permission[];
   is_active: boolean; active_loans_count?: number; created_at: string;
 }

@@ -4,10 +4,10 @@ import { AuthStore } from '../auth.store';
 import { Permission } from '../models';
 
 /**
- * Protege una ruta por capacidad en lugar de por rol.
+ * Guards a route by capability rather than by role.
  *
- * Uso: `canActivate: [authGuard, permissionGuard(['dashboard.view'])]`.
- * Basta con tener una de las capacidades indicadas.
+ * Usage: `canActivate: [authGuard, permissionGuard(['dashboard.view'])]`.
+ * Holding any one of the listed capabilities is enough.
  */
 export function permissionGuard(allowed: Permission[]): CanActivateFn {
   return () => {

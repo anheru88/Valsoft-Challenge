@@ -5,6 +5,6 @@ const meta: Meta<Skeleton> = { title: 'Shared UI/Skeleton', component: Skeleton,
 export default meta;
 type S = StoryObj<Skeleton>;
 
-export const FilasDeTabla: S = { args: { variant: 'rows', rows: 5 } };
-export const TarjetaKpi: S =   { args: { variant: 'stat' } };
-export const TarjetaDetalle: S = { args: { variant: 'card' } };
+export const TableRows: S = { args: { variant: 'rows', rows: 5 } };
+export const StatCard: S =   { args: { variant: 'stat' } };
+export const DetailCard: S = { args: { variant: 'card' } };

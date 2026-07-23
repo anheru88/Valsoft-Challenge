@@ -5,6 +5,6 @@ const meta: Meta<StatusChip> = { title: 'Shared UI/StatusChip', component: Statu
 export default meta;
 type S = StoryObj<StatusChip>;
 
-export const Activo: S =   { args: { status: 'active' } };
-export const Vencido: S =  { args: { status: 'overdue' } };
-export const Devuelto: S = { args: { status: 'returned' } };
+export const Active: S =   { args: { status: 'active' } };
+export const Overdue: S =  { args: { status: 'overdue' } };
+export const Returned: S = { args: { status: 'returned' } };

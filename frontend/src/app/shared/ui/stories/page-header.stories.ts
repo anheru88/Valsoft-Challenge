@@ -16,5 +16,5 @@ const meta: Meta<PageHeader> = {
 export default meta;
 type S = StoryObj<PageHeader>;
 
-export const ConAccion: S = { args: { title: 'Libros', subtitle: '1.240 títulos en catálogo' } };
-export const SoloTitulo: S = { args: { title: 'Mis préstamos' } };
+export const WithAction: S = { args: { title: 'Libros', subtitle: '1.240 títulos en catálogo' } };
+export const TitleOnly: S = { args: { title: 'Mis préstamos' } };

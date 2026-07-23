@@ -5,11 +5,11 @@ import { AuthStore } from '../../core/auth.store';
 import { Permission, Role, User } from '../../core/models';
 
 /**
- * Andamiaje común de las historias de página.
+ * Shared scaffolding for the page stories.
  *
- * Una página no es una pieza aislada: necesita router, y lee de la sesión para
- * decidir qué ofrece. Sembrar aquí una sesión concreta es lo que permite
- * revisar la misma pantalla como administrador, bibliotecario o socio.
+ * A page is not an isolated piece: it needs a router, and it reads the session
+ * to decide what it offers. Seeding a concrete session here is what lets the
+ * same screen be reviewed as an administrator, a librarian or a member.
  */
 const PERMISSIONS: Record<Role, Permission[]> = {
   member: ['catalog.view'],
@@ -56,10 +56,10 @@ function authStoreFor(role: Role): Provider {
 }
 
 /**
- * Decorador: la página se renderiza con una sesión del rol indicado.
+ * Decorator: renders the page with a session of the given role.
  *
- * La ruta comodín es necesaria: sin ella el router intenta emparejar la URL del
- * propio iframe de Storybook y aborta el arranque con NG04002.
+ * The wildcard route is required — without it the router tries to match
+ * Storybook's own iframe URL and aborts the bootstrap with NG04002.
  */
 export function asRole(role: Role) {
   return applicationConfig({

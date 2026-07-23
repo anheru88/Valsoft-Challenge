@@ -4,11 +4,11 @@ import { LoginPage } from '../auth/login/login-page';
 import { asRole } from './page-harness';
 
 /**
- * El acceso. Un fallo de credenciales es un error de negocio y va junto al
- * formulario, nunca en un aviso flotante (PRD 5).
+ * Sign-in. A credential failure is a business error and belongs next to the
+ * form, never in a floating toast (PRD 5).
  */
 const meta: Meta<LoginPage> = {
-  title: 'Pages/Acceso/Entrar',
+  title: 'Pages/Auth/Sign in',
   component: LoginPage,
   decorators: [asRole('member')],
   parameters: { layout: 'centered' },
@@ -17,19 +17,19 @@ export default meta;
 
 type S = StoryObj<LoginPage>;
 
-export const Vacio: S = { name: 'Formulario vacío' };
+export const Blank: S = { name: 'Blank form' };
 
-export const CredencialesInvalidas: S = {
-  name: 'Credenciales inválidas',
+export const InvalidCredentials: S = {
+  name: 'Invalid credentials',
   render: () => ({ props: { errorMessage: signal('Estas credenciales no coinciden con nuestros registros.') } }),
 };
 
-export const SesionCaducada: S = {
-  name: 'Sesión caducada',
+export const ExpiredSession: S = {
+  name: 'Expired session',
   render: () => ({ props: { sessionExpired: signal(true) } }),
 };
 
-export const Enviando: S = {
-  name: 'Enviando',
+export const Submitting: S = {
+  name: 'Submitting',
   render: () => ({ props: { loading: signal(true) } }),
 };

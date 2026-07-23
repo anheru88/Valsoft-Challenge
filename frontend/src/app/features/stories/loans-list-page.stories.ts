@@ -5,11 +5,11 @@ import { Loan } from '../../core/models';
 import { asRole } from './page-harness';
 
 /**
- * El listado de circulación. La devolución no es destructiva, así que se
- * confirma con un clic y un aviso, sin diálogo de por medio (PRD 5).
+ * The circulation list. A check-in is not destructive, so it takes one click and
+ * a toast rather than a confirmation dialog (PRD 5).
  */
 const meta: Meta<LoansListPage> = {
-  title: 'Pages/Préstamos/Listado',
+  title: 'Pages/Loans/List',
   component: LoansListPage,
   decorators: [asRole('librarian')],
   parameters: { layout: 'fullscreen' },
@@ -18,14 +18,14 @@ export default meta;
 
 type S = StoryObj<LoansListPage>;
 
-export const Cargado: S = {};
+export const Loaded: S = {};
 
-export const Cargando: S = { render: () => ({ props: { loading: signal(true) } }) };
+export const Loading: S = { render: () => ({ props: { loading: signal(true) } }) };
 
 export const Error: S = { render: () => ({ props: { error: signal(true) } }) };
 
-export const SinPrestamos: S = {
-  name: 'Sin préstamos',
+export const NoLoans: S = {
+  name: 'No loans',
   render: () => ({
     props: {
       allLoans: signal<Loan[]>([]),
@@ -34,8 +34,8 @@ export const SinPrestamos: S = {
   }),
 };
 
-/** Devolución en curso: el botón de esa fila queda ocupado, el resto no. */
-export const DevolucionEnCurso: S = {
-  name: 'Devolución en curso',
+/** Check-in in flight: that row's button is busy, the others are not. */
+export const CheckInInFlight: S = {
+  name: 'Check-in in flight',
   render: () => ({ props: { returningId: signal(501) } }),
 };

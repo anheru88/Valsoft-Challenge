@@ -4,7 +4,7 @@ import { BookDetailPage } from '../books/detail/book-detail-page';
 import { asRole } from './page-harness';
 
 const meta: Meta<BookDetailPage> = {
-  title: 'Pages/Libros/Detalle',
+  title: 'Pages/Books/Detail',
   component: BookDetailPage,
   decorators: [asRole('librarian')],
   parameters: { layout: 'fullscreen' },
@@ -13,15 +13,15 @@ export default meta;
 
 type S = StoryObj<BookDetailPage>;
 
-export const Cargado: S = {};
+export const Loaded: S = {};
 
-export const Cargando: S = { render: () => ({ props: { loading: signal(true) } }) };
+export const Loading: S = { render: () => ({ props: { loading: signal(true) } }) };
 
 export const Error: S = { render: () => ({ props: { error: signal(true) } }) };
 
-/** Sin ejemplares libres: la acción de prestar debe quedar fuera de alcance. */
-export const SinEjemplares: S = {
-  name: 'Sin ejemplares',
+/** No free copies: the lend action must be out of reach. */
+export const NoCopiesLeft: S = {
+  name: 'No copies left',
   render: () => ({
     props: {
       book: signal({
@@ -37,5 +37,5 @@ export const SinEjemplares: S = {
   }),
 };
 
-/** Un socio ve la ficha sin las acciones de curaduría ni el recuento de préstamos. */
-export const ComoSocio: S = { name: 'Como socio', decorators: [asRole('member')] };
+/** A member sees the record without curation actions or the loan count. */
+export const AsMember: S = { name: 'As a member', decorators: [asRole('member')] };
