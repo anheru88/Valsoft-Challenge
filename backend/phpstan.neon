@@ -3,8 +3,9 @@ includes:
 
 parameters:
     level: 8
+    # Production code only. Pest binds `$this` to the TestCase at runtime, which
+    # no static analyser can follow, so the suite is verified by running it.
     paths:
         - app
         - database
         - routes
-        - tests
