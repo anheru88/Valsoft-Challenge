@@ -26,6 +26,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property int $total_copies
  * @property int $available_copies
  * @property-read int|null $active_loans_count aliased withCount, present on repository queries
+ * @property-read list<string>|null $matched_on annotated by search, absent elsewhere
  */
 class Book extends Model
 {

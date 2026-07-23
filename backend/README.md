@@ -1,59 +1,99 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Librarium — Backend
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+REST API for the library management system specified in [`../docs`](../docs):
+the PRDs, RFC-001 and the API specification are the source of truth; this
+service implements them.
 
-## About Laravel
+## Stack
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+Laravel 12 · PHP 8.2+ · MariaDB · Sanctum token auth · Pest · Pint · PHPStan
+(larastan) level 8.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Getting started
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+```bash
+composer install
+cp .env.example .env
+php artisan key:generate
+php artisan migrate --seed
+php artisan serve
+```
 
-## Learning Laravel
+`.env.example` points at MariaDB, the production engine. For a zero-setup local
+run, set `DB_CONNECTION=sqlite` and `touch database/database.sqlite` — the
+migrations apply MariaDB-only features (FULLTEXT, CHECK constraints) behind
+driver checks, so the schema builds on both.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+The demo seeder creates one account per role, all with the password `password`:
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+| Role | Email |
+|---|---|
+| Administrator | `admin@librarium.test` |
+| Librarian | `librarian@librarium.test` |
+| Member | `member@librarium.test` |
 
-## Laravel Sponsors
+## Commands
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+```bash
+vendor/bin/pest                  # test suite
+vendor/bin/pest --filter=Loans   # one directory or test name
+composer lint                    # Pint (PSR-12)
+composer analyse                 # PHPStan level 8
+```
 
-### Premium Partners
+The suite runs on SQLite by default. To exercise the MariaDB-only guards —
+`SELECT ... FOR UPDATE` on check-out, FULLTEXT relevance search — point
+`phpunit.xml` at a MariaDB `librarium_test` database; tests that need them skip
+themselves elsewhere rather than pretending to pass.
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+## Layout
 
-## Contributing
+Business logic lives under `app/Library`, not in Laravel's default folders
+(RFC-001 §4). `app/Http` is a thin edge: a controller authorizes, builds a DTO,
+calls an action and returns a resource.
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+```
+app/Library/
+├── Shared/            # DomainException, DomainEvent, Clock, TransactionRunner,
+│                      #   pagination and sorting value objects, base repository
+└── Domains/
+    ├── Auth/          # login, registration, password change, token issuing
+    ├── Users/         # accounts, roles, the permission matrix
+    ├── Books/         # catalogue, ISBN value object, search implementations
+    ├── Authors/
+    ├── Categories/
+    ├── Loans/         # circulation: check-out, check-in, the BR-LOAN rules
+    └── Dashboard/     # aggregate reporting reads
+```
 
-## Code of Conduct
+Each domain owns its models, contracts, repositories, actions, DTOs, policies,
+events, requests, resources and exceptions. Domains talk to each other through
+contracts only — circulation asks Books to adjust its counter rather than
+writing the column itself.
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+## API
 
-## Security Vulnerabilities
+Everything is under `/api/v1` (ADR-8). All routes require a bearer token except
+`POST /auth/register` and `POST /auth/login`.
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+Errors share one envelope:
 
-## License
+```json
+{ "error": { "code": "LOAN_LIMIT_REACHED",
+             "message": "This member already has 5 active loans (limit 5).",
+             "details": { "limit": 5, "active_loans": 5 },
+             "trace_id": "8c9f1e2a-…" } }
+```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+`422` means the input is malformed; `409` means the input is fine and the world
+disagrees. The full code registry is in the API specification §10. Every
+response carries `X-Request-Id`, honouring an inbound one, so a user report maps
+to its logs.
+
+`php artisan route:list --path=api` prints the current surface.
+
+## Configuration
+
+`config/library.php` holds the tunable business constants — active loan limit,
+loan window, pagination caps, minimum search length — so the rules read them
+instead of hard-coding numbers.

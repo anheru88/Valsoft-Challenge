@@ -6,7 +6,10 @@ use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\AuthorController;
 use App\Http\Controllers\Api\V1\BookController;
 use App\Http\Controllers\Api\V1\CategoryController;
+use App\Http\Controllers\Api\V1\DashboardController;
 use App\Http\Controllers\Api\V1\LoanController;
+use App\Http\Controllers\Api\V1\ReportController;
+use App\Http\Controllers\Api\V1\SearchController;
 use App\Http\Controllers\Api\V1\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -46,6 +49,18 @@ Route::middleware(['auth:sanctum', 'active'])->group(function (): void {
     Route::get('categories/{category}', [CategoryController::class, 'show'])->name('categories.show');
     Route::put('categories/{category}', [CategoryController::class, 'update'])->name('categories.update');
     Route::delete('categories/{category}', [CategoryController::class, 'destroy'])->name('categories.destroy');
+
+    Route::get('search/books', [SearchController::class, 'books'])->name('search.books');
+
+    Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard.index');
+    Route::get('dashboard/recent-activity', [DashboardController::class, 'recentActivity'])->name('dashboard.recent-activity');
+    Route::get('dashboard/popular-authors', [DashboardController::class, 'popularAuthors'])->name('dashboard.popular-authors');
+    Route::get('dashboard/recent-books', [DashboardController::class, 'recentBooks'])->name('dashboard.recent-books');
+    Route::get('dashboard/books-by-category', [DashboardController::class, 'booksByCategory'])->name('dashboard.books-by-category');
+    Route::get('dashboard/monthly-stats', [DashboardController::class, 'monthlyStats'])->name('dashboard.monthly-stats');
+
+    Route::get('reports/overdue', [ReportController::class, 'overdue'])->name('reports.overdue');
+    Route::get('reports/most-borrowed', [ReportController::class, 'mostBorrowed'])->name('reports.most-borrowed');
 
     Route::get('loans', [LoanController::class, 'index'])->name('loans.index');
     Route::post('loans', [LoanController::class, 'store'])->name('loans.store');

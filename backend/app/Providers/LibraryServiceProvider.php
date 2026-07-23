@@ -11,13 +11,19 @@ use App\Library\Domains\Authors\Models\Author;
 use App\Library\Domains\Authors\Policies\AuthorPolicy;
 use App\Library\Domains\Authors\Repositories\EloquentAuthorRepository;
 use App\Library\Domains\Books\Contracts\BookRepositoryInterface;
+use App\Library\Domains\Books\Contracts\BookSearchInterface;
 use App\Library\Domains\Books\Models\Book;
 use App\Library\Domains\Books\Policies\BookPolicy;
 use App\Library\Domains\Books\Repositories\EloquentBookRepository;
+use App\Library\Domains\Books\Search\FulltextBookSearch;
+use App\Library\Domains\Books\Search\LikeBookSearch;
 use App\Library\Domains\Categories\Contracts\CategoryRepositoryInterface;
 use App\Library\Domains\Categories\Models\Category;
 use App\Library\Domains\Categories\Policies\CategoryPolicy;
 use App\Library\Domains\Categories\Repositories\EloquentCategoryRepository;
+use App\Library\Domains\Dashboard\Contracts\DashboardRepositoryInterface;
+use App\Library\Domains\Dashboard\Policies\DashboardPolicy;
+use App\Library\Domains\Dashboard\Repositories\EloquentDashboardRepository;
 use App\Library\Domains\Loans\Contracts\LoanRepositoryInterface;
 use App\Library\Domains\Loans\Models\Loan;
 use App\Library\Domains\Loans\Policies\LoanPolicy;
@@ -35,6 +41,8 @@ use App\Library\Shared\Infrastructure\LogAuditLogger;
 use App\Library\Shared\Infrastructure\RecordDomainEventAudit;
 use App\Library\Shared\Infrastructure\SystemClock;
 use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Database\DatabaseManager;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Event;
@@ -61,6 +69,18 @@ class LibraryServiceProvider extends ServiceProvider
         $this->app->bind(BookRepositoryInterface::class, EloquentBookRepository::class);
         $this->app->bind(AuthorRepositoryInterface::class, EloquentAuthorRepository::class);
         $this->app->bind(CategoryRepositoryInterface::class, EloquentCategoryRepository::class);
+        $this->app->bind(DashboardRepositoryInterface::class, EloquentDashboardRepository::class);
+
+        // ADR-6: FULLTEXT where the engine offers it, an indexed LIKE fallback
+        // elsewhere. Both sit behind the same contract, which is also where a
+        // future Meilisearch implementation would plug in.
+        $this->app->bind(BookSearchInterface::class, function (Application $app): BookSearchInterface {
+            $driver = $app->make(DatabaseManager::class)->connection()->getDriverName();
+
+            return $app->make(in_array($driver, ['mysql', 'mariadb'], true)
+                ? FulltextBookSearch::class
+                : LikeBookSearch::class);
+        });
     }
 
     public function boot(): void
@@ -74,6 +94,11 @@ class LibraryServiceProvider extends ServiceProvider
         Gate::policy(Author::class, AuthorPolicy::class);
         Gate::policy(Category::class, CategoryPolicy::class);
         Gate::policy(Loan::class, LoanPolicy::class);
+
+        // The dashboard has no model of its own, so its policy is registered as
+        // named abilities.
+        Gate::define('view-dashboard', [DashboardPolicy::class, 'view']);
+        Gate::define('view-reports', [DashboardPolicy::class, 'viewReports']);
 
         $this->registerRateLimiters();
 

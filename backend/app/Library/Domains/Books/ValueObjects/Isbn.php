@@ -53,6 +53,18 @@ final readonly class Isbn
             && preg_match('/^\d{9}[\dX]$|^\d{13}$/', $normalized) === 1;
     }
 
+    /**
+     * The form a lookup should compare against: the ISBN-13 conversion when the
+     * input is valid, otherwise the merely normalized string — which matches
+     * nothing, exactly as a bad ISBN should.
+     */
+    public static function canonical(string $raw): string
+    {
+        $isbn = self::tryFrom($raw);
+
+        return $isbn instanceof self ? $isbn->value : self::normalize($raw);
+    }
+
     public static function normalize(string $raw): string
     {
         return strtoupper(preg_replace('/[\s-]/', '', trim($raw)) ?? '');

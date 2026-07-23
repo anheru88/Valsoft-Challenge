@@ -42,6 +42,8 @@ final class BookResource extends JsonResource
                 $user instanceof User && $user->isStaff(),
                 fn () => $this->active_loans_count,
             ),
+            // Present only on search hits (API specification 8).
+            'matched_on' => $this->whenNotNull($this->matched_on),
             'created_at' => $this->created_at?->toIso8601ZuluString(),
             'updated_at' => $this->updated_at?->toIso8601ZuluString(),
         ];
