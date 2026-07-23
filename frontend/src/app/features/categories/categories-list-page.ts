@@ -1,39 +1,59 @@
 import { Component, inject, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { businessMessage } from '../../core/api/error-message';
 import { Category } from '../../core/models';
 import { PageHeader } from '../../shared/ui/page-header';
 import { SearchInput } from '../../shared/ui/search-input';
+import { InlineAlert } from '../../shared/ui/inline-alert';
+import { Skeleton } from '../../shared/ui/skeleton';
 import { EmptyState } from '../../shared/ui/empty-state';
+import { ErrorState } from '../../shared/ui/error-state';
 import { ConfirmDialog } from '../../shared/ui/confirm-dialog';
 import { CategoryFormDialog } from './category-form-dialog';
+import { CategoriesApiService } from './data/categories-api.service';
+import { CategoriesStore } from './data/categories.store';
 
 @Component({
   selector: 'lib-categories-list-page',
   standalone: true,
-  imports: [MatButtonModule, MatIconModule, PageHeader, SearchInput, EmptyState],
+  imports: [MatButtonModule, MatIconModule, MatPaginatorModule,
+            PageHeader, SearchInput, InlineAlert, Skeleton, EmptyState, ErrorState],
+  providers: [CategoriesStore],
   templateUrl: './categories-list-page.html',
-  styles: [`.strong { font-weight: 600; } .num { text-align: right; } .actions-col { width: 96px; text-align: right; }`],
+  styles: [`
+    .strong { font-weight: 600; } .num { text-align: right; } .actions-col { width: 96px; text-align: right; }
+    mat-paginator { border-top: 1px solid var(--lib-line); }
+  `],
 })
 export class CategoriesListPage {
   private readonly dialog = inject(MatDialog);
   private readonly snack = inject(MatSnackBar);
+  private readonly store = inject(CategoriesStore);
+  private readonly api = inject(CategoriesApiService);
 
-  // Demo data — GET /api/v1/categories
-  readonly categories = signal<Category[]>([
-    { id: 1, name: 'Fiction', slug: 'fiction', books_count: 412 },
-    { id: 2, name: 'Historia', slug: 'historia', books_count: 268 },
-    { id: 3, name: 'Infantil', slug: 'infantil', books_count: 231 },
-  ]);
+  readonly loading = this.store.loading;
+  readonly error = this.store.error;
+  readonly categories = this.store.categories;
+  readonly meta = this.store.meta;
+  readonly actionError = signal<string | null>(null);
 
-  onSearch(q: string): void { void q; /* TODO: GET /categories?q= */ }
+  onSearch(q: string): void { this.store.patchQuery({ q }); }
+
+  onPage(e: PageEvent): void { this.store.setPage(e.pageIndex + 1, e.pageSize); }
+
+  load(): void { this.store.reload(); }
 
   openForm(category?: Category): void {
     this.dialog.open(CategoryFormDialog, { width: '440px', data: category ?? null })
-      .afterClosed().subscribe(changed => {
-        if (changed) this.snack.open(category ? 'Category actualizada' : 'Category creada', undefined, { duration: 4000 });
+      .afterClosed().subscribe(saved => {
+        if (!saved) return;
+
+        this.snack.open(category ? 'Category updated' : 'Category created', undefined, { duration: 4000 });
+        this.store.reload();
       });
   }
 
@@ -46,7 +66,16 @@ export class CategoriesListPage {
       confirmLabel: 'Delete category', destructive: true,
     } }).afterClosed().subscribe(ok => {
       if (!ok) return;
-      // TODO API: DELETE /categories/{id}; en 409 CATEGORY_IN_USE mostrar motivo.
+
+      this.actionError.set(null);
+      this.api.remove(c.id).subscribe({
+        next: () => {
+          this.snack.open('Category deleted', undefined, { duration: 4000 });
+          this.store.reload();
+        },
+        // 409 CATEGORY_IN_USE: books are still filed under it.
+        error: (err: unknown) => this.actionError.set(businessMessage(err)),
+      });
     });
   }
 }

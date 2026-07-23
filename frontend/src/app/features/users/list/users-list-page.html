@@ -1,55 +1,72 @@
 <div class="page">
-  <lib-page-header title="Users" subtitle="Cuentas y roles del sistema">
+  <lib-page-header title="Users" subtitle="Accounts and roles">
     <button mat-flat-button color="primary" routerLink="/users/new">
       <mat-icon>person_add</mat-icon> New user
     </button>
   </lib-page-header>
 
   <div class="toolbar">
-    <lib-search-input placeholder="Name o correo…" (changed)="onSearch($event)" />
+    <lib-search-input placeholder="Name or email…" [initial]="q()" (changed)="onSearch($event)" />
     <mat-form-field appearance="outline" class="compact">
       <mat-label>Role</mat-label>
-      <mat-select [value]="roleFilter()" (selectionChange)="roleFilter.set($event.value)">
+      <mat-select [value]="roleFilter()" (selectionChange)="setRole($event.value)">
         <mat-option [value]="null">All</mat-option>
-        <mat-option value="admin">Admin</mat-option>
-        <mat-option value="librarian">Bibliotecario</mat-option>
-        <mat-option value="member">Socio</mat-option>
+        <mat-option value="admin">Administrator</mat-option>
+        <mat-option value="librarian">Librarian</mat-option>
+        <mat-option value="member">Member</mat-option>
       </mat-select>
     </mat-form-field>
   </div>
 
+  @if (actionError()) {
+    <lib-inline-alert tone="danger">{{ actionError() }}</lib-inline-alert>
+  }
+
   <div class="card">
-    <table class="lib-table" aria-label="Listado de usuarios">
-      <thead>
-        <tr><th>Name</th><th>Correo</th><th>Role</th><th>Loans activos</th><th>Estado</th><th class="actions-col"></th></tr>
-      </thead>
-      <tbody>
-        @for (u of filteredUsers(); track u.id) {
-          <tr [class.inactive]="!u.is_active">
-            <td class="strong">{{ u.name }}</td>
-            <td class="muted">{{ u.email }}</td>
-            <td><lib-role-badge [role]="u.roles[0]" /></td>
-            <td class="mono">{{ u.active_loans_count ?? 0 }}</td>
-            <td>
-              @if (u.is_active) { <span class="state ok">Activa</span> }
-              @else { <span class="state off">Desactivada</span> }
-            </td>
-            <td class="actions-col">
-              <button mat-icon-button [matMenuTriggerFor]="menu" [attr.aria-label]="'Acciones para ' + u.name">
-                <mat-icon>more_vert</mat-icon>
-              </button>
-              <mat-menu #menu="matMenu">
-                <button mat-menu-item [routerLink]="['/users', u.id, 'edit']"><mat-icon>edit</mat-icon> Edit</button>
-                <button mat-menu-item (click)="toggleActive(u)">
-                  <mat-icon>{{ u.is_active ? 'person_off' : 'person' }}</mat-icon>
-                  {{ u.is_active ? 'Deactivate cuenta' : 'Reactivar cuenta' }}
+    @if (loading()) {
+      <lib-skeleton variant="rows" [rows]="6" />
+    } @else if (error()) {
+      <lib-error-state title="Could not load the users" (retry)="load()" />
+    } @else if (users().length === 0) {
+      <lib-empty-state icon="group" title="No accounts match"
+                       message="Try another name, or clear the role filter." />
+    } @else {
+      <table class="lib-table" aria-label="User list">
+        <thead>
+          <tr><th>Name</th><th>Email</th><th>Role</th><th>Active loans</th><th>Status</th><th class="actions-col"></th></tr>
+        </thead>
+        <tbody>
+          @for (u of users(); track u.id) {
+            <tr [class.inactive]="!u.is_active">
+              <td class="strong">{{ u.name }}</td>
+              <td class="muted">{{ u.email }}</td>
+              <td><lib-role-badge [role]="u.roles[0]" /></td>
+              <td class="mono">{{ u.active_loans_count ?? 0 }}</td>
+              <td>
+                @if (u.is_active) { <span class="state ok">Active</span> }
+                @else { <span class="state off">Deactivated</span> }
+              </td>
+              <td class="actions-col">
+                <button mat-icon-button [matMenuTriggerFor]="menu" [attr.aria-label]="'Actions for ' + u.name">
+                  <mat-icon>more_vert</mat-icon>
                 </button>
-                <button mat-menu-item class="danger-text" (click)="confirmDelete(u)"><mat-icon>delete</mat-icon> Delete</button>
-              </mat-menu>
-            </td>
-          </tr>
-        }
-      </tbody>
-    </table>
+                <mat-menu #menu="matMenu">
+                  <button mat-menu-item [routerLink]="['/users', u.id, 'edit']"><mat-icon>edit</mat-icon> Edit</button>
+                  <button mat-menu-item (click)="toggleActive(u)">
+                    <mat-icon>{{ u.is_active ? 'person_off' : 'person' }}</mat-icon>
+                    {{ u.is_active ? 'Deactivate account' : 'Reactivate account' }}
+                  </button>
+                  <button mat-menu-item class="danger-text" (click)="confirmDelete(u)"><mat-icon>delete</mat-icon> Delete</button>
+                </mat-menu>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+
+      <mat-paginator [length]="meta().total" [pageIndex]="meta().current_page - 1"
+                     [pageSize]="meta().per_page" [pageSizeOptions]="[15, 30, 50]"
+                     (page)="onPage($event)" aria-label="User pagination" />
+    }
   </div>
 </div>

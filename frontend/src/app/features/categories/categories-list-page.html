@@ -1,5 +1,5 @@
 <div class="page">
-  <lib-page-header title="Categories" [subtitle]="categories().length + ' categories'">
+  <lib-page-header title="Categories" [subtitle]="meta().total + ' categories'">
     <button mat-flat-button color="primary" (click)="openForm()">
       <mat-icon>add</mat-icon> Add category
     </button>
@@ -9,8 +9,16 @@
     <lib-search-input placeholder="Search categories…" (changed)="onSearch($event)" />
   </div>
 
+  @if (actionError()) {
+    <lib-inline-alert tone="danger">{{ actionError() }}</lib-inline-alert>
+  }
+
   <div class="card">
-    @if (categories().length === 0) {
+    @if (loading()) {
+      <lib-skeleton variant="rows" [rows]="5" />
+    } @else if (error()) {
+      <lib-error-state title="Could not load the categories" (retry)="load()" />
+    } @else if (categories().length === 0) {
       <lib-empty-state icon="category" title="No categories yet"
                        message="Categories make the catalogue browsable by subject."
                        actionLabel="Add category" (action)="openForm()" />
@@ -31,6 +39,10 @@
           }
         </tbody>
       </table>
+
+      <mat-paginator [length]="meta().total" [pageIndex]="meta().current_page - 1"
+                     [pageSize]="meta().per_page" [pageSizeOptions]="[15, 30, 50]"
+                     (page)="onPage($event)" aria-label="Category pagination" />
     }
   </div>
 </div>

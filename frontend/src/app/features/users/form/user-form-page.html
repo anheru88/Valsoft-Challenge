@@ -1,6 +1,6 @@
 <div class="page narrow">
   <lib-page-header [title]="isEdit() ? 'Edit user' : 'New user'"
-                   [subtitle]="isAdmin() ? 'Cualquier rol' : 'Como bibliotecario solo puedes dar de alta socios'" />
+                   [subtitle]="isAdmin() ? 'Any role' : 'As a librarian you can only sign up members'" />
 
   @if (serverError()) { <lib-inline-alert tone="danger">{{ serverError() }}</lib-inline-alert> }
 
@@ -9,7 +9,8 @@
       <mat-form-field appearance="outline">
         <mat-label>Full name</mat-label>
         <input matInput formControlName="name" />
-        @if (form.controls.name.hasError('required')) { <mat-error>El nombre es obligatorio.</mat-error> }
+        @if (form.controls.name.hasError('required')) { <mat-error>The name is required.</mat-error> }
+        @if (fieldErrors()['name']) { <mat-error>{{ fieldErrors()['name'] }}</mat-error> }
       </mat-form-field>
 
       <mat-form-field appearance="outline">
@@ -23,20 +24,22 @@
         <mat-form-field appearance="outline">
           <mat-label>Role</mat-label>
           <mat-select formControlName="role">
-            <mat-option value="member">Socio</mat-option>
-            <mat-option value="librarian">Bibliotecario</mat-option>
-            <mat-option value="admin">Administrador</mat-option>
+            <mat-option value="member">Member</mat-option>
+            <mat-option value="librarian">Librarian</mat-option>
+            <mat-option value="admin">Administrator</mat-option>
           </mat-select>
-          <mat-hint>Los roles cambian lo que la persona puede ver y hacer.</mat-hint>
+          <mat-hint>The role decides what the person can see and do.</mat-hint>
+          @if (fieldErrors()['role']) { <mat-error>{{ fieldErrors()['role'] }}</mat-error> }
         </mat-form-field>
       }
 
       @if (!isEdit()) {
         <mat-form-field appearance="outline">
-          <mat-label>Password inicial</mat-label>
+          <mat-label>Initial password</mat-label>
           <input matInput type="password" formControlName="password" autocomplete="new-password" />
           <mat-hint>They can change it once they sign in.</mat-hint>
           @if (form.controls.password.hasError('minlength')) { <mat-error>At least 8 characters.</mat-error> }
+          @if (fieldErrors()['password']) { <mat-error>{{ fieldErrors()['password'] }}</mat-error> }
         </mat-form-field>
       }
     </div>
@@ -44,7 +47,7 @@
     <div class="form-actions">
       <button mat-button type="button" (click)="cancel()">Cancel</button>
       <button mat-flat-button color="primary" type="submit" [disabled]="saving()">
-        {{ isEdit() ? 'Save cambios' : 'Create usuario' }}
+        {{ isEdit() ? 'Save changes' : 'Create user' }}
       </button>
     </div>
   </form>

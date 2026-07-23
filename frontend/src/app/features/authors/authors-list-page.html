@@ -1,23 +1,29 @@
 <div class="page">
-  <lib-page-header title="Authors" [subtitle]="authors().length + ' authors in the catalogue'">
+  <lib-page-header title="Authors" [subtitle]="meta().total + ' authors in the catalogue'">
     <button mat-flat-button color="primary" (click)="openForm()">
       <mat-icon>add</mat-icon> Add author
     </button>
   </lib-page-header>
 
   <div class="toolbar">
-    <lib-search-input placeholder="Buscar autores…" (changed)="onSearch($event)" />
+    <lib-search-input placeholder="Search authors…" (changed)="onSearch($event)" />
   </div>
+
+  @if (actionError()) {
+    <lib-inline-alert tone="danger">{{ actionError() }}</lib-inline-alert>
+  }
 
   <div class="card">
     @if (loading()) {
       <lib-skeleton variant="rows" [rows]="5" />
+    } @else if (error()) {
+      <lib-error-state title="Could not load the authors" (retry)="load()" />
     } @else if (authors().length === 0) {
       <lib-empty-state icon="history_edu" title="No authors yet"
-                       message="Los autores se asignan a los libros al darlos de alta."
+                       message="Authors are attached to books as they are catalogued."
                        actionLabel="Add author" (action)="openForm()" />
     } @else {
-      <table class="lib-table" aria-label="Listado de autores">
+      <table class="lib-table" aria-label="Author list">
         <thead><tr><th>Name</th><th>Year of birth</th><th class="num">Books</th><th class="actions-col"></th></tr></thead>
         <tbody>
           @for (a of authors(); track a.id) {
@@ -33,6 +39,10 @@
           }
         </tbody>
       </table>
+
+      <mat-paginator [length]="meta().total" [pageIndex]="meta().current_page - 1"
+                     [pageSize]="meta().per_page" [pageSizeOptions]="[15, 30, 50]"
+                     (page)="onPage($event)" aria-label="Author pagination" />
     }
   </div>
 </div>
