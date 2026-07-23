@@ -18,6 +18,21 @@ interface BookRepositoryInterface
 
     public function findById(int $id): ?Book;
 
+    /**
+     * Reads the row under a pessimistic lock (ADR-5). The lock is what
+     * serialises concurrent check-outs of the last copy, so it must be taken
+     * inside the caller's transaction.
+     */
+    public function findForUpdate(int $id): ?Book;
+
+    /**
+     * The counter is owned by this domain (BR-BOOK-2): circulation asks for an
+     * adjustment rather than writing the column itself.
+     */
+    public function decrementAvailableCopies(Book $book): void;
+
+    public function incrementAvailableCopies(Book $book): void;
+
     public function create(BookData $data): Book;
 
     public function update(Book $book, BookData $data): Book;

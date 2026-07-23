@@ -19,6 +19,8 @@ use App\Library\Domains\Categories\Models\Category;
 use App\Library\Domains\Categories\Policies\CategoryPolicy;
 use App\Library\Domains\Categories\Repositories\EloquentCategoryRepository;
 use App\Library\Domains\Loans\Contracts\LoanRepositoryInterface;
+use App\Library\Domains\Loans\Models\Loan;
+use App\Library\Domains\Loans\Policies\LoanPolicy;
 use App\Library\Domains\Loans\Repositories\EloquentLoanRepository;
 use App\Library\Domains\Users\Contracts\UserRepositoryInterface;
 use App\Library\Domains\Users\Models\User;
@@ -71,6 +73,7 @@ class LibraryServiceProvider extends ServiceProvider
         Gate::policy(Book::class, BookPolicy::class);
         Gate::policy(Author::class, AuthorPolicy::class);
         Gate::policy(Category::class, CategoryPolicy::class);
+        Gate::policy(Loan::class, LoanPolicy::class);
 
         $this->registerRateLimiters();
 

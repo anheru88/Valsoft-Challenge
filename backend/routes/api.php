@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\AuthorController;
 use App\Http\Controllers\Api\V1\BookController;
 use App\Http\Controllers\Api\V1\CategoryController;
+use App\Http\Controllers\Api\V1\LoanController;
 use App\Http\Controllers\Api\V1\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -45,6 +46,12 @@ Route::middleware(['auth:sanctum', 'active'])->group(function (): void {
     Route::get('categories/{category}', [CategoryController::class, 'show'])->name('categories.show');
     Route::put('categories/{category}', [CategoryController::class, 'update'])->name('categories.update');
     Route::delete('categories/{category}', [CategoryController::class, 'destroy'])->name('categories.destroy');
+
+    Route::get('loans', [LoanController::class, 'index'])->name('loans.index');
+    Route::post('loans', [LoanController::class, 'store'])->name('loans.store');
+    Route::get('loans/{loan}', [LoanController::class, 'show'])->name('loans.show');
+    Route::post('loans/{loan}/return', [LoanController::class, 'return'])->name('loans.return');
+    Route::get('users/{user}/loans', [LoanController::class, 'forUser'])->name('users.loans');
 
     Route::get('users', [UserController::class, 'index'])->name('users.index');
     Route::post('users', [UserController::class, 'store'])->name('users.store');

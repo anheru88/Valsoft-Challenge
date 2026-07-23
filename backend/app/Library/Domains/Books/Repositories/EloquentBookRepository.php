@@ -33,6 +33,23 @@ final class EloquentBookRepository extends EloquentRepository implements BookRep
         return $this->withListRelations(Book::query())->find($id);
     }
 
+    public function findForUpdate(int $id): ?Book
+    {
+        // No eager loads: this is the locking read on the counter, kept as
+        // narrow and as short-lived as possible (RFC 9.3).
+        return Book::query()->lockForUpdate()->find($id);
+    }
+
+    public function decrementAvailableCopies(Book $book): void
+    {
+        $book->decrement('available_copies');
+    }
+
+    public function incrementAvailableCopies(Book $book): void
+    {
+        $book->increment('available_copies');
+    }
+
     public function create(BookData $data): Book
     {
         $book = new Book($data->toAttributes());
