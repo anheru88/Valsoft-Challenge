@@ -87,7 +87,7 @@ export class LoginPage {
       case 'USER_INACTIVE':
         return 'Your account has been deactivated. Please contact the library.';
       case 'RATE_LIMITED':
-        return 'Demasiados intentos. Espera un minuto y vuelve a probar.';
+        return 'Too many attempts. Wait a minute and try again.';
       default:
         return 'Could not sign you in. Please try again.';
     }

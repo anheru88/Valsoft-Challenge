@@ -32,7 +32,7 @@ export const apiErrorInterceptor: HttpInterceptorFn = (req, next) => {
         router.navigate(['/forbidden']);
       } else if (err.status >= 500) {
         const traceId = err.error?.error?.trace_id ?? '';
-        snack.open('Algo salió mal. Vuelve a intentarlo.' + (traceId ? ' Ref: ' + traceId : ''), 'Cerrar', { duration: 6000 });
+        snack.open('Something went wrong. Please try again.' + (traceId ? ' Ref: ' + traceId : ''), 'Close', { duration: 6000 });
       }
       return throwError(() => err);
     }),

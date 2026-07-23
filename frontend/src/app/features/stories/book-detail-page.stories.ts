@@ -25,12 +25,12 @@ export const NoCopiesLeft: S = {
   render: () => ({
     props: {
       book: signal({
-        id: 1, title: 'Cien años de soledad', isbn: '9780307474728',
-        description: 'Crónica de los Buendía en Macondo.',
+        id: 1, title: 'One Hundred Years of Solitude', isbn: '9780307474728',
+        description: 'The Buendía family across a century in Macondo.',
         publisher: 'Vintage', publication_year: 1967,
         total_copies: 3, available_copies: 0, is_available: false,
         authors: [{ id: 3, name: 'Gabriel García Márquez' }],
-        categories: [{ id: 1, name: 'Narrativa', slug: 'narrativa' }],
+        categories: [{ id: 1, name: 'Fiction', slug: 'fiction' }],
         active_loans_count: 3, created_at: '2026-06-01',
       }),
     },

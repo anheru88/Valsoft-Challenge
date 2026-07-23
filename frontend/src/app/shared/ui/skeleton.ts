@@ -1,7 +1,7 @@
 import { Component, input } from '@angular/core';
 
 /** Skeletons that mirror the real geometry, so nothing shifts when data lands.
- *  Variantes: 'rows' (tabla), 'stat' (KPI), 'card' (detalle). */
+ *  Variants: 'rows' (table), 'stat' (KPI), 'card' (detail). */
 @Component({
   selector: 'lib-skeleton',
   standalone: true,

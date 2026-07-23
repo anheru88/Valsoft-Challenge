@@ -1,6 +1,6 @@
 import { Component, computed, input } from '@angular/core';
 
-/** "3 / 5 available" — el estado nunca depende solo del color. */
+/** "3/5 available" — the state never rests on colour alone. */
 @Component({
   selector: 'lib-availability-badge',
   standalone: true,
@@ -8,7 +8,7 @@ import { Component, computed, input } from '@angular/core';
     <span class="avail" [class.none]="available() === 0">
       <span class="dot" aria-hidden="true"></span>
       <span class="mono">{{ available() }}/{{ total() }}</span>
-      <span class="label">{{ available() === 0 ? 'sin ejemplares' : 'available' }}</span>
+      <span class="label">{{ available() === 0 ? 'none left' : 'available' }}</span>
     </span>
   `,
   styles: [`

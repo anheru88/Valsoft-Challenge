@@ -23,5 +23,5 @@ export const FilteredByRole: S = {
 
 export const NoResults: S = {
   name: 'No results',
-  render: () => ({ props: { users: signal<User[]>([]), q: signal('nadie') } }),
+  render: () => ({ props: { users: signal<User[]>([]), q: signal('nobody') } }),
 };

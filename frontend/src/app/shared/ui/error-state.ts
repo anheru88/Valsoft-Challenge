@@ -2,7 +2,7 @@ import { Component, input, output } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 
-/** Fallo de carga con reintento; el trace_id queda plegado para soporte. */
+/** A failed load with a retry; the trace_id stays folded away for support. */
 @Component({
   selector: 'lib-error-state',
   standalone: true,
@@ -19,7 +19,7 @@ import { MatIconModule } from '@angular/material/icon';
           </details>
         }
       </div>
-      <button mat-stroked-button (click)="retry.emit()">Reintentar</button>
+      <button mat-stroked-button (click)="retry.emit()">Try again</button>
     </div>
   `,
   styles: [`
@@ -29,7 +29,7 @@ import { MatIconModule } from '@angular/material/icon';
   `],
 })
 export class ErrorState {
-  readonly title = input('No se pudo cargar');
+  readonly title = input('Could not load');
   readonly message = input('Check your connection and try again.');
   readonly traceId = input<string>();
   readonly retry = output<void>();

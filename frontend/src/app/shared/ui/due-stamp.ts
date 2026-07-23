@@ -5,9 +5,9 @@ import { LoanStatus } from '../../core/models';
 /**
  * A due-date stamp in the style of a loan card: monospaced, uppercase, inked
  * border and a slight rotation. The signature element of the system.
- *  - active   → verde  "DEVOLVER 24 JUL"
- *  - overdue  → rojo   "VENCIDO · 3 DÍAS"
- *  - returned → gris   "DEVUELTO 12 JUL"
+ *  - active   → green "DUE 24 JUL"
+ *  - overdue  → red   "OVERDUE · 3 DAYS"
+ *  - returned → grey  "RETURNED 12 JUL"
  */
 @Component({
   selector: 'lib-due-stamp',
@@ -16,9 +16,9 @@ import { LoanStatus } from '../../core/models';
   template: `
     <span class="stamp" [class]="status()" role="status">
       @switch (status()) {
-        @case ('overdue')  { VENCIDO · {{ daysOverdue() }} {{ daysOverdue() === 1 ? 'DÍA' : 'DÍAS' }} }
-        @case ('returned') { DEVUELTO {{ (returnedAt() ?? dueDate()) | date: 'd MMM' | uppercase }} }
-        @default           { DEVOLVER {{ dueDate() | date: 'd MMM' | uppercase }} }
+        @case ('overdue')  { OVERDUE · {{ daysOverdue() }} {{ daysOverdue() === 1 ? 'DAY' : 'DAYS' }} }
+        @case ('returned') { RETURNED {{ (returnedAt() ?? dueDate()) | date: 'd MMM' | uppercase }} }
+        @default           { DUE {{ dueDate() | date: 'd MMM' | uppercase }} }
       }
     </span>
   `,

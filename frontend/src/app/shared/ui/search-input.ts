@@ -33,7 +33,7 @@ import { MatButtonModule } from '@angular/material/button';
   `],
 })
 export class SearchInput implements OnInit {
-  readonly placeholder = input('Buscar…');
+  readonly placeholder = input('Search…');
   readonly initial = input('');
   readonly changed = output<string>();
 

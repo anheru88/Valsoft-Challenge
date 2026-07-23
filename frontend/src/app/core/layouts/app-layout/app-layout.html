@@ -81,8 +81,9 @@
         <span class="user-name">{{ auth.user()?.name }}</span>
         <mat-icon>expand_more</mat-icon>
       </button>
+      <!-- The profile and change-password screens of PRD 2.1 are not built yet;
+           an entry that 404s is worse than one that is not offered. -->
       <mat-menu #userMenu="matMenu">
-        <button mat-menu-item routerLink="/profile"><mat-icon>person</mat-icon> My profile</button>
         <button mat-menu-item (click)="logout()"><mat-icon>logout</mat-icon> Sign out</button>
       </mat-menu>
     </header>

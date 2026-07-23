@@ -14,13 +14,13 @@ h1, h2, h3 { font-family: var(--lib-font-display); font-weight: 600; letter-spac
 a { color: var(--lib-green); text-decoration: none; }
 a:hover { text-decoration: underline; }
 
-/* Datos "de ficha": ISBN, fechas, códigos */
+/* Catalogue-card data: ISBN, dates, codes */
 .mono { font-family: var(--lib-font-mono); font-size: .92em; letter-spacing: .01em; }
 
 /* Foco visible siempre */
 :focus-visible { outline: 2px solid var(--lib-green); outline-offset: 2px; border-radius: 4px; }
 
-/* Utilidades de layout usadas por las vistas */
+/* Layout helpers the views rely on */
 .page { padding: var(--sp-6); max-width: 1240px; margin: 0 auto; }
 .card {
   background: var(--lib-surface);
@@ -37,7 +37,7 @@ a:hover { text-decoration: underline; }
 
 .toolbar { display: flex; flex-wrap: wrap; gap: var(--sp-3); align-items: center; margin-bottom: var(--sp-4); }
 
-/* Tabla base */
+/* Base table */
 .lib-table { width: 100%; border-collapse: collapse; }
 .lib-table th {
   text-align: left; font-weight: 600; font-size: 12px; text-transform: uppercase;

@@ -10,6 +10,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatMenuModule } from '@angular/material/menu';
 import { AuthStore } from '../../auth.store';
+import { AuthApiService } from '../../../features/auth/data/auth-api.service';
 import { RoleBadge } from '../../../shared/ui/role-badge';
 
 @Component({
@@ -22,6 +23,7 @@ import { RoleBadge } from '../../../shared/ui/role-badge';
 })
 export class AppLayout {
   readonly auth = inject(AuthStore);
+  private readonly api = inject(AuthApiService);
   private readonly router = inject(Router);
   private readonly bp = inject(BreakpointObserver);
 
@@ -55,8 +57,21 @@ export class AppLayout {
     localStorage.setItem('librarium.theme', this.dark() ? 'dark' : 'light');
   }
 
+  /**
+   * The token is revoked server-side, then the session is dropped here.
+   *
+   * The local half happens either way: a network failure must not leave someone
+   * signed in on a shared desk machine, and a token the server never heard
+   * about being revoked is the lesser problem.
+   */
   logout(): void {
-    // TODO: AuthApiService.logout() → POST /auth/logout
+    this.api.logout().subscribe({
+      next: () => this.endSession(),
+      error: () => this.endSession(),
+    });
+  }
+
+  private endSession(): void {
     this.auth.clearSession();
     this.router.navigate(['/login']);
   }

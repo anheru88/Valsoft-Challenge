@@ -3,7 +3,7 @@ import { moduleMetadata } from '@storybook/angular';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { ConfirmDialog } from '../confirm-dialog';
 
-/** El contenido del diálogo renderizado plano (sin overlay) para revisión visual. */
+/** The dialog content rendered flat, without the overlay, for visual review. */
 const meta: Meta<ConfirmDialog> = {
   title: 'Shared UI/ConfirmDialog',
   component: ConfirmDialog,
@@ -13,9 +13,9 @@ const meta: Meta<ConfirmDialog> = {
       providers: [
         { provide: MatDialogRef, useValue: { close: () => {} } },
         { provide: MAT_DIALOG_DATA, useValue: {
-            title: '¿Eliminar «Cien años de soledad»?',
-            message: 'El libro se retirará del catálogo. Los préstamos ya devueltos conservan su historial.',
-            confirmLabel: 'Eliminar libro',
+            title: 'Delete «One Hundred Years of Solitude»?',
+            message: 'The book will be withdrawn from the catalogue. Returned loans keep their history.',
+            confirmLabel: 'Delete book',
             destructive: true,
         } },
       ],

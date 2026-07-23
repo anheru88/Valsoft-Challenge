@@ -10,5 +10,5 @@ const meta: Meta<SearchInput> = {
 export default meta;
 type S = StoryObj<SearchInput>;
 
-export const Basic: S = { args: { placeholder: 'Buscar por título, ISBN, autor…' } };
-export const WithInitialValue: S = { args: { placeholder: 'Buscar autores…', initial: 'garcía' } };
+export const Basic: S = { args: { placeholder: 'Search by title, ISBN or author…' } };
+export const WithInitialValue: S = { args: { placeholder: 'Search authors…', initial: 'garcía' } };

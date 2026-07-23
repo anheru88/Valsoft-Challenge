@@ -3,8 +3,8 @@ import { LoanStatus } from '../../core/models';
 
 const META: Record<LoanStatus, { label: string; icon: string }> = {
   active:   { label: 'Active',   icon: '●' },
-  overdue:  { label: 'Vencido',  icon: '▲' },
-  returned: { label: 'Devuelto', icon: '✓' },
+  overdue:  { label: 'Overdue',  icon: '▲' },
+  returned: { label: 'Returned', icon: '✓' },
 };
 
 @Component({

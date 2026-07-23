@@ -1,9 +1,10 @@
-import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { Provider } from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { applicationConfig } from '@storybook/angular';
 import { AuthStore } from '../../core/auth.store';
 import { Permission, Role, User } from '../../core/models';
+import { fakeApiInterceptor } from './fake-api';
 
 /**
  * Shared scaffolding for the page stories.
@@ -67,9 +68,10 @@ export function asRole(role: Role) {
   return applicationConfig({
     providers: [
       provideRouter([{ path: '**', children: [] }]),
-      // Pages that talk to the API inject a service that needs it; the stories
-      // render their states from props and never fire a request.
-      provideHttpClient(),
+      // The pages fetch what they show, so the stories have to answer them.
+      // `fakeApiInterceptor` replies with the real envelopes; the states that
+      // are awkward to provoke are still set by overriding the page's signals.
+      provideHttpClient(withInterceptors([fakeApiInterceptor])),
       authStoreFor(role),
     ],
   });

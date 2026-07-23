@@ -9,12 +9,12 @@ const meta: Meta<PageHeader> = {
     props: args,
     template: `
       <lib-page-header [title]="title" [subtitle]="subtitle">
-        <button mat-flat-button color="primary">Añadir libro</button>
+        <button mat-flat-button color="primary">Add book</button>
       </lib-page-header>`,
   }),
 };
 export default meta;
 type S = StoryObj<PageHeader>;
 
-export const WithAction: S = { args: { title: 'Libros', subtitle: '1.240 títulos en catálogo' } };
-export const TitleOnly: S = { args: { title: 'Mis préstamos' } };
+export const WithAction: S = { args: { title: 'Books', subtitle: '1,240 titles in the catalogue' } };
+export const TitleOnly: S = { args: { title: 'My loans' } };

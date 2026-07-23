@@ -1,14 +1,14 @@
 /* ============================================================
    Librarium — Design tokens
    Identidad: verde "lámpara de biblioteca" + latón + sello rojo.
-   ISBN, fechas y códigos siempre en monoespaciada (ficha de catálogo).
+   ISBN, dates and codes always in monospace, like a catalogue card.
    Todo color se consume vía var(--lib-*): nunca hex en features.
    ============================================================ */
 
 :root {
   /* Superficies */
   --lib-paper:        #F5F6F2;   /* fondo app */
-  --lib-surface:      #FFFFFF;   /* tarjetas, tablas */
+  --lib-surface:      #FFFFFF;   /* cards, tables */
   --lib-surface-2:    #EEF0EA;   /* hover filas, chips neutros */
   --lib-line:         #E1E4DC;   /* bordes hairline */
 
@@ -25,14 +25,14 @@
   --lib-brass-soft:   #F4ECDB;
 
   /* Estados */
-  --lib-stamp:        #B3402A;   /* rojo sello: vencido / destructivo */
+  --lib-stamp:        #B3402A;   /* stamp red: overdue / destructive */
   --lib-stamp-soft:   #F8E9E5;
   --lib-info:         #3D5A80;
   --lib-info-soft:    #E7EDF5;
   --lib-warn:         #9A6A12;
   --lib-warn-soft:    #F6EFDE;
 
-  /* Tipografía */
+  /* Typography */
   --lib-font-display: 'Fraunces', Georgia, 'Times New Roman', serif;
   --lib-font-body:    'Public Sans', 'Segoe UI', system-ui, sans-serif;
   --lib-font-mono:    'IBM Plex Mono', ui-monospace, 'Courier New', monospace;

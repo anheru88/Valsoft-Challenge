@@ -2,7 +2,7 @@ import { Component, input } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 
 /** Inline alert for business rules (LOAN_LIMIT_REACHED and friends).
- *  Los errores que bloquean un flujo nunca van en toast. */
+ *  An error that blocks a flow is never left to a toast. */
 @Component({
   selector: 'lib-inline-alert',
   standalone: true,

@@ -14,8 +14,8 @@ export default meta;
 type S = StoryObj<InlineAlert & { text: string }>;
 
 export const BusinessRule: S = { args: { tone: 'danger',
-  text: 'Este socio ya tiene 5 préstamos activos (límite 5). Debe devolver un libro antes de llevarse otro.' } as any };
+  text: 'This member already holds 5 active loans (the limit). They must return one before taking another.' } as any };
 export const OverdueWarning: S = { args: { tone: 'warn',
-  text: 'El socio tiene 2 préstamos vencidos. No puede llevarse libros hasta devolverlos.' } as any };
+  text: 'This member has 2 overdue loans. They cannot borrow again until those come back.' } as any };
 export const Informational: S = { args: { tone: 'info',
-  text: 'La fecha de devolución por defecto es de 14 días (máximo 60).' } as any };
+  text: 'The default due date is 14 days away, 60 at most.' } as any };

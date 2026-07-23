@@ -21,7 +21,7 @@ export const Blank: S = { name: 'Blank form' };
 
 export const InvalidCredentials: S = {
   name: 'Invalid credentials',
-  render: () => ({ props: { errorMessage: signal('Estas credenciales no coinciden con nuestros registros.') } }),
+  render: () => ({ props: { errorMessage: signal('That email and password do not match.') } }),
 };
 
 export const ExpiredSession: S = {

@@ -4,7 +4,11 @@ import { Router, RouterLink } from '@angular/router';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
+import { fieldErrors } from '../../../core/api/api-error';
+import { businessMessage } from '../../../core/api/error-message';
+import { AuthStore } from '../../../core/auth.store';
 import { InlineAlert } from '../../../shared/ui/inline-alert';
+import { AuthApiService } from '../data/auth-api.service';
 
 function passwordsMatch(group: AbstractControl) {
   return group.get('password')?.value === group.get('password_confirmation')?.value ? null : { mismatch: true };
@@ -25,10 +29,12 @@ function passwordsMatch(group: AbstractControl) {
 export class RegisterPage {
   private readonly fb = inject(FormBuilder);
   private readonly router = inject(Router);
+  private readonly auth = inject(AuthStore);
+  private readonly api = inject(AuthApiService);
 
   readonly loading = signal(false);
   readonly errorMessage = signal<string | null>(null);
-  /** Errores 422 del API mapeados por campo (details.errors) */
+  /** 422 messages from the API, keyed by field (`details.errors`). */
   readonly serverErrors = signal<Record<string, string>>({});
 
   readonly form = this.fb.nonNullable.group({
@@ -38,11 +44,29 @@ export class RegisterPage {
     password_confirmation: ['', Validators.required],
   }, { validators: passwordsMatch });
 
+  /** Registering creates a member account and signs it in (FR-AUTH-2). */
   submit(): void {
+    this.errorMessage.set(null);
+    this.serverErrors.set({});
     if (this.form.invalid) { this.form.markAllAsTouched(); return; }
     this.loading.set(true);
-    // TODO API: POST /api/v1/auth/register → auto-login y redirigir a /books
-    // En error 422: this.serverErrors.set(mapFieldErrors(e)); p. ej. email ya registrado.
-    this.loading.set(false);
+
+    this.api.register(this.form.getRawValue()).subscribe({
+      next: ({ data }) => {
+        this.auth.startSession(data.token, data.user);
+        this.router.navigateByUrl('/books');
+      },
+      error: (err: unknown) => {
+        this.loading.set(false);
+        // A taken email is a 422 about that field; anything else is said once
+        // above the form.
+        const perField = fieldErrors(err);
+        this.serverErrors.set(perField);
+
+        if (Object.keys(perField).length === 0) {
+          this.errorMessage.set(businessMessage(err, 'Could not create the account. Please try again.'));
+        }
+      },
+    });
   }
 }
