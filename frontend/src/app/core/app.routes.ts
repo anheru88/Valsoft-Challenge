@@ -46,6 +46,8 @@ export const APP_ROUTES: Routes = [
 
       { path: 'search', title: 'Search — Librarium', loadComponent: () => import('../features/search/search-page').then(m => m.SearchPage) },
 
+      { path: 'profile', title: 'Your profile — Librarium', loadComponent: () => import('../features/profile/profile-page').then(m => m.ProfilePage) },
+
       { path: '', pathMatch: 'full', redirectTo: 'books' },
     ],
   },

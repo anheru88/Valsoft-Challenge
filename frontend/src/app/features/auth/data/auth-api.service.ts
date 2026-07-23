@@ -26,6 +26,12 @@ export interface Session {
   user: User;
 }
 
+export interface PasswordChange {
+  current_password: string;
+  password: string;
+  password_confirmation: string;
+}
+
 /**
  * The authentication endpoints (API specification 2).
  *
@@ -52,5 +58,15 @@ export class AuthApiService {
   /** The authenticated account, with its effective capabilities (FR-AUTH-6). */
   me(): Observable<Envelope<User>> {
     return this.http.get<Envelope<User>>('auth/me');
+  }
+
+  /**
+   * Changes the caller's own password (API specification 2). A wrong current
+   * password comes back as `422 CURRENT_PASSWORD_INVALID`. On success the
+   * server revokes every *other* token — this session's stays valid — so the
+   * screen has nothing to clean up.
+   */
+  changePassword(change: PasswordChange): Observable<void> {
+    return this.http.put<void>('auth/password', change);
   }
 }

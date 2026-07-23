@@ -1,0 +1,71 @@
+<div class="page narrow">
+  <lib-page-header title="Your profile" subtitle="Your account and sign-in details" />
+
+  <div class="cards">
+    <section class="card card-pad" aria-labelledby="account-heading">
+      <h3 id="account-heading">Account</h3>
+      @if (user(); as u) {
+        <dl class="facts">
+          <dt>Name</dt>
+          <dd>{{ u.name }}</dd>
+
+          <dt>Email</dt>
+          <dd>{{ u.email }}</dd>
+
+          <dt>Role</dt>
+          <dd><lib-role-badge [role]="role() ?? 'member'" /></dd>
+
+          @if (u.active_loans_count != null) {
+            <dt>Active loans</dt>
+            <dd>{{ u.active_loans_count }}</dd>
+          }
+
+          <dt>Member since</dt>
+          <dd>{{ u.created_at | date: 'longDate' }}</dd>
+        </dl>
+      }
+    </section>
+
+    <section id="password" class="card card-pad" aria-labelledby="password-heading">
+      <h3 id="password-heading">Change password</h3>
+
+      @if (serverError()) { <lib-inline-alert tone="danger">{{ serverError() }}</lib-inline-alert> }
+
+      <form class="pw-form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+        <mat-form-field appearance="outline" class="full">
+          <mat-label>Current password</mat-label>
+          <input matInput type="password" formControlName="current_password" autocomplete="current-password" />
+          @if (form.controls.current_password.hasError('required')) {
+            <mat-error>Enter your current password.</mat-error>
+          }
+          @if (form.controls.current_password.hasError('wrong')) {
+            <mat-error>That is not your current password.</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full">
+          <mat-label>New password</mat-label>
+          <input matInput type="password" formControlName="password" autocomplete="new-password" />
+          <mat-hint>At least 8 characters, with a letter and a number.</mat-hint>
+          @if (form.controls.password.hasError('minlength')) { <mat-error>At least 8 characters.</mat-error> }
+          @if (form.controls.password.hasError('pattern')) {
+            <mat-error>Use at least one letter and one number.</mat-error>
+          }
+          @if (fieldErrors()['password']) { <mat-error>{{ fieldErrors()['password'] }}</mat-error> }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full">
+          <mat-label>Confirm new password</mat-label>
+          <input matInput type="password" formControlName="password_confirmation" autocomplete="new-password" />
+          @if (form.hasError('mismatch') && form.controls.password_confirmation.touched) {
+            <mat-error>The two passwords do not match.</mat-error>
+          }
+        </mat-form-field>
+
+        <div class="form-actions">
+          <button mat-flat-button color="primary" type="submit" [disabled]="saving()">Update password</button>
+        </div>
+      </form>
+    </section>
+  </div>
+</div>
