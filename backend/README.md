@@ -24,13 +24,24 @@ run, set `DB_CONNECTION=sqlite` and `touch database/database.sqlite` — the
 migrations apply MariaDB-only features (FULLTEXT, CHECK constraints) behind
 driver checks, so the schema builds on both.
 
-The demo seeder creates one account per role, all with the password `password`:
+The demo seeder builds a small library with a year of history behind it: 81
+titles by 57 authors across 8 categories, 38 accounts and ~340 loans spread over
+twelve months, including open, overdue and returned ones. That shape is
+deliberate — the dashboard's monthly series, the popular-author ranking and the
+overdue report all need movement to say anything.
+
+Accounts, all with the password `password`:
 
 | Role | Email |
 |---|---|
 | Administrator | `admin@librarium.test` |
-| Librarian | `librarian@librarium.test` |
-| Member | `member@librarium.test` |
+| Librarian | `librarian@librarium.test` (and `librarian2@librarium.test`) |
+| Member | `member@librarium.test` (plus 34 more, `nombre.apellido@example.com`) |
+
+Seeded data obeys the same rules the API enforces: `available_copies` equals
+total minus open loans, no member holds more than the active limit, and nobody
+holds the same title twice at once. Re-running `migrate:fresh --seed` produces a
+different but equally valid library.
 
 ## Commands
 
