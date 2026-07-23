@@ -69,6 +69,41 @@ for instance by the local dev servers below — change `APP_PORT`, `BACKEND_PORT
 > on the dev server will not resolve — under local development Storybook is its own
 > server (`npm run storybook`, `:6006`).
 
+## Screenshots
+
+Captured from the running stack, signed in as the seeded administrator. Click any
+thumbnail for the full image; captions live in [`screenshots/`](screenshots/).
+
+<table>
+  <tr>
+    <td align="center"><a href="screenshots/01-landing.png"><img src="screenshots/01-landing.png" width="200"/></a><br/><sub>Landing</sub></td>
+    <td align="center"><a href="screenshots/02-login.png"><img src="screenshots/02-login.png" width="200"/></a><br/><sub>Sign in</sub></td>
+    <td align="center"><a href="screenshots/03-register.png"><img src="screenshots/03-register.png" width="200"/></a><br/><sub>Register</sub></td>
+    <td align="center"><a href="screenshots/04-dashboard.png"><img src="screenshots/04-dashboard.png" width="200"/></a><br/><sub>Dashboard</sub></td>
+  </tr>
+  <tr>
+    <td align="center"><a href="screenshots/05-books.png"><img src="screenshots/05-books.png" width="200"/></a><br/><sub>Catalogue</sub></td>
+    <td align="center"><a href="screenshots/06-book-detail.png"><img src="screenshots/06-book-detail.png" width="200"/></a><br/><sub>Book detail</sub></td>
+    <td align="center"><a href="screenshots/07-book-new.png"><img src="screenshots/07-book-new.png" width="200"/></a><br/><sub>New book</sub></td>
+    <td align="center"><a href="screenshots/08-authors.png"><img src="screenshots/08-authors.png" width="200"/></a><br/><sub>Authors</sub></td>
+  </tr>
+  <tr>
+    <td align="center"><a href="screenshots/09-categories.png"><img src="screenshots/09-categories.png" width="200"/></a><br/><sub>Categories</sub></td>
+    <td align="center"><a href="screenshots/10-loans.png"><img src="screenshots/10-loans.png" width="200"/></a><br/><sub>Loans</sub></td>
+    <td align="center"><a href="screenshots/11-loan-checkout.png"><img src="screenshots/11-loan-checkout.png" width="200"/></a><br/><sub>Check-out</sub></td>
+    <td align="center"><a href="screenshots/12-my-loans.png"><img src="screenshots/12-my-loans.png" width="200"/></a><br/><sub>My loans</sub></td>
+  </tr>
+  <tr>
+    <td align="center"><a href="screenshots/13-users.png"><img src="screenshots/13-users.png" width="200"/></a><br/><sub>Users</sub></td>
+    <td align="center"><a href="screenshots/14-reports.png"><img src="screenshots/14-reports.png" width="200"/></a><br/><sub>Reports</sub></td>
+    <td align="center"><a href="screenshots/15-search.png"><img src="screenshots/15-search.png" width="200"/></a><br/><sub>Search</sub></td>
+    <td align="center"><a href="screenshots/16-profile.png"><img src="screenshots/16-profile.png" width="200"/></a><br/><sub>Profile</sub></td>
+  </tr>
+  <tr>
+    <td align="center"><a href="screenshots/17-storybook.png"><img src="screenshots/17-storybook.png" width="200"/></a><br/><sub>Storybook</sub></td>
+  </tr>
+</table>
+
 ## Running it locally
 
 Two servers, two terminals. Both default to a local SQLite database and need no
