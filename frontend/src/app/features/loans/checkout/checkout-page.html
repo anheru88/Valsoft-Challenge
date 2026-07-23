@@ -1,0 +1,98 @@
+<div class="page narrow">
+  <lib-page-header title="Prestar libro"
+                   subtitle="Flujo de mostrador: socio, libro y fecha en menos de 30 segundos" />
+
+  <form class="card card-pad" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+
+    <!-- 1 · Socio -->
+    <h2 class="step">1 · Socio</h2>
+    <mat-form-field appearance="outline" class="full">
+      <mat-label>Buscar socio por nombre o correo</mat-label>
+      <input matInput formControlName="memberQuery" [matAutocomplete]="memberAuto" />
+      <mat-icon matSuffix>person_search</mat-icon>
+      <mat-autocomplete #memberAuto="matAutocomplete" (optionSelected)="selectMember($event.option.value)"
+                        [displayWith]="displayMember">
+        @for (m of memberResults(); track m.id) {
+          <mat-option [value]="m">{{ m.name }} <span class="faint">· {{ m.email }}</span></mat-option>
+        }
+      </mat-autocomplete>
+    </mat-form-field>
+
+    @if (member(); as m) {
+      <div class="member-summary" [class.blocked]="memberBlocked()">
+        <div class="row">
+          <strong>{{ m.name }}</strong>
+          <span class="mono muted">{{ m.active_loans_count }}/5 préstamos</span>
+        </div>
+        @if (memberOverdue()) {
+          <lib-inline-alert tone="danger">
+            Este socio tiene préstamos vencidos. Debe devolverlos antes de llevarse otro libro.
+          </lib-inline-alert>
+        } @else if (memberAtLimit()) {
+          <lib-inline-alert tone="danger">
+            Este socio ya tiene 5 préstamos activos (límite 5). Debe devolver un libro antes de llevarse otro.
+          </lib-inline-alert>
+        } @else if (m.active_loans_count === 4) {
+          <lib-inline-alert tone="warn">Le queda 1 préstamo disponible.</lib-inline-alert>
+        }
+      </div>
+    }
+
+    <!-- 2 · Libro -->
+    <h2 class="step">2 · Libro</h2>
+    <mat-form-field appearance="outline" class="full">
+      <mat-label>Buscar por título o ISBN (compatible con lector de códigos)</mat-label>
+      <input matInput formControlName="bookQuery" [matAutocomplete]="bookAuto" class="mono-input" />
+      <mat-icon matSuffix>qr_code_scanner</mat-icon>
+      <mat-autocomplete #bookAuto="matAutocomplete" (optionSelected)="selectBook($event.option.value)"
+                        [displayWith]="displayBook">
+        @for (b of bookResults(); track b.id) {
+          <mat-option [value]="b" [disabled]="b.available_copies === 0">
+            {{ b.title }}
+            <span class="faint mono">· {{ b.isbn }}</span>
+            <span class="faint">· {{ b.available_copies }} disp.</span>
+          </mat-option>
+        }
+      </mat-autocomplete>
+    </mat-form-field>
+
+    @if (book(); as b) {
+      <div class="row book-summary">
+        <mat-icon aria-hidden="true">menu_book</mat-icon>
+        <div class="grow">
+          <strong>{{ b.title }}</strong>
+          <div class="faint mono">{{ b.isbn }}</div>
+        </div>
+        <lib-availability-badge [available]="b.available_copies" [total]="b.total_copies" />
+      </div>
+      @if (duplicateTitle()) {
+        <lib-inline-alert tone="danger">
+          El socio ya tiene un ejemplar de este título en préstamo. No puede llevarse dos iguales.
+        </lib-inline-alert>
+      }
+    }
+
+    <!-- 3 · Fecha de devolución -->
+    <h2 class="step">3 · Devolución</h2>
+    <div class="row wrap">
+      <mat-form-field appearance="outline">
+        <mat-label>Fecha de devolución</mat-label>
+        <input matInput [matDatepicker]="dp" formControlName="dueDate" [min]="minDate" [max]="maxDate" />
+        <mat-datepicker-toggle matSuffix [for]="dp" />
+        <mat-datepicker #dp />
+        <mat-hint>Por defecto 14 días · máximo 60</mat-hint>
+      </mat-form-field>
+      <lib-due-stamp status="active" [dueDate]="dueDateIso()" />
+    </div>
+
+    @if (serverError()) { <lib-inline-alert tone="danger">{{ serverError() }}</lib-inline-alert> }
+
+    <div class="form-actions">
+      <button mat-button type="button" (click)="reset()">Limpiar</button>
+      <button mat-flat-button color="primary" type="submit"
+              [disabled]="!canSubmit() || saving()">
+        Registrar préstamo
+      </button>
+    </div>
+  </form>
+</div>

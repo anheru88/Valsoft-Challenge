@@ -1,0 +1,27 @@
+@use '@angular/material' as mat;
+
+/* Angular Material supplies the accessible primitives (dialogs, form fields,
+   menus); the brand comes from the tokens. Green is the closest built-in
+   palette to the library-lamp green, and orange to the brass accent, so
+   Material's own surfaces sit next to ours without clashing. */
+html {
+  color-scheme: light;
+
+  @include mat.theme((
+    color: (
+      primary: mat.$green-palette,
+      tertiary: mat.$orange-palette,
+    ),
+    typography: (
+      plain-family: var(--lib-font-body, 'Public Sans', system-ui, sans-serif),
+      brand-family: var(--lib-font-display, 'Fraunces', Georgia, serif),
+    ),
+    density: 0,
+  ));
+}
+
+/* Dark mode is a class on <body>, toggled from the topbar. Switching the colour
+   scheme is enough: Material reads it, and our tokens redefine themselves. */
+body.dark-theme {
+  color-scheme: dark;
+}

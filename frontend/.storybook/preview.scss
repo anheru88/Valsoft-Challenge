@@ -1,0 +1,10 @@
+/* The canvas should look like the application shell, not like a blank page. */
+body {
+  background: var(--lib-paper);
+  color: var(--lib-ink);
+  padding: 16px;
+}
+
+.sb-show-main.sb-main-padded {
+  padding: 20px;
+}

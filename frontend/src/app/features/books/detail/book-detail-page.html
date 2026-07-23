@@ -1,0 +1,80 @@
+<div class="page">
+  @if (loading()) {
+    <lib-skeleton variant="card" />
+  } @else if (error()) {
+    <lib-error-state title="No se pudo cargar el libro" (retry)="load()" />
+  } @else if (book(); as b) {
+    <nav class="breadcrumb" aria-label="Miga de pan">
+      <a routerLink="/books">{{ isStaff() ? 'Libros' : 'Catálogo' }}</a>
+      <span aria-hidden="true">/</span>
+      <span>{{ b.title }}</span>
+    </nav>
+
+    <div class="detail-grid">
+      <!-- Cubierta -->
+      <div class="cover card">
+        @if (b.cover_url) {
+          <img [src]="b.cover_url" [alt]="'Cubierta de ' + b.title" />
+        } @else {
+          <div class="cover-fallback" aria-hidden="true">
+            <mat-icon>menu_book</mat-icon>
+          </div>
+        }
+      </div>
+
+      <!-- Ficha -->
+      <div class="card card-pad">
+        <div class="row head">
+          <div class="grow">
+            <h1>{{ b.title }}</h1>
+            <p class="muted by">
+              @for (a of b.authors; track a.id; let last = $last) {
+                <span>{{ a.name }}</span>@if (!last) { <span>, </span> }
+              }
+            </p>
+          </div>
+          <lib-availability-badge [available]="b.available_copies" [total]="b.total_copies" />
+        </div>
+
+        <dl class="meta">
+          <div><dt>ISBN</dt><dd class="mono">{{ b.isbn }}</dd></div>
+          @if (b.publisher) { <div><dt>Editorial</dt><dd>{{ b.publisher }}</dd></div> }
+          @if (b.publication_year) { <div><dt>Año</dt><dd class="mono">{{ b.publication_year }}</dd></div> }
+          <div>
+            <dt>Categorías</dt>
+            <dd>
+              @for (c of b.categories; track c.id) {
+                <a class="cat-chip" [routerLink]="['/books']" [queryParams]="{ category_id: c.id }">{{ c.name }}</a>
+              }
+            </dd>
+          </div>
+          @if (isStaff() && b.active_loans_count !== undefined) {
+            <div><dt>Préstamos activos</dt><dd class="mono">{{ b.active_loans_count }}</dd></div>
+          }
+        </dl>
+
+        @if (b.description) {
+          <h2 class="sect">Descripción</h2>
+          <p class="desc">{{ b.description }}</p>
+        }
+
+        @if (isStaff()) {
+          <div class="form-actions">
+            <button mat-stroked-button [routerLink]="['/books', b.id, 'edit']">
+              <mat-icon>edit</mat-icon> Editar
+            </button>
+            <button mat-flat-button color="primary" routerLink="/loans/checkout"
+                    [queryParams]="{ bookId: b.id }" [disabled]="b.available_copies === 0">
+              <mat-icon>swap_horiz</mat-icon>
+              {{ b.available_copies === 0 ? 'Sin ejemplares disponibles' : 'Prestar este libro' }}
+            </button>
+          </div>
+        } @else if (b.available_copies === 0) {
+          <lib-inline-alert tone="info">
+            Ahora mismo no hay ejemplares disponibles. Consulta en el mostrador cuándo se espera la próxima devolución.
+          </lib-inline-alert>
+        }
+      </div>
+    </div>
+  }
+</div>

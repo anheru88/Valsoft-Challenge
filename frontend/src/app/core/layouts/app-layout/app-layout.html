@@ -1,0 +1,91 @@
+<mat-sidenav-container class="shell">
+
+  <!-- Navegación lateral (filtrada por rol) -->
+  <mat-sidenav #snav class="shell-nav"
+               [mode]="isHandset() ? 'over' : 'side'"
+               [opened]="!isHandset()"
+               [attr.role]="'navigation'" aria-label="Navegación principal">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true">L</span>
+      <span class="brand-name">Librarium</span>
+    </div>
+
+    <mat-nav-list>
+      @if (auth.isStaff()) {
+        <a mat-list-item routerLink="/dashboard" routerLinkActive="active-link">
+          <mat-icon matListItemIcon>space_dashboard</mat-icon> Panel
+        </a>
+      }
+      <a mat-list-item routerLink="/books" routerLinkActive="active-link">
+        <mat-icon matListItemIcon>menu_book</mat-icon> {{ auth.isStaff() ? 'Libros' : 'Catálogo' }}
+      </a>
+      @if (auth.isStaff()) {
+        <a mat-list-item routerLink="/authors" routerLinkActive="active-link">
+          <mat-icon matListItemIcon>history_edu</mat-icon> Autores
+        </a>
+        <a mat-list-item routerLink="/categories" routerLinkActive="active-link">
+          <mat-icon matListItemIcon>category</mat-icon> Categorías
+        </a>
+        <a mat-list-item routerLink="/loans" routerLinkActive="active-link">
+          <mat-icon matListItemIcon>swap_horiz</mat-icon> Préstamos
+        </a>
+      }
+      @if (!auth.isStaff()) {
+        <a mat-list-item routerLink="/my-loans" routerLinkActive="active-link">
+          <mat-icon matListItemIcon>bookmark</mat-icon> Mis préstamos
+        </a>
+      }
+      @if (auth.isAdmin()) {
+        <a mat-list-item routerLink="/users" routerLinkActive="active-link">
+          <mat-icon matListItemIcon>group</mat-icon> Usuarios
+        </a>
+      } @else if (auth.isStaff()) {
+        <a mat-list-item routerLink="/users/new" routerLinkActive="active-link">
+          <mat-icon matListItemIcon>person_add</mat-icon> Alta de socio
+        </a>
+      }
+    </mat-nav-list>
+  </mat-sidenav>
+
+  <mat-sidenav-content>
+    <!-- Barra superior -->
+    <header class="topbar" role="banner">
+      @if (isHandset()) {
+        <button mat-icon-button (click)="snav.toggle()" aria-label="Abrir navegación">
+          <mat-icon>menu</mat-icon>
+        </button>
+      }
+
+      <!-- Búsqueda global (atajo: /) -->
+      <form class="global-search" role="search" (submit)="goSearch($event)">
+        <mat-icon aria-hidden="true">search</mat-icon>
+        <input #searchBox type="search" name="q"
+               placeholder="Buscar por título, ISBN, autor…"
+               aria-label="Buscar en el catálogo"
+               [(ngModel)]="searchTerm" />
+        <kbd class="mono" aria-hidden="true">/</kbd>
+      </form>
+
+      <span class="grow"></span>
+
+      <button mat-icon-button (click)="toggleTheme()"
+              [attr.aria-label]="dark() ? 'Cambiar a tema claro' : 'Cambiar a tema oscuro'">
+        <mat-icon>{{ dark() ? 'light_mode' : 'dark_mode' }}</mat-icon>
+      </button>
+
+      <button mat-button [matMenuTriggerFor]="userMenu" class="user-btn" aria-label="Menú de usuario">
+        <lib-role-badge [role]="auth.role() ?? 'member'" />
+        <span class="user-name">{{ auth.user()?.name }}</span>
+        <mat-icon>expand_more</mat-icon>
+      </button>
+      <mat-menu #userMenu="matMenu">
+        <button mat-menu-item routerLink="/profile"><mat-icon>person</mat-icon> Mi perfil</button>
+        <button mat-menu-item (click)="logout()"><mat-icon>logout</mat-icon> Cerrar sesión</button>
+      </mat-menu>
+    </header>
+
+    <main id="main" role="main">
+      <router-outlet />
+    </main>
+  </mat-sidenav-content>
+</mat-sidenav-container>

@@ -1,0 +1,11 @@
+.err {
+  min-height: 70vh; display: grid; place-content: center; justify-items: center;
+  text-align: center; gap: var(--sp-2); padding: var(--sp-6);
+}
+.code {
+  font-size: 13px; letter-spacing: .2em; color: var(--lib-stamp);
+  border: 1.5px solid currentColor; border-radius: 6px; padding: 3px 10px;
+  transform: rotate(-2deg);
+}
+h1 { margin: var(--sp-2) 0 0; font-size: 26px; }
+p { max-width: 46ch; margin: 0 0 var(--sp-4); }

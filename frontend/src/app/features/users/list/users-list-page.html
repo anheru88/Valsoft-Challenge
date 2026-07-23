@@ -1,0 +1,55 @@
+<div class="page">
+  <lib-page-header title="Usuarios" subtitle="Cuentas y roles del sistema">
+    <button mat-flat-button color="primary" routerLink="/users/new">
+      <mat-icon>person_add</mat-icon> Nuevo usuario
+    </button>
+  </lib-page-header>
+
+  <div class="toolbar">
+    <lib-search-input placeholder="Nombre o correo…" (changed)="onSearch($event)" />
+    <mat-form-field appearance="outline" class="compact">
+      <mat-label>Rol</mat-label>
+      <mat-select [value]="roleFilter()" (selectionChange)="roleFilter.set($event.value)">
+        <mat-option [value]="null">Todos</mat-option>
+        <mat-option value="admin">Admin</mat-option>
+        <mat-option value="librarian">Bibliotecario</mat-option>
+        <mat-option value="member">Socio</mat-option>
+      </mat-select>
+    </mat-form-field>
+  </div>
+
+  <div class="card">
+    <table class="lib-table" aria-label="Listado de usuarios">
+      <thead>
+        <tr><th>Nombre</th><th>Correo</th><th>Rol</th><th>Préstamos activos</th><th>Estado</th><th class="actions-col"></th></tr>
+      </thead>
+      <tbody>
+        @for (u of filteredUsers(); track u.id) {
+          <tr [class.inactive]="!u.is_active">
+            <td class="strong">{{ u.name }}</td>
+            <td class="muted">{{ u.email }}</td>
+            <td><lib-role-badge [role]="u.role" /></td>
+            <td class="mono">{{ u.active_loans_count ?? 0 }}</td>
+            <td>
+              @if (u.is_active) { <span class="state ok">Activa</span> }
+              @else { <span class="state off">Desactivada</span> }
+            </td>
+            <td class="actions-col">
+              <button mat-icon-button [matMenuTriggerFor]="menu" [attr.aria-label]="'Acciones para ' + u.name">
+                <mat-icon>more_vert</mat-icon>
+              </button>
+              <mat-menu #menu="matMenu">
+                <button mat-menu-item [routerLink]="['/users', u.id, 'edit']"><mat-icon>edit</mat-icon> Editar</button>
+                <button mat-menu-item (click)="toggleActive(u)">
+                  <mat-icon>{{ u.is_active ? 'person_off' : 'person' }}</mat-icon>
+                  {{ u.is_active ? 'Desactivar cuenta' : 'Reactivar cuenta' }}
+                </button>
+                <button mat-menu-item class="danger-text" (click)="confirmDelete(u)"><mat-icon>delete</mat-icon> Eliminar</button>
+              </mat-menu>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</div>

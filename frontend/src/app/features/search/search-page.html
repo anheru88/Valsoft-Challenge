@@ -1,0 +1,24 @@
+<div class="page">
+  <lib-page-header title="Resultados de búsqueda"
+                   [subtitle]="query() ? results().length + ' resultados para «' + query() + '»' : 'Escribe algo para buscar'" />
+
+  @if (query() && results().length === 0) {
+    <lib-empty-state icon="search_off" title="Nada por aquí"
+                     [message]="'No hay resultados para «' + query() + '». Revisa la ortografía o prueba con el ISBN.'" />
+  } @else {
+    <div class="results">
+      @for (b of results(); track b.id) {
+        <article class="card card-pad result">
+          <div class="row">
+            <div class="grow">
+              <a class="title" [routerLink]="['/books', b.id]">{{ b.title }}</a>
+              <div class="muted">{{ authorNames(b) }}</div>
+              <div class="faint mono">{{ b.isbn }}</div>
+            </div>
+            <lib-availability-badge [available]="b.available_copies" [total]="b.total_copies" />
+          </div>
+        </article>
+      }
+    </div>
+  }
+</div>

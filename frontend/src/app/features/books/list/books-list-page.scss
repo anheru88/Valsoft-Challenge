@@ -1,0 +1,22 @@
+.compact { width: 180px; }
+.title-link { font-weight: 600; color: var(--lib-ink); }
+.title-link:hover { color: var(--lib-green); }
+.cat-chip {
+  display: inline-block; margin-right: 6px; padding: 1px 8px;
+  border-radius: 999px; font-size: 11px;
+  background: var(--lib-surface-2); color: var(--lib-ink-soft);
+}
+.actions-col { width: 48px; text-align: right; }
+.sort-btn {
+  all: unset; cursor: pointer; font: inherit; color: inherit;
+  text-transform: inherit; letter-spacing: inherit;
+}
+.sort-btn:hover { color: var(--lib-ink); }
+mat-paginator { border-top: 1px solid var(--lib-line); }
+
+/* En móvil la tabla degrada a tarjetas: ocultamos columnas secundarias */
+@media (max-width: 700px) {
+  .lib-table th:nth-child(2), .lib-table td:nth-child(2),
+  .lib-table th:nth-child(3), .lib-table td:nth-child(3),
+  .lib-table th:nth-child(4), .lib-table td:nth-child(4) { display: none; }
+}

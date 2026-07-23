@@ -1,0 +1,100 @@
+<div class="page">
+  <lib-page-header [title]="isStaff() ? 'Libros' : 'Catálogo'"
+                   [subtitle]="totalLabel()">
+    @if (isStaff()) {
+      <button mat-flat-button color="primary" routerLink="/books/new">
+        <mat-icon>add</mat-icon> Añadir libro
+      </button>
+    }
+  </lib-page-header>
+
+  <!-- Barra de filtros: se sincroniza con la URL (enlaces compartibles) -->
+  <div class="toolbar" role="search">
+    <lib-search-input placeholder="Título, ISBN, autor…" [initial]="filters().q"
+                      (changed)="setFilter({ q: $event })" />
+
+    <mat-form-field appearance="outline" class="compact">
+      <mat-label>Categoría</mat-label>
+      <mat-select [value]="filters().categoryId" (selectionChange)="setFilter({ categoryId: $event.value })">
+        <mat-option [value]="null">Todas</mat-option>
+        @for (c of categories(); track c.id) { <mat-option [value]="c.id">{{ c.name }}</mat-option> }
+      </mat-select>
+    </mat-form-field>
+
+    <mat-slide-toggle [checked]="filters().onlyAvailable"
+                      (change)="setFilter({ onlyAvailable: $event.checked })">
+      Solo disponibles
+    </mat-slide-toggle>
+
+    @if (hasActiveFilters()) {
+      <button mat-button (click)="clearFilters()">Limpiar filtros</button>
+    }
+  </div>
+
+  <div class="card">
+    @if (loading()) {
+      <lib-skeleton variant="rows" [rows]="6" />
+    } @else if (error()) {
+      <lib-error-state title="No se pudieron cargar los libros" (retry)="load()" />
+    } @else if (books().length === 0) {
+      @if (hasActiveFilters()) {
+        <lib-empty-state icon="filter_alt_off" title="Sin resultados con estos filtros"
+                         message="Prueba a ampliar la búsqueda o limpia los filtros activos."
+                         actionLabel="Limpiar filtros" (action)="clearFilters()" />
+      } @else if (isStaff()) {
+        <lib-empty-state icon="menu_book" title="Aún no hay libros"
+                         message="Añade tu primer libro para empezar a construir el catálogo."
+                         actionLabel="Añadir libro" (action)="goNew()" />
+      } @else {
+        <lib-empty-state icon="menu_book" title="El catálogo está vacío"
+                         message="Vuelve pronto: la biblioteca está incorporando títulos." />
+      }
+    } @else {
+      <table class="lib-table" aria-label="Listado de libros">
+        <thead>
+          <tr>
+            <th><button class="sort-btn" (click)="toggleSort('title')">Título {{ sortIndicator('title') }}</button></th>
+            <th>Autores</th>
+            <th>Categorías</th>
+            <th>ISBN</th>
+            <th><button class="sort-btn" (click)="toggleSort('available_copies')">Disponibilidad {{ sortIndicator('available_copies') }}</button></th>
+            <th class="actions-col"><span class="cdk-visually-hidden">Acciones</span></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (b of books(); track b.id) {
+            <tr>
+              <td><a [routerLink]="['/books', b.id]" class="title-link">{{ b.title }}</a></td>
+              <td class="muted">{{ authorNames(b) }}</td>
+              <td>
+                @for (c of b.categories; track c.id) { <span class="cat-chip">{{ c.name }}</span> }
+              </td>
+              <td class="mono">{{ b.isbn }}</td>
+              <td><lib-availability-badge [available]="b.available_copies" [total]="b.total_copies" /></td>
+              <td class="actions-col">
+                @if (isStaff()) {
+                  <button mat-icon-button [matMenuTriggerFor]="rowMenu"
+                          [attr.aria-label]="'Acciones para ' + b.title">
+                    <mat-icon>more_vert</mat-icon>
+                  </button>
+                  <mat-menu #rowMenu="matMenu">
+                    <button mat-menu-item [routerLink]="['/books', b.id, 'edit']"><mat-icon>edit</mat-icon> Editar</button>
+                    <button mat-menu-item routerLink="/loans/checkout" [queryParams]="{ bookId: b.id }"
+                            [disabled]="b.available_copies === 0">
+                      <mat-icon>swap_horiz</mat-icon> Prestar
+                    </button>
+                    <button mat-menu-item class="danger-text" (click)="confirmDelete(b)"><mat-icon>delete</mat-icon> Eliminar</button>
+                  </mat-menu>
+                }
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+
+      <mat-paginator [length]="meta().total" [pageIndex]="meta().current_page - 1"
+                     [pageSize]="meta().per_page" [pageSizeOptions]="[15, 30, 50]"
+                     (page)="onPage($event)" aria-label="Paginación de libros" />
+    }
+  </div>
+</div>

@@ -1,0 +1,97 @@
+<div class="page">
+  <lib-page-header title="Panel" subtitle="Estado de la biblioteca de un vistazo">
+    <button mat-flat-button color="primary" routerLink="/loans/checkout">
+      <mat-icon>swap_horiz</mat-icon> Prestar libro
+    </button>
+  </lib-page-header>
+
+  <!-- KPIs (cada widget carga y falla de forma independiente) -->
+  @if (loadingKpis()) {
+    <div class="kpi-grid">
+      @for (i of [1,2,3,4]; track i) { <lib-skeleton variant="stat" /> }
+    </div>
+  } @else if (kpisError()) {
+    <lib-error-state title="No se pudieron cargar los indicadores" (retry)="loadKpis()" />
+  } @else if (kpis(); as k) {
+    <div class="kpi-grid">
+      <lib-stat-card label="Libros en catálogo" [value]="k.total_books" [hint]="k.total_copies + ' ejemplares'" />
+      <lib-stat-card label="Disponibles ahora" [value]="k.available_copies" />
+      <lib-stat-card label="Prestados ahora" [value]="k.borrowed_now" [hint]="'Socios: ' + k.total_members" />
+      <lib-stat-card label="Vencidos" [value]="k.overdue_now" tone="alert" hint="Requieren seguimiento" />
+    </div>
+
+    <div class="kpi-grid month-row">
+      <lib-stat-card label="Libros añadidos (mes)" [value]="k.books_added_this_month" />
+      <lib-stat-card label="Préstamos (mes)" [value]="k.loans_this_month" />
+      <lib-stat-card label="Devoluciones (mes)" [value]="k.returns_this_month" />
+      <lib-stat-card label="Socios" [value]="k.total_members" />
+    </div>
+  }
+
+  <div class="two-col section">
+    <!-- Actividad reciente -->
+    <section class="card" aria-labelledby="activity-title">
+      <h2 id="activity-title" class="widget-title">Actividad reciente</h2>
+      <ol class="activity">
+        @for (item of activity(); track item.id) {
+          <li>
+            <mat-icon class="act-icon" [class.return]="item.type === 'loan_returned'" aria-hidden="true">
+              {{ item.type === 'loan_returned' ? 'assignment_turned_in' : item.type === 'loan_created' ? 'swap_horiz' : 'library_add' }}
+            </mat-icon>
+            <div class="grow">
+              <span [innerText]="item.summary"></span>
+              <time class="faint mono" [attr.datetime]="item.occurred_at">{{ item.occurred_at | date: 'd MMM, HH:mm' }}</time>
+            </div>
+          </li>
+        } @empty {
+          <lib-empty-state icon="history" title="Sin actividad todavía"
+                           message="Los préstamos y altas de libros aparecerán aquí." />
+        }
+      </ol>
+    </section>
+
+    <!-- Libros por categoría (barras CSS accesibles, sin dependencia de gráficos) -->
+    <section class="card" aria-labelledby="cats-title">
+      <h2 id="cats-title" class="widget-title">Libros por categoría</h2>
+      <ul class="bars">
+        @for (c of byCategory(); track c.name) {
+          <li>
+            <span class="bar-label">{{ c.name }}</span>
+            <span class="bar-track" aria-hidden="true">
+              <span class="bar-fill" [style.width.%]="(c.count / maxCategoryCount()) * 100"></span>
+            </span>
+            <span class="mono">{{ c.count }}</span>
+          </li>
+        }
+      </ul>
+    </section>
+  </div>
+
+  <div class="two-col section">
+    <!-- Autores populares -->
+    <section class="card" aria-labelledby="authors-title">
+      <h2 id="authors-title" class="widget-title">Autores más prestados <span class="faint">(30 días)</span></h2>
+      <table class="lib-table">
+        <thead><tr><th>Autor</th><th class="num">Préstamos</th></tr></thead>
+        <tbody>
+          @for (a of popularAuthors(); track a.name) {
+            <tr><td>{{ a.name }}</td><td class="num mono">{{ a.loans }}</td></tr>
+          }
+        </tbody>
+      </table>
+    </section>
+
+    <!-- Añadidos recientemente -->
+    <section class="card" aria-labelledby="recent-title">
+      <h2 id="recent-title" class="widget-title">Añadidos recientemente</h2>
+      <ul class="recent-books">
+        @for (b of recentBooks(); track b.id) {
+          <li>
+            <a [routerLink]="['/books', b.id]">{{ b.title }}</a>
+            <span class="faint mono">{{ b.isbn }}</span>
+          </li>
+        }
+      </ul>
+    </section>
+  </div>
+</div>

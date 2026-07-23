@@ -1,0 +1,87 @@
+<div class="page">
+  <lib-page-header title="Préstamos" subtitle="Gestiona los libros en circulación">
+    <button mat-flat-button color="primary" routerLink="/loans/checkout">
+      <mat-icon>swap_horiz</mat-icon> Prestar libro
+    </button>
+  </lib-page-header>
+
+  <!-- Filtro por estado (tabs) + búsqueda por socio/libro -->
+  <nav mat-tab-nav-bar [tabPanel]="panel" aria-label="Filtrar por estado">
+    @for (t of tabs; track t.value) {
+      <a mat-tab-link [active]="statusFilter() === t.value" (click)="setStatus(t.value)">
+        {{ t.label }}
+        @if (t.value === 'overdue' && overdueCount() > 0) {
+          <span class="tab-badge">{{ overdueCount() }}</span>
+        }
+      </a>
+    }
+  </nav>
+  <mat-tab-nav-panel #panel />
+
+  <div class="toolbar">
+    <lib-search-input placeholder="Socio, título o ISBN…" (changed)="onSearch($event)" />
+  </div>
+
+  <div class="card">
+    @if (loading()) {
+      <lib-skeleton variant="rows" [rows]="6" />
+    } @else if (error()) {
+      <lib-error-state title="No se pudieron cargar los préstamos" (retry)="load()" />
+    } @else if (loans().length === 0) {
+      @switch (statusFilter()) {
+        @case ('overdue') {
+          <lib-empty-state icon="task_alt" title="Nada vencido"
+                           message="Todos los préstamos están al día. Buen trabajo." />
+        }
+        @case ('active') {
+          <lib-empty-state icon="swap_horiz" title="No hay préstamos activos"
+                           message="Cuando prestes un libro aparecerá aquí."
+                           actionLabel="Prestar libro" (action)="goCheckout()" />
+        }
+        @default {
+          <lib-empty-state icon="swap_horiz" title="Todavía no hay préstamos"
+                           message="Registra el primer préstamo desde el mostrador."
+                           actionLabel="Prestar libro" (action)="goCheckout()" />
+        }
+      }
+    } @else {
+      <table class="lib-table" aria-label="Listado de préstamos">
+        <thead>
+          <tr>
+            <th>Socio</th><th>Libro</th><th>Prestado</th><th>Devolución</th><th>Estado</th>
+            <th class="actions-col"><span class="cdk-visually-hidden">Acciones</span></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (l of loans(); track l.id) {
+            <tr [class.overdue-row]="l.status === 'overdue'">
+              <td>
+                <div class="strong">{{ l.user.name }}</div>
+                <div class="faint">{{ l.user.email }}</div>
+              </td>
+              <td>
+                <a [routerLink]="['/books', l.book.id]">{{ l.book.title }}</a>
+                <div class="faint mono">{{ l.book.isbn }}</div>
+              </td>
+              <td class="mono muted">{{ l.loaned_at | date: 'd MMM y' }}</td>
+              <td><lib-due-stamp [status]="l.status" [dueDate]="l.due_date"
+                                 [returnedAt]="l.returned_at" [daysOverdue]="l.days_overdue" /></td>
+              <td><lib-status-chip [status]="l.status" /></td>
+              <td class="actions-col">
+                @if (l.status !== 'returned') {
+                  <button mat-stroked-button (click)="checkIn(l)" [disabled]="returningId() === l.id">
+                    Registrar devolución
+                  </button>
+                }
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+
+      <mat-paginator [length]="meta().total" [pageIndex]="meta().current_page - 1"
+                     [pageSize]="meta().per_page" [pageSizeOptions]="[15, 30, 50]"
+                     (page)="onPage($event)" aria-label="Paginación de préstamos" />
+    }
+  </div>
+</div>

@@ -1,0 +1,57 @@
+<div class="page">
+  <lib-page-header title="Mis préstamos" [subtitle]="activeLoans().length + ' de 5 préstamos en uso'" />
+
+  <mat-tab-group>
+    <mat-tab label="Activos">
+      @if (activeLoans().length === 0) {
+        <lib-empty-state icon="menu_book" title="No tienes libros en préstamo"
+                         message="Explora el catálogo y pide tu próximo libro en el mostrador."
+                         actionLabel="Ver catálogo" (action)="goCatalog()" />
+      } @else {
+        <div class="loan-cards">
+          @for (l of activeLoans(); track l.id) {
+            <article class="card card-pad loan-card" [class.overdue]="l.status === 'overdue'">
+              <div class="row">
+                <div class="grow">
+                  <a class="strong" [routerLink]="['/books', l.book.id]">{{ l.book.title }}</a>
+                  <div class="faint mono">{{ l.book.isbn }}</div>
+                </div>
+                <lib-due-stamp [status]="l.status" [dueDate]="l.due_date" [daysOverdue]="l.days_overdue" />
+              </div>
+              <p class="muted small">
+                Prestado el {{ l.loaned_at | date: 'd MMMM' }} ·
+                @if (l.status === 'overdue') {
+                  <span class="danger-text">Devuélvelo cuanto antes en el mostrador.</span>
+                } @else {
+                  Quedan {{ daysLeft(l) }} días.
+                }
+              </p>
+            </article>
+          }
+        </div>
+      }
+    </mat-tab>
+
+    <mat-tab label="Historial">
+      @if (history().length === 0) {
+        <lib-empty-state icon="history" title="Aún no has devuelto ningún libro"
+                         message="Tu historial de lecturas aparecerá aquí." />
+      } @else {
+        <div class="card hist">
+          <table class="lib-table" aria-label="Historial de préstamos">
+            <thead><tr><th>Libro</th><th>Prestado</th><th>Devuelto</th></tr></thead>
+            <tbody>
+              @for (l of history(); track l.id) {
+                <tr>
+                  <td><a [routerLink]="['/books', l.book.id]">{{ l.book.title }}</a></td>
+                  <td class="mono muted">{{ l.loaned_at | date: 'd MMM y' }}</td>
+                  <td><lib-due-stamp status="returned" [dueDate]="l.due_date" [returnedAt]="l.returned_at" /></td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </mat-tab>
+  </mat-tab-group>
+</div>

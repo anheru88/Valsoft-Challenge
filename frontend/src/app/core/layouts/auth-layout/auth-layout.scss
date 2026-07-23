@@ -1,0 +1,16 @@
+.auth-shell {
+  min-height: 100vh; display: grid; place-items: center;
+  background:
+    radial-gradient(1000px 500px at 85% -10%, var(--lib-green-soft), transparent),
+    var(--lib-paper);
+  padding: var(--sp-6);
+}
+.auth-panel { width: min(420px, 100%); }
+.auth-brand { text-align: center; margin-bottom: var(--sp-6); }
+.auth-brand h1 { margin: var(--sp-3) 0 var(--sp-1); }
+.brand-mark {
+  display: inline-grid; place-items: center;
+  width: 44px; height: 44px; border-radius: 12px;
+  background: var(--lib-green); color: var(--lib-surface);
+  font-family: var(--lib-font-display); font-size: 24px;
+}

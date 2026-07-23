@@ -1,0 +1,22 @@
+.month-row { margin-top: var(--sp-4); }
+.section { margin-top: var(--sp-5); }
+.widget-title { font-size: 16px; margin: 0; padding: var(--sp-4) var(--sp-5); border-bottom: 1px solid var(--lib-line); }
+
+.activity { list-style: none; margin: 0; padding: var(--sp-2) 0; }
+.activity li { display: flex; gap: var(--sp-3); padding: var(--sp-3) var(--sp-5); align-items: flex-start; }
+.activity li + li { border-top: 1px solid var(--lib-line); }
+.activity time { display: block; font-size: 11px; }
+.act-icon { color: var(--lib-green); font-size: 20px; width: 20px; height: 20px; margin-top: 2px; }
+.act-icon.return { color: var(--lib-info); }
+
+.bars { list-style: none; margin: 0; padding: var(--sp-4) var(--sp-5); display: grid; gap: var(--sp-3); }
+.bars li { display: grid; grid-template-columns: 96px 1fr 40px; gap: var(--sp-3); align-items: center; }
+.bar-label { font-size: 13px; color: var(--lib-ink-soft); }
+.bar-track { height: 10px; border-radius: 999px; background: var(--lib-surface-2); overflow: hidden; }
+.bar-fill { display: block; height: 100%; border-radius: inherit; background: var(--lib-green); }
+.bars li:nth-child(even) .bar-fill { background: var(--lib-brass); }
+
+.lib-table .num { text-align: right; }
+.recent-books { list-style: none; margin: 0; padding: var(--sp-2) 0; }
+.recent-books li { display: flex; justify-content: space-between; gap: var(--sp-3); padding: var(--sp-3) var(--sp-5); }
+.recent-books li + li { border-top: 1px solid var(--lib-line); }

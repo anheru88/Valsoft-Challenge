@@ -1,0 +1,77 @@
+/* ============================================================
+   Librarium — Design tokens
+   Identidad: verde "lámpara de biblioteca" + latón + sello rojo.
+   ISBN, fechas y códigos siempre en monoespaciada (ficha de catálogo).
+   Todo color se consume vía var(--lib-*): nunca hex en features.
+   ============================================================ */
+
+:root {
+  /* Superficies */
+  --lib-paper:        #F5F6F2;   /* fondo app */
+  --lib-surface:      #FFFFFF;   /* tarjetas, tablas */
+  --lib-surface-2:    #EEF0EA;   /* hover filas, chips neutros */
+  --lib-line:         #E1E4DC;   /* bordes hairline */
+
+  /* Tinta */
+  --lib-ink:          #1E2B33;
+  --lib-ink-soft:     #5B6B74;
+  --lib-ink-faint:    #8D99A1;
+
+  /* Marca */
+  --lib-green:        #2F6B4F;   /* primario */
+  --lib-green-strong: #245640;
+  --lib-green-soft:   #E6F0EA;
+  --lib-brass:        #A97E2F;   /* acento */
+  --lib-brass-soft:   #F4ECDB;
+
+  /* Estados */
+  --lib-stamp:        #B3402A;   /* rojo sello: vencido / destructivo */
+  --lib-stamp-soft:   #F8E9E5;
+  --lib-info:         #3D5A80;
+  --lib-info-soft:    #E7EDF5;
+  --lib-warn:         #9A6A12;
+  --lib-warn-soft:    #F6EFDE;
+
+  /* Tipografía */
+  --lib-font-display: 'Fraunces', Georgia, 'Times New Roman', serif;
+  --lib-font-body:    'Public Sans', 'Segoe UI', system-ui, sans-serif;
+  --lib-font-mono:    'IBM Plex Mono', ui-monospace, 'Courier New', monospace;
+
+  /* Geometría */
+  --lib-radius:       10px;
+  --lib-radius-sm:    6px;
+  --lib-shadow-1:     0 1px 2px rgba(30,43,51,.06), 0 1px 8px rgba(30,43,51,.05);
+  --lib-shadow-2:     0 4px 16px rgba(30,43,51,.10);
+
+  /* Espaciado (múltiplos de 4) */
+  --sp-1: 4px;  --sp-2: 8px;  --sp-3: 12px; --sp-4: 16px;
+  --sp-5: 20px; --sp-6: 24px; --sp-8: 32px; --sp-10: 40px;
+}
+
+/* Modo oscuro: mismo lenguaje, papel nocturno */
+.dark-theme {
+  --lib-paper:        #14191C;
+  --lib-surface:      #1C2327;
+  --lib-surface-2:    #232C31;
+  --lib-line:         #2E383E;
+
+  --lib-ink:          #E8ECEA;
+  --lib-ink-soft:     #A7B4BA;
+  --lib-ink-faint:    #71808A;
+
+  --lib-green:        #5CA57F;
+  --lib-green-strong: #74B893;
+  --lib-green-soft:   #1E3229;
+  --lib-brass:        #C99B4A;
+  --lib-brass-soft:   #33291A;
+
+  --lib-stamp:        #D9705B;
+  --lib-stamp-soft:   #3A231E;
+  --lib-info:         #7FA3CC;
+  --lib-info-soft:    #1E2A38;
+  --lib-warn:         #CFA14C;
+  --lib-warn-soft:    #33290F;
+
+  --lib-shadow-1:     0 1px 2px rgba(0,0,0,.4);
+  --lib-shadow-2:     0 4px 16px rgba(0,0,0,.5);
+}
