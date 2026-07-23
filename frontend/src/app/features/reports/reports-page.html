@@ -1,0 +1,95 @@
+<div class="page">
+  <lib-page-header title="Reports" subtitle="The library at a glance, for administrators" />
+
+  <div class="reports">
+    <!-- Overdue loans ─────────────────────────────────────────────────────-->
+    <section class="card" aria-labelledby="overdue-heading">
+      <header class="section-head">
+        <h3 id="overdue-heading">Overdue loans</h3>
+        @if (!overdueLoading() && !overdueError()) {
+          <span class="count">{{ overdueMeta().total }} late</span>
+        }
+      </header>
+
+      @if (overdueLoading()) {
+        <lib-skeleton variant="rows" [rows]="5" />
+      } @else if (overdueError()) {
+        <lib-error-state title="Could not load overdue loans" (retry)="loadOverdue()" />
+      } @else if (overdue().length === 0) {
+        <lib-empty-state icon="task_alt" title="Nothing overdue"
+                         message="Every loan is within its window. Good work." />
+      } @else {
+        <table class="lib-table" aria-label="Overdue loans, most overdue first">
+          <thead>
+            <tr><th scope="col">Member</th><th scope="col">Book</th><th scope="col">Due</th><th scope="col" class="num">Days overdue</th></tr>
+          </thead>
+          <tbody>
+            @for (l of overdue(); track l.id) {
+              <tr class="overdue-row">
+                <td>
+                  <div class="strong">{{ l.user.name }}</div>
+                  <div class="faint">{{ l.user.email }}</div>
+                </td>
+                <td>
+                  <a [routerLink]="['/books', l.book.id]">{{ l.book.title }}</a>
+                  <div class="faint mono">{{ l.book.isbn }}</div>
+                </td>
+                <td>
+                  <lib-due-stamp [status]="l.status" [dueDate]="l.due_date"
+                                 [returnedAt]="l.returned_at" [daysOverdue]="l.days_overdue" />
+                </td>
+                <td class="num strong">{{ l.days_overdue }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+
+        <mat-paginator [length]="overdueMeta().total" [pageIndex]="overdueMeta().current_page - 1"
+                       [pageSize]="overdueMeta().per_page" [pageSizeOptions]="[15, 30, 50]"
+                       (page)="onOverduePage($event)" aria-label="Overdue loans pagination" />
+      }
+    </section>
+
+    <!-- Most borrowed ─────────────────────────────────────────────────────-->
+    <section class="card card-pad" aria-labelledby="popular-heading">
+      <header class="section-head">
+        <h3 id="popular-heading">Most borrowed</h3>
+      </header>
+
+      <form class="range" (ngSubmit)="loadPopular()">
+        <mat-form-field appearance="outline">
+          <mat-label>From</mat-label>
+          <input matInput type="date" [value]="from()" (input)="setFrom($any($event.target).value)" />
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>To</mat-label>
+          <input matInput type="date" [value]="to()" (input)="setTo($any($event.target).value)" />
+        </mat-form-field>
+        <button mat-stroked-button type="submit">Apply</button>
+        <span class="hint">All time, unless a range is set.</span>
+      </form>
+
+      @if (popularLoading()) {
+        <lib-skeleton variant="rows" [rows]="5" />
+      } @else if (popularError()) {
+        <lib-error-state title="Could not load the ranking" (retry)="loadPopular()" />
+      } @else if (popular().length === 0) {
+        <lib-empty-state icon="local_library" title="No loans in this range"
+                         message="Widen the dates, or wait for the shelves to move." />
+      } @else {
+        <ol class="ranking">
+          @for (row of popular(); track row.book.id; let i = $index) {
+            <li>
+              <span class="rank">{{ i + 1 }}</span>
+              <span class="title">
+                <a [routerLink]="['/books', row.book.id]">{{ row.book.title }}</a>
+                <span class="faint mono">{{ row.book.isbn }}</span>
+              </span>
+              <span class="loans">{{ row.loans_count }} {{ row.loans_count === 1 ? 'loan' : 'loans' }}</span>
+            </li>
+          }
+        </ol>
+      }
+    </section>
+  </div>
+</div>

@@ -47,6 +47,11 @@
           <mat-icon matListItemIcon>person_add</mat-icon> Add a member
         </a>
       }
+      @if (auth.can('reports.view')) {
+        <a mat-list-item routerLink="/reports" routerLinkActive="active-link">
+          <mat-icon matListItemIcon>insights</mat-icon> Reports
+        </a>
+      }
     </mat-nav-list>
   </mat-sidenav>
 

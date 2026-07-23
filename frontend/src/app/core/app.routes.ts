@@ -44,6 +44,8 @@ export const APP_ROUTES: Routes = [
       { path: 'users/new', title: 'New user — Librarium', canActivate: [permissionGuard(['users.create-any', 'users.create-member'])], loadComponent: () => import('../features/users/form/user-form-page').then(m => m.UserFormPage) },
       { path: 'users/:id/edit', title: 'Edit user — Librarium', canActivate: [permissionGuard(['users.manage'])], loadComponent: () => import('../features/users/form/user-form-page').then(m => m.UserFormPage) },
 
+      { path: 'reports', title: 'Reports — Librarium', canActivate: [permissionGuard(['reports.view'])], loadComponent: () => import('../features/reports/reports-page').then(m => m.ReportsPage) },
+
       { path: 'search', title: 'Search — Librarium', loadComponent: () => import('../features/search/search-page').then(m => m.SearchPage) },
 
       { path: 'profile', title: 'Your profile — Librarium', loadComponent: () => import('../features/profile/profile-page').then(m => m.ProfilePage) },
