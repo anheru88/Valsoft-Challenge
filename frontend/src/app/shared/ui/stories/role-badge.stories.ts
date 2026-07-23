@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/angular';
 import { RoleBadge } from '../role-badge';
 
-const meta: Meta<RoleBadge> = { title: 'Design System/RoleBadge', component: RoleBadge, tags: ['autodocs'] };
+const meta: Meta<RoleBadge> = { title: 'Shared UI/RoleBadge', component: RoleBadge, tags: ['autodocs'] };
 export default meta;
 type S = StoryObj<RoleBadge>;
 

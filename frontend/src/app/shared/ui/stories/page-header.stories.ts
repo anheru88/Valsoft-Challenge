@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/angular';
 import { PageHeader } from '../page-header';
 
 const meta: Meta<PageHeader> = {
-  title: 'Design System/PageHeader',
+  title: 'Shared UI/PageHeader',
   component: PageHeader,
   tags: ['autodocs'],
   render: (args) => ({

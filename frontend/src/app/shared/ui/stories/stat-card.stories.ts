@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/angular';
 import { StatCard } from '../stat-card';
 
-const meta: Meta<StatCard> = { title: 'Design System/StatCard', component: StatCard, tags: ['autodocs'] };
+const meta: Meta<StatCard> = { title: 'Shared UI/StatCard', component: StatCard, tags: ['autodocs'] };
 export default meta;
 type S = StoryObj<StatCard>;
 

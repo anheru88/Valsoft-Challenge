@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/angular';
 import { AvailabilityBadge } from '../availability-badge';
 
 const meta: Meta<AvailabilityBadge> = {
-  title: 'Design System/AvailabilityBadge',
+  title: 'Shared UI/AvailabilityBadge',
   component: AvailabilityBadge,
   tags: ['autodocs'],
 };

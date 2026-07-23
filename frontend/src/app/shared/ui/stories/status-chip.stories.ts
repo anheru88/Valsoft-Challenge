@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/angular';
 import { StatusChip } from '../status-chip';
 
-const meta: Meta<StatusChip> = { title: 'Design System/StatusChip', component: StatusChip, tags: ['autodocs'] };
+const meta: Meta<StatusChip> = { title: 'Shared UI/StatusChip', component: StatusChip, tags: ['autodocs'] };
 export default meta;
 type S = StoryObj<StatusChip>;
 

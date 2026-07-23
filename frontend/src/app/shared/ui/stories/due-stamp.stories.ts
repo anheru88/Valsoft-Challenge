@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/angular';
 import { DueStamp } from '../due-stamp';
 
 const meta: Meta<DueStamp> = {
-  title: 'Design System/DueStamp',
+  title: 'Shared UI/DueStamp',
   component: DueStamp,
   tags: ['autodocs'],
   parameters: { docs: { description: { component:

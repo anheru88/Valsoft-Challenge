@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/angular';
 import { EmptyState } from '../empty-state';
 
-const meta: Meta<EmptyState> = { title: 'Design System/EmptyState', component: EmptyState, tags: ['autodocs'] };
+const meta: Meta<EmptyState> = { title: 'Shared UI/EmptyState', component: EmptyState, tags: ['autodocs'] };
 export default meta;
 type S = StoryObj<EmptyState>;
 

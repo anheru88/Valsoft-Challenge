@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/angular';
 import { ErrorState } from '../error-state';
 
-const meta: Meta<ErrorState> = { title: 'Design System/ErrorState', component: ErrorState, tags: ['autodocs'] };
+const meta: Meta<ErrorState> = { title: 'Shared UI/ErrorState', component: ErrorState, tags: ['autodocs'] };
 export default meta;
 type S = StoryObj<ErrorState>;
 

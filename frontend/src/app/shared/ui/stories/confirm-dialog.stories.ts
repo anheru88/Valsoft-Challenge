@@ -5,7 +5,7 @@ import { ConfirmDialog } from '../confirm-dialog';
 
 /** El contenido del diálogo renderizado plano (sin overlay) para revisión visual. */
 const meta: Meta<ConfirmDialog> = {
-  title: 'Design System/ConfirmDialog',
+  title: 'Shared UI/ConfirmDialog',
   component: ConfirmDialog,
   tags: ['autodocs'],
   decorators: [

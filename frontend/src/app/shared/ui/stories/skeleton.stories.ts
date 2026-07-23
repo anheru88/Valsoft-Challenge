@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/angular';
 import { Skeleton } from '../skeleton';
 
-const meta: Meta<Skeleton> = { title: 'Design System/Skeleton', component: Skeleton, tags: ['autodocs'] };
+const meta: Meta<Skeleton> = { title: 'Shared UI/Skeleton', component: Skeleton, tags: ['autodocs'] };
 export default meta;
 type S = StoryObj<Skeleton>;
 

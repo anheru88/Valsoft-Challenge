@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/angular';
 import { InlineAlert } from '../inline-alert';
 
 const meta: Meta<InlineAlert> = {
-  title: 'Design System/InlineAlert',
+  title: 'Shared UI/InlineAlert',
   component: InlineAlert,
   tags: ['autodocs'],
   render: (args) => ({

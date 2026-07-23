@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/angular';
 import { SearchInput } from '../search-input';
 
 const meta: Meta<SearchInput> = {
-  title: 'Design System/SearchInput',
+  title: 'Shared UI/SearchInput',
   component: SearchInput,
   tags: ['autodocs'],
   argTypes: { changed: { action: 'changed (300ms debounce)' } },
