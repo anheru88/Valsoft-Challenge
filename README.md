@@ -10,7 +10,66 @@ backend/    Laravel 12 REST API                        — complete
 frontend/   Angular 20 SPA                             — complete, reading and writing the API
 ```
 
-## Running it
+## Running it with Docker
+
+One command builds and serves the whole system — MariaDB, the Laravel API and the
+Angular SPA — behind a single port:
+
+```bash
+./run.sh
+```
+
+Then open **http://teachassignment.local:8080** and sign in with a seeded account
+(below). `./run.sh logs` follows the containers; `./run.sh down` stops them.
+
+What the script does, in order:
+
+1. copies each `.env.example` to `.env` (root, `backend/`, `frontend/`) if one is
+   missing;
+2. generates a Laravel `APP_KEY` into the root `.env` when it is empty;
+3. maps `teachassignment.local` to `127.0.0.1` in `/etc/hosts` (asks for sudo);
+4. runs `docker compose up -d --build`;
+5. waits until the API answers on `/up` — the schema migration and the demo seed
+   run automatically on the first boot, and are skipped on later restarts.
+
+Three containers behind one public door. The browser only ever talks to the
+frontend: nginx serves the built SPA, proxies `/api/…` to the backend (same
+origin, so no CORS) and serves the static Storybook at `/storybook/`.
+
+| Service | Build | Host port | Role |
+|---|---|---|---|
+| `db` | `mariadb:11` | `3306` | Database; data on a named volume |
+| `backend` | `backend/Dockerfile` | `8000` | Laravel API (`artisan serve`, 4 workers) |
+| `frontend` | `frontend/Dockerfile` | `8080` | Built SPA + proxy of `/api` + `/storybook` |
+
+```
+frontend:8080
+  ├ /            the SPA
+  ├ /api/v1/…    → backend:8000 → db
+  └ /storybook/  the component catalogue (static)
+```
+
+Configuration lives in the root `.env` (public host, ports, database credentials,
+`APP_KEY`). If ports `8080`, `8000` or `3306` are already taken on your machine —
+for instance by the local dev servers below — change `APP_PORT`, `BACKEND_PORT` or
+`DB_PORT` there and re-run. [`DOCKER.md`](DOCKER.md) has the full reference.
+
+> **`http://localhost:8080` always works**, whatever the host name. The
+> `teachassignment.local` alias is a convenience that only resolves once it is in
+> your hosts file. On **WSL2** the browser runs on Windows, which ignores the
+> Linux `/etc/hosts` the script edits — so use `localhost`, or add the alias to
+> the Windows hosts file from an *Administrator* PowerShell:
+> ```powershell
+> Add-Content -Path "$env:windir\System32\drivers\etc\hosts" -Value "127.0.0.1 teachassignment.local"
+> ```
+
+> The `/storybook/` sub-path is a property of the Docker build alone: it is nginx
+> serving the pre-built static Storybook. The Angular dev server (`ng serve`, on
+> `:4200` or whatever `--port` you pass) has no such route, so a `/storybook` path
+> on the dev server will not resolve — under local development Storybook is its own
+> server (`npm run storybook`, `:6006`).
+
+## Running it locally
 
 Two servers, two terminals. Both default to a local SQLite database and need no
 external services.

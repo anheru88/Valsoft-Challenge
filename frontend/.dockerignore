@@ -1,0 +1,10 @@
+.git
+node_modules
+dist
+.angular
+storybook-static
+.storybook/../storybook-static
+coverage
+*.log
+.env
+.env.*
