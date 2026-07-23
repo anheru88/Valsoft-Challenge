@@ -8,15 +8,15 @@
     }
   </lib-page-header>
 
-  <!-- Barra de filtros: se sincroniza con la URL (enlaces compartibles) -->
+  <!-- Filter bar -->
   <div class="toolbar" role="search">
-    <lib-search-input placeholder="Title, ISBN, autor…" [initial]="filters().q"
+    <lib-search-input placeholder="Title, ISBN, author…" [initial]="filters().q"
                       (changed)="setFilter({ q: $event })" />
 
     <mat-form-field appearance="outline" class="compact">
       <mat-label>Category</mat-label>
       <mat-select [value]="filters().categoryId" (selectionChange)="setFilter({ categoryId: $event.value })">
-        <mat-option [value]="null">Todas</mat-option>
+        <mat-option [value]="null">All</mat-option>
         @for (c of categories(); track c.id) { <mat-option [value]="c.id">{{ c.name }}</mat-option> }
       </mat-select>
     </mat-form-field>
@@ -30,6 +30,10 @@
       <button mat-button (click)="clearFilters()">Clear filters</button>
     }
   </div>
+
+  @if (actionError()) {
+    <lib-inline-alert tone="danger">{{ actionError() }}</lib-inline-alert>
+  }
 
   <div class="card">
     @if (loading()) {
@@ -50,15 +54,15 @@
                          message="Come back soon: the library is still adding titles." />
       }
     } @else {
-      <table class="lib-table" aria-label="Listado de libros">
+      <table class="lib-table" aria-label="Book list">
         <thead>
           <tr>
             <th><button class="sort-btn" (click)="toggleSort('title')">Title {{ sortIndicator('title') }}</button></th>
             <th>Authors</th>
             <th>Categories</th>
             <th>ISBN</th>
-            <th><button class="sort-btn" (click)="toggleSort('available_copies')">Disponibilidad {{ sortIndicator('available_copies') }}</button></th>
-            <th class="actions-col"><span class="cdk-visually-hidden">Acciones</span></th>
+            <th><button class="sort-btn" (click)="toggleSort('available_copies')">Availability {{ sortIndicator('available_copies') }}</button></th>
+            <th class="actions-col"><span class="cdk-visually-hidden">Actions</span></th>
           </tr>
         </thead>
         <tbody>
@@ -74,14 +78,14 @@
               <td class="actions-col">
                 @if (isStaff()) {
                   <button mat-icon-button [matMenuTriggerFor]="rowMenu"
-                          [attr.aria-label]="'Acciones para ' + b.title">
+                          [attr.aria-label]="'Actions for ' + b.title">
                     <mat-icon>more_vert</mat-icon>
                   </button>
                   <mat-menu #rowMenu="matMenu">
                     <button mat-menu-item [routerLink]="['/books', b.id, 'edit']"><mat-icon>edit</mat-icon> Edit</button>
                     <button mat-menu-item routerLink="/loans/checkout" [queryParams]="{ bookId: b.id }"
                             [disabled]="b.available_copies === 0">
-                      <mat-icon>swap_horiz</mat-icon> Prestar
+                      <mat-icon>swap_horiz</mat-icon> Lend
                     </button>
                     <button mat-menu-item class="danger-text" (click)="confirmDelete(b)"><mat-icon>delete</mat-icon> Delete</button>
                   </mat-menu>

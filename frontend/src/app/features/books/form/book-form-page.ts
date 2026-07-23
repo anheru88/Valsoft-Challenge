@@ -6,8 +6,15 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { forkJoin } from 'rxjs';
+import { apiErrorCode, fieldErrors } from '../../../core/api/api-error';
+import { businessMessage } from '../../../core/api/error-message';
+import { Author, Book, Category } from '../../../core/models';
+import { AuthorsApiService } from '../../authors/data/authors-api.service';
+import { CategoriesApiService } from '../../categories/data/categories-api.service';
 import { PageHeader } from '../../../shared/ui/page-header';
 import { InlineAlert } from '../../../shared/ui/inline-alert';
+import { BookPayload, BooksApiService } from '../data/books-api.service';
 
 /** Client-side ISBN-10/13 checksum validation; the server validates again. */
 export function isbnValidator(control: AbstractControl): ValidationErrors | null {
@@ -38,18 +45,23 @@ export class BookFormPage {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly snack = inject(MatSnackBar);
+  private readonly api = inject(BooksApiService);
+  private readonly authorsApi = inject(AuthorsApiService);
+  private readonly categoriesApi = inject(CategoriesApiService);
+
+  private readonly bookId = Number(this.route.snapshot.paramMap.get('id')) || null;
 
   readonly currentYear = new Date().getFullYear();
-  readonly isEdit = computed(() => this.route.snapshot.paramMap.has('id'));
+  readonly isEdit = computed(() => this.bookId !== null);
+  readonly loading = signal(true);
   readonly saving = signal(false);
   readonly serverError = signal<string | null>(null);
   readonly fieldErrors = signal<Record<string, string>>({});
   readonly currentTitle = signal('');       // title loaded when editing
   readonly availableCopies = signal(0);     // read-only when editing
 
-  // Catalogues para selects — sustituir por GET /authors y GET /categories
-  readonly authors = signal([{ id: 3, name: 'Gabriel García Márquez' }, { id: 5, name: 'Irene Vallejo' }, { id: 8, name: 'Roald Dahl' }]);
-  readonly categories = signal([{ id: 1, name: 'Fiction' }, { id: 2, name: 'Historia' }, { id: 3, name: 'Infantil' }]);
+  readonly authors = signal<Pick<Author, 'id' | 'name'>[]>([]);
+  readonly categories = signal<Pick<Category, 'id' | 'name'>[]>([]);
 
   readonly form = this.fb.nonNullable.group({
     title: ['', Validators.required],
@@ -63,19 +75,102 @@ export class BookFormPage {
     description: [''],
   });
 
+  constructor() {
+    // The selects are useless half-filled, so the form waits for both lists —
+    // and for the book itself when one is being edited.
+    forkJoin({
+      authors: this.authorsApi.list({ per_page: 100, sort: 'name' }),
+      categories: this.categoriesApi.list({ per_page: 100, sort: 'name' }),
+    }).subscribe({
+      next: ({ authors, categories }) => {
+        this.authors.set(authors.data);
+        this.categories.set(categories.data);
+        this.loading.set(false);
+      },
+      error: (err: unknown) => {
+        this.loading.set(false);
+        this.serverError.set(businessMessage(err, 'Could not load the authors and categories.'));
+      },
+    });
+
+    if (this.bookId) {
+      this.api.get(this.bookId).subscribe({
+        next: ({ data }) => this.fill(data),
+        error: (err: unknown) => this.serverError.set(businessMessage(err, 'Could not load this book.')),
+      });
+    }
+  }
+
+  private fill(book: Book): void {
+    this.currentTitle.set(book.title);
+    this.availableCopies.set(book.available_copies);
+
+    this.form.patchValue({
+      title: book.title,
+      isbn: book.isbn,
+      total_copies: book.total_copies,
+      author_ids: book.authors.map(a => a.id),
+      category_ids: book.categories.map(c => c.id),
+      publisher: book.publisher ?? '',
+      publication_year: book.publication_year ?? null,
+      cover_url: book.cover_url ?? '',
+      description: book.description ?? '',
+    });
+  }
+
   submit(): void {
     this.serverError.set(null);
     this.fieldErrors.set({});
     if (this.form.invalid) { this.form.markAllAsTouched(); return; }
     this.saving.set(true);
-    // TODO API: POST /api/v1/books | PUT /api/v1/books/{id}
-    //  201/200 → snack '{isEdit ? "Cambios guardados" : "Libro creado"}' y volver al detalle.
-    //  422 VALIDATION_FAILED → fieldErrors por campo (isbn duplicado, etc.)
-    //  422 BOOK_COPIES_BELOW_LOANED → fieldErrors['total_copies'] con el mensaje del API.
-    this.saving.set(false);
-    this.snack.open(this.isEdit() ? 'Cambios guardados' : 'Libro creado', undefined, { duration: 4000 });
-    this.router.navigate(['/books']);
+
+    const value = this.form.getRawValue();
+    const payload: BookPayload = {
+      title: value.title,
+      isbn: value.isbn,
+      total_copies: value.total_copies,
+      author_ids: value.author_ids,
+      category_ids: value.category_ids,
+      // Empty is not the same as "no value": the API takes null for the fields
+      // that are optional, and rejects an empty string as a URL.
+      publisher: value.publisher || null,
+      publication_year: value.publication_year,
+      cover_url: value.cover_url || null,
+      description: value.description || null,
+    };
+
+    const request = this.bookId
+      ? this.api.update(this.bookId, payload)
+      : this.api.create(payload);
+
+    request.subscribe({
+      next: ({ data }) => {
+        this.saving.set(false);
+        this.snack.open(this.isEdit() ? 'Changes saved' : '«' + data.title + '» added to the catalogue',
+                        undefined, { duration: 4000 });
+        this.router.navigate(['/books', data.id]);
+      },
+      error: (err: unknown) => {
+        this.saving.set(false);
+        // A rejected field is answered next to that field. BOOK_COPIES_BELOW_LOANED
+        // is a 422 about `total_copies` that carries no per-field list, so it is
+        // placed by hand rather than shown as a page-wide failure.
+        const perField = fieldErrors(err);
+
+        if (apiErrorCode(err) === 'BOOK_COPIES_BELOW_LOANED') {
+          perField['total_copies'] = businessMessage(err);
+        }
+
+        this.fieldErrors.set(perField);
+
+        if (Object.keys(perField).length === 0) {
+          this.serverError.set(businessMessage(err, 'Could not save the book.'));
+        }
+      },
+    });
   }
 
-  cancel(): void { this.router.navigate(['/books']); }
+  cancel(): void {
+    this.router.navigate(this.bookId ? ['/books', this.bookId] : ['/books']);
+  }
 }

@@ -9,15 +9,20 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { businessMessage } from '../../../core/api/error-message';
 import { AuthStore } from '../../../core/auth.store';
 import { Book, Category } from '../../../core/models';
+import { CategoriesApiService } from '../../categories/data/categories-api.service';
 import { PageHeader } from '../../../shared/ui/page-header';
 import { SearchInput } from '../../../shared/ui/search-input';
 import { AvailabilityBadge } from '../../../shared/ui/availability-badge';
+import { InlineAlert } from '../../../shared/ui/inline-alert';
 import { Skeleton } from '../../../shared/ui/skeleton';
 import { EmptyState } from '../../../shared/ui/empty-state';
 import { ErrorState } from '../../../shared/ui/error-state';
 import { ConfirmDialog } from '../../../shared/ui/confirm-dialog';
+import { BooksApiService } from '../data/books-api.service';
+import { BooksStore } from '../data/books.store';
 
 interface BookFilters { q: string; categoryId: number | null; onlyAvailable: boolean; }
 
@@ -26,7 +31,8 @@ interface BookFilters { q: string; categoryId: number | null; onlyAvailable: boo
   standalone: true,
   imports: [RouterLink, MatButtonModule, MatIconModule, MatMenuModule, MatFormFieldModule,
             MatSelectModule, MatSlideToggleModule, MatPaginatorModule,
-            PageHeader, SearchInput, AvailabilityBadge, Skeleton, EmptyState, ErrorState],
+            PageHeader, SearchInput, AvailabilityBadge, InlineAlert, Skeleton, EmptyState, ErrorState],
+  providers: [BooksStore],
   templateUrl: './books-list-page.html',
   styleUrl: './books-list-page.scss',
 })
@@ -35,63 +41,69 @@ export class BooksListPage {
   private readonly router = inject(Router);
   private readonly dialog = inject(MatDialog);
   private readonly snack = inject(MatSnackBar);
+  private readonly store = inject(BooksStore);
+  private readonly api = inject(BooksApiService);
+  private readonly categoriesApi = inject(CategoriesApiService);
 
   readonly isStaff = this.auth.isStaff;
-  readonly loading = signal(false);
-  readonly error = signal(false);
+  readonly loading = this.store.loading;
+  readonly error = this.store.error;
+  readonly books = this.store.books;
+  readonly meta = this.store.meta;
 
-  readonly filters = signal<BookFilters>({ q: '', categoryId: null, onlyAvailable: false });
-  readonly sort = signal<{ field: string; dir: 'asc' | 'desc' }>({ field: 'title', dir: 'asc' });
-  readonly meta = signal({ current_page: 1, per_page: 15, total: 3, last_page: 1 });
+  /** A refused delete: shown on the page, because it concerns this request. */
+  readonly actionError = signal<string | null>(null);
+
+  /** The query as the filter bar thinks of it. */
+  readonly filters = computed<BookFilters>(() => {
+    const query = this.store.query();
+
+    return {
+      q: query.q ?? '',
+      categoryId: query.category_id ?? null,
+      onlyAvailable: query.available === true,
+    };
+  });
+
+  readonly sort = computed(() => ({
+    field: this.store.query().sort ?? 'title',
+    dir: this.store.query().direction ?? 'asc',
+  }));
 
   readonly hasActiveFilters = computed(() =>
     this.filters().q !== '' || this.filters().categoryId !== null || this.filters().onlyAvailable);
   readonly totalLabel = computed(() => this.meta().total + ' titles in the catalogue');
 
-  // Demo data — replace with GET /api/v1/books with filters, sorting and paging
-  readonly categories = signal<Pick<Category, 'id' | 'name'>[]>([
-    { id: 1, name: 'Fiction' }, { id: 2, name: 'Historia' }, { id: 3, name: 'Infantil' },
-  ]);
+  /** The whole category list: it fits in one page and drives the filter. */
+  readonly categories = signal<Pick<Category, 'id' | 'name'>[]>([]);
 
-  readonly books = signal<Book[]>([
-    { id: 1, title: 'One Hundred Years of Solitude', isbn: '9780307474728', publisher: 'Vintage', publication_year: 1967,
-      total_copies: 5, available_copies: 3, is_available: true, created_at: '2026-06-01',
-      authors: [{ id: 3, name: 'Gabriel García Márquez' }], categories: [{ id: 1, name: 'Fiction', slug: 'fiction' }] },
-    { id: 2, title: 'El infinito en un junco', isbn: '9788417860790', publisher: 'Siruela', publication_year: 2019,
-      total_copies: 2, available_copies: 0, is_available: false, created_at: '2026-06-10',
-      authors: [{ id: 5, name: 'Irene Vallejo' }], categories: [{ id: 2, name: 'Historia', slug: 'historia' }] },
-    { id: 3, title: 'Matilda', isbn: '9788420482880', publisher: 'Alfaguara', publication_year: 1988,
-      total_copies: 4, available_copies: 4, is_available: true, created_at: '2026-06-15',
-      authors: [{ id: 8, name: 'Roald Dahl' }], categories: [{ id: 3, name: 'Infantil', slug: 'infantil' }] },
-  ]);
+  constructor() {
+    this.categoriesApi.list({ per_page: 100, sort: 'name' })
+      .subscribe({ next: ({ data }) => this.categories.set(data), error: () => this.categories.set([]) });
+  }
 
   authorNames(b: Book): string { return b.authors.map(a => a.name).join(', '); }
 
   setFilter(patch: Partial<BookFilters>): void {
-    this.filters.update(f => ({ ...f, ...patch }));
-    this.load(); // TODO: keep the router query params in sync as well
+    this.store.patchQuery({
+      ...('q' in patch ? { q: patch.q } : {}),
+      ...('categoryId' in patch ? { category_id: patch.categoryId } : {}),
+      // `available=false` would ask for the unavailable ones; the toggle means
+      // "narrow to what can be borrowed", so off is simply no filter.
+      ...('onlyAvailable' in patch ? { available: patch.onlyAvailable ? true : undefined } : {}),
+    });
   }
 
-  clearFilters(): void {
-    this.filters.set({ q: '', categoryId: null, onlyAvailable: false });
-    this.load();
-  }
+  clearFilters(): void { this.store.clearFilters(); }
 
-  toggleSort(field: string): void {
-    this.sort.update(s => s.field === field
-      ? { field, dir: s.dir === 'asc' ? 'desc' : 'asc' }
-      : { field, dir: 'asc' });
-    this.load();
-  }
+  toggleSort(field: string): void { this.store.toggleSort(field); }
+
   sortIndicator(field: string): string {
     const s = this.sort();
     return s.field !== field ? '' : s.dir === 'asc' ? '↑' : '↓';
   }
 
-  onPage(e: PageEvent): void {
-    this.meta.update(m => ({ ...m, current_page: e.pageIndex + 1, per_page: e.pageSize }));
-    this.load();
-  }
+  onPage(e: PageEvent): void { this.store.setPage(e.pageIndex + 1, e.pageSize); }
 
   goNew(): void { this.router.navigate(['/books/new']); }
 
@@ -99,17 +111,22 @@ export class BooksListPage {
     this.dialog.open(ConfirmDialog, { data: {
       title: 'Delete «' + b.title + '»?',
       message: 'The book will be withdrawn from the catalogue. Returned loans keep their history.',
-      confirmLabel: 'Delete libro', destructive: true,
+      confirmLabel: 'Delete book', destructive: true,
     } }).afterClosed().subscribe(ok => {
       if (!ok) return;
-      // TODO API: DELETE /api/v1/books/{id}
-      // 204 → this.snack.open('Libro eliminado', undefined, { duration: 4000 }); this.load();
-      // 409 BOOK_HAS_ACTIVE_LOANS → alert with the reason and a link to the open loans.
-      this.snack.open('Libro eliminado', undefined, { duration: 4000 });
+
+      this.actionError.set(null);
+      this.api.remove(b.id).subscribe({
+        next: () => {
+          this.snack.open('«' + b.title + '» removed from the catalogue', undefined, { duration: 4000 });
+          this.store.reload();
+        },
+        // 409 BOOK_HAS_ACTIVE_LOANS is the expected refusal: the title cannot go
+        // while copies are out (BR-BOOK-3).
+        error: (err: unknown) => this.actionError.set(businessMessage(err)),
+      });
     });
   }
 
-  load(): void {
-    // TODO API: GET /api/v1/books?q&category_id&available&sort&direction&page&per_page
-  }
+  load(): void { this.store.reload(); }
 }

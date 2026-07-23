@@ -8,6 +8,7 @@ import { AvailabilityBadge } from '../../../shared/ui/availability-badge';
 import { Skeleton } from '../../../shared/ui/skeleton';
 import { ErrorState } from '../../../shared/ui/error-state';
 import { InlineAlert } from '../../../shared/ui/inline-alert';
+import { BooksApiService } from '../data/books-api.service';
 
 @Component({
   selector: 'lib-book-detail-page',
@@ -20,25 +21,43 @@ import { InlineAlert } from '../../../shared/ui/inline-alert';
 export class BookDetailPage {
   private readonly route = inject(ActivatedRoute);
   private readonly auth = inject(AuthStore);
+  private readonly api = inject(BooksApiService);
 
   readonly isStaff = this.auth.isStaff;
-  readonly loading = signal(false);
+  readonly loading = signal(true);
   readonly error = signal(false);
+  readonly book = signal<Book | null>(null);
 
-  // Demo data — replace with GET /api/v1/books/{id}
-  readonly book = signal<Book>({
-    id: 1, title: 'One Hundred Years of Solitude', isbn: '9780307474728',
-    description: 'The Buendía family across a century in the mythical town of Macondo: the novel that founded modern magical realism.',
-    publisher: 'Penguin', publication_year: 1967, cover_url: undefined,
-    total_copies: 5, available_copies: 3, is_available: true, active_loans_count: 2,
-    authors: [{ id: 3, name: 'Gabriel García Márquez' }],
-    categories: [{ id: 1, name: 'Fiction', slug: 'fiction' }],
-    created_at: '2026-06-01',
-  });
+  constructor() {
+    this.load();
+  }
 
+  /**
+   * The endpoint carries an ETag; the browser replays `If-None-Match` on its
+   * own, so a revisit that has not changed costs a 304 and no payload.
+   */
   load(): void {
     const id = Number(this.route.snapshot.paramMap.get('id'));
-    // TODO API: GET /api/v1/books/{id} (soporta ETag/If-None-Match)
-    void id;
+
+    if (!id) {
+      this.loading.set(false);
+      this.error.set(true);
+
+      return;
+    }
+
+    this.loading.set(true);
+    this.error.set(false);
+
+    this.api.get(id).subscribe({
+      next: ({ data }) => {
+        this.book.set(data);
+        this.loading.set(false);
+      },
+      error: () => {
+        this.loading.set(false);
+        this.error.set(true);
+      },
+    });
   }
 }

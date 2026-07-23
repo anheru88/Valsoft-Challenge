@@ -4,17 +4,17 @@
   } @else if (error()) {
     <lib-error-state title="Could not load the book" (retry)="load()" />
   } @else if (book(); as b) {
-    <nav class="breadcrumb" aria-label="Miga de pan">
+    <nav class="breadcrumb" aria-label="Breadcrumb">
       <a routerLink="/books">{{ isStaff() ? 'Books' : 'Catalogue' }}</a>
       <span aria-hidden="true">/</span>
       <span>{{ b.title }}</span>
     </nav>
 
     <div class="detail-grid">
-      <!-- Cubierta -->
+      <!-- Cover -->
       <div class="cover card">
         @if (b.cover_url) {
-          <img [src]="b.cover_url" [alt]="'Cubierta de ' + b.title" />
+          <img [src]="b.cover_url" [alt]="'Cover of ' + b.title" />
         } @else {
           <div class="cover-fallback" aria-hidden="true">
             <mat-icon>menu_book</mat-icon>
@@ -22,7 +22,7 @@
         }
       </div>
 
-      <!-- Ficha -->
+      <!-- Record -->
       <div class="card card-pad">
         <div class="row head">
           <div class="grow">
@@ -49,7 +49,7 @@
             </dd>
           </div>
           @if (isStaff() && b.active_loans_count !== undefined) {
-            <div><dt>Loans activos</dt><dd class="mono">{{ b.active_loans_count }}</dd></div>
+            <div><dt>Active loans</dt><dd class="mono">{{ b.active_loans_count }}</dd></div>
           }
         </dl>
 
@@ -66,7 +66,7 @@
             <button mat-flat-button color="primary" routerLink="/loans/checkout"
                     [queryParams]="{ bookId: b.id }" [disabled]="b.available_copies === 0">
               <mat-icon>swap_horiz</mat-icon>
-              {{ b.available_copies === 0 ? 'Sin ejemplares available' : 'Prestar este libro' }}
+              {{ b.available_copies === 0 ? 'No copies available' : 'Lend this book' }}
             </button>
           </div>
         } @else if (b.available_copies === 0) {

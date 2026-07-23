@@ -10,21 +10,22 @@
         <mat-label>Title</mat-label>
         <input matInput formControlName="title" maxlength="255" />
         @if (form.controls.title.hasError('required')) { <mat-error>The title is required.</mat-error> }
+        @if (fieldErrors()['title']) { <mat-error>{{ fieldErrors()['title'] }}</mat-error> }
       </mat-form-field>
 
       <mat-form-field appearance="outline">
         <mat-label>ISBN</mat-label>
         <input matInput formControlName="isbn" class="mono" placeholder="978-0-06-088328-7" />
-        <mat-hint>ISBN-10 o ISBN-13; los guiones se normalizan.</mat-hint>
-        @if (form.controls.isbn.hasError('required')) { <mat-error>El ISBN es obligatorio.</mat-error> }
+        <mat-hint>ISBN-10 or ISBN-13; hyphens are normalised away.</mat-hint>
+        @if (form.controls.isbn.hasError('required')) { <mat-error>The ISBN is required.</mat-error> }
         @if (form.controls.isbn.hasError('isbn')) { <mat-error>The ISBN check digit is not valid.</mat-error> }
         @if (fieldErrors()['isbn']) { <mat-error>{{ fieldErrors()['isbn'] }}</mat-error> }
       </mat-form-field>
 
       <mat-form-field appearance="outline">
-        <mat-label>Copies totales</mat-label>
+        <mat-label>Total copies</mat-label>
         <input matInput type="number" formControlName="total_copies" min="1" />
-        @if (form.controls.total_copies.hasError('min')) { <mat-error>Debe haber al menos 1 ejemplar.</mat-error> }
+        @if (form.controls.total_copies.hasError('min')) { <mat-error>There must be at least one copy.</mat-error> }
         @if (fieldErrors()['total_copies']) { <mat-error>{{ fieldErrors()['total_copies'] }}</mat-error> }
       </mat-form-field>
 
@@ -32,7 +33,7 @@
         <mat-form-field appearance="outline">
           <mat-label>Copies available</mat-label>
           <input matInput [value]="availableCopies()" disabled />
-          <mat-hint>Lo gestiona el sistema con los loans; no se edita a mano.</mat-hint>
+          <mat-hint>The system keeps this in step with the loans; it is not edited by hand.</mat-hint>
         </mat-form-field>
       }
 
@@ -41,7 +42,8 @@
         <mat-select formControlName="author_ids" multiple>
           @for (a of authors(); track a.id) { <mat-option [value]="a.id">{{ a.name }}</mat-option> }
         </mat-select>
-        @if (form.controls.author_ids.hasError('required')) { <mat-error>Elige al menos un autor.</mat-error> }
+        @if (form.controls.author_ids.hasError('required')) { <mat-error>Pick at least one author.</mat-error> }
+        @if (fieldErrors()['author_ids']) { <mat-error>{{ fieldErrors()['author_ids'] }}</mat-error> }
       </mat-form-field>
 
       <mat-form-field appearance="outline">
@@ -50,6 +52,7 @@
           @for (c of categories(); track c.id) { <mat-option [value]="c.id">{{ c.name }}</mat-option> }
         </mat-select>
         @if (form.controls.category_ids.hasError('required')) { <mat-error>Pick at least one category.</mat-error> }
+        @if (fieldErrors()['category_ids']) { <mat-error>{{ fieldErrors()['category_ids'] }}</mat-error> }
       </mat-form-field>
 
       <mat-form-field appearance="outline">
@@ -60,11 +63,13 @@
       <mat-form-field appearance="outline">
         <mat-label>Year of publication</mat-label>
         <input matInput type="number" formControlName="publication_year" min="1450" [max]="currentYear" />
+        @if (fieldErrors()['publication_year']) { <mat-error>{{ fieldErrors()['publication_year'] }}</mat-error> }
       </mat-form-field>
 
       <mat-form-field appearance="outline" class="span-2">
-        <mat-label>URL de la cubierta</mat-label>
+        <mat-label>Cover URL</mat-label>
         <input matInput type="url" formControlName="cover_url" placeholder="https://…" />
+        @if (fieldErrors()['cover_url']) { <mat-error>{{ fieldErrors()['cover_url'] }}</mat-error> }
       </mat-form-field>
 
       <mat-form-field appearance="outline" class="span-2">
@@ -75,8 +80,8 @@
 
     <div class="form-actions">
       <button mat-button type="button" (click)="cancel()">Cancel</button>
-      <button mat-flat-button color="primary" type="submit" [disabled]="saving()">
-        {{ isEdit() ? 'Save cambios' : 'Create libro' }}
+      <button mat-flat-button color="primary" type="submit" [disabled]="saving() || loading()">
+        {{ isEdit() ? 'Save changes' : 'Create book' }}
       </button>
     </div>
   </form>

@@ -14,7 +14,7 @@
 .sort-btn:hover { color: var(--lib-ink); }
 mat-paginator { border-top: 1px solid var(--lib-line); }
 
-/* En móvil la tabla degrada a tarjetas: ocultamos columnas secundarias */
+/* On a narrow screen the secondary columns are dropped rather than squeezed */
 @media (max-width: 700px) {
   .lib-table th:nth-child(2), .lib-table td:nth-child(2),
   .lib-table th:nth-child(3), .lib-table td:nth-child(3),

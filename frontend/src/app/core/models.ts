@@ -1,4 +1,4 @@
-// ── Tipos del API (/api/v1) ────────────────────────────────────────────────
+// ── API types (/api/v1) ────────────────────────────────────────────────────
 export type Role = 'admin' | 'librarian' | 'member';
 export type LoanStatus = 'active' | 'overdue' | 'returned';
 
@@ -29,16 +29,18 @@ export interface User {
   is_active: boolean; active_loans_count?: number; created_at: string;
 }
 
-export interface Author { id: number; name: string; bio?: string; birth_year?: number; books_count?: number; }
-export interface Category { id: number; name: string; slug: string; description?: string; books_count?: number; }
+export interface Author { id: number; name: string; bio?: string | null; birth_year?: number | null; books_count?: number; }
+export interface Category { id: number; name: string; slug: string; description?: string | null; books_count?: number; }
 
 export interface Book {
-  id: number; title: string; isbn: string; description?: string;
-  publisher?: string; publication_year?: number; cover_url?: string;
+  id: number; title: string; isbn: string; description?: string | null;
+  publisher?: string | null; publication_year?: number | null; cover_url?: string | null;
   total_copies: number; available_copies: number; is_available: boolean;
   authors: Pick<Author, 'id' | 'name'>[];
   categories: Pick<Category, 'id' | 'name' | 'slug'>[];
-  active_loans_count?: number; // solo staff
+  active_loans_count?: number; // staff only
+  /** Which fields a search hit matched on (API specification 8). */
+  matched_on?: string[];
   created_at: string;
 }
 
@@ -49,9 +51,12 @@ export interface Loan {
   book: Pick<Book, 'id' | 'title' | 'isbn'>;
 }
 
+/** Paging counters the API returns alongside every list. */
+export interface PageMeta { current_page: number; per_page: number; total: number; last_page: number; }
+
 export interface Paginated<T> {
   data: T[];
-  meta: { current_page: number; per_page: number; total: number; last_page: number };
+  meta: PageMeta;
 }
 
 export interface ApiError {
@@ -63,3 +68,19 @@ export interface DashboardKpis {
   borrowed_now: number; overdue_now: number; total_members: number;
   books_added_this_month: number; loans_this_month: number; returns_this_month: number;
 }
+
+// ── Dashboard widgets (API specification 9) ────────────────────────────────
+export type ActivityType = 'loan_created' | 'loan_returned' | 'book_created';
+
+export interface ActivityItem {
+  type: ActivityType;
+  occurred_at: string;
+  summary: string;
+  book?: { id: number; title: string } | null;
+  user?: { id: number; name: string } | null;
+}
+
+export interface PopularAuthor { author: { id: number; name: string }; loans_count: number; }
+export interface CategoryCount { category: { id: number; name: string }; books_count: number; }
+export interface MonthlyStats { labels: string[]; loans: number[]; returns: number[]; }
+export interface MostBorrowedBook { book: Pick<Book, 'id' | 'title' | 'isbn'>; loans_count: number; }
