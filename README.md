@@ -7,7 +7,7 @@ the product and is kept in step with the code.
 ```
 docs/       PRDs, architecture RFC, API specification — the source of truth
 backend/    Laravel 12 REST API                        — complete
-frontend/   Angular 20 SPA                             — views built, not yet wired to the API
+frontend/   Angular 20 SPA                             — complete, reading and writing the API
 ```
 
 ## Running it

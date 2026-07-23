@@ -8,8 +8,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 - `docs/` — the specification, and the authoritative one. The originating brief is `docs/Prompt.md`; the four numbered docs are its output.
 - `backend/` — the Laravel 12 API implementing it. See `backend/README.md` for setup; commands are `vendor/bin/pest`, `composer lint`, `composer analyse`, `composer openapi`.
+- `frontend/` — the Angular 20 SPA of `docs/02-prd-frontend.md`, reading and writing that API. Commands are `npm start`, `npm run storybook`, `npm run stories:check`.
 
-The Angular SPA of `docs/02-prd-frontend.md` is not implemented yet.
+The profile and change-password screens of frontend PRD 2.1 are the only ones still missing.
 
 When code and docs disagree, that is a bug in one of them: fix the code, or amend the doc with rationale the way the RFC's own ADRs do (ADR-11 is the worked example).
 
