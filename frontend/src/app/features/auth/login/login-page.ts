@@ -6,8 +6,10 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { apiErrorCode } from '../../../core/api/api-error';
 import { AuthStore } from '../../../core/auth.store';
 import { InlineAlert } from '../../../shared/ui/inline-alert';
+import { AuthApiService } from '../data/auth-api.service';
 
 @Component({
   selector: 'lib-login-page',
@@ -29,6 +31,7 @@ export class LoginPage {
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
   private readonly auth = inject(AuthStore);
+  private readonly api = inject(AuthApiService);
 
   readonly loading = signal(false);
   readonly showPassword = signal(false);
@@ -45,21 +48,37 @@ export class LoginPage {
     if (this.form.invalid) { this.form.markAllAsTouched(); return; }
     this.loading.set(true);
 
-    // TODO API: POST /api/v1/auth/login → { token, user }
-    // AuthApiService.login(this.form.getRawValue()).subscribe({
-    //   next: ({ token, user }) => {
-    //     this.auth.startSession(token, user);
-    //     const redirect = this.route.snapshot.queryParamMap.get('redirect');
-    //     this.router.navigateByUrl(redirect ?? (this.auth.can('dashboard.view') ? '/dashboard' : '/books'));
-    //   },
-    //   error: (e) => {
-    //     this.loading.set(false);
-    //     this.errorMessage.set(e.status === 422 || e.status === 401
-    //       ? 'El correo o la contraseña no son correctos.'
-    //       : e.status === 403 ? 'Tu cuenta está desactivada. Contacta con la biblioteca.'
-    //       : 'No se pudo iniciar sesión. Inténtalo de nuevo.');
-    //   },
-    // });
-    this.loading.set(false); // quitar al conectar el API
+    this.api.login(this.form.getRawValue()).subscribe({
+      next: ({ data }) => {
+        this.auth.startSession(data.token, data.user);
+
+        // Back to wherever the guard interrupted, or to the screen this account
+        // is actually equipped to use.
+        const redirect = this.route.snapshot.queryParamMap.get('redirect');
+        this.router.navigateByUrl(redirect ?? (this.auth.can('dashboard.view') ? '/dashboard' : '/books'));
+      },
+      error: (error: unknown) => {
+        this.loading.set(false);
+        this.errorMessage.set(this.messageFor(error));
+      },
+    });
+  }
+
+  /**
+   * A refusal to sign in is a business answer, not a system failure, so it is
+   * shown next to the form rather than in a toast (PRD 5).
+   */
+  private messageFor(error: unknown): string {
+    switch (apiErrorCode(error)) {
+      case 'INVALID_CREDENTIALS':
+      case 'VALIDATION_FAILED':
+        return 'El correo o la contraseña no son correctos.';
+      case 'USER_INACTIVE':
+        return 'Tu cuenta está desactivada. Contacta con la biblioteca.';
+      case 'RATE_LIMITED':
+        return 'Demasiados intentos. Espera un minuto y vuelve a probar.';
+      default:
+        return 'No se pudo iniciar sesión. Inténtalo de nuevo.';
+    }
   }
 }
