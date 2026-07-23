@@ -1,37 +1,37 @@
 <div class="page">
-  <lib-page-header title="Panel" subtitle="Estado de la biblioteca de un vistazo">
+  <lib-page-header title="Dashboard" subtitle="The state of the library at a glance">
     <button mat-flat-button color="primary" routerLink="/loans/checkout">
-      <mat-icon>swap_horiz</mat-icon> Prestar libro
+      <mat-icon>swap_horiz</mat-icon> Lend a book
     </button>
   </lib-page-header>
 
-  <!-- KPIs (cada widget carga y falla de forma independiente) -->
+  <!-- KPIs (each widget loads and fails independently) -->
   @if (loadingKpis()) {
     <div class="kpi-grid">
       @for (i of [1,2,3,4]; track i) { <lib-skeleton variant="stat" /> }
     </div>
   } @else if (kpisError()) {
-    <lib-error-state title="No se pudieron cargar los indicadores" (retry)="loadKpis()" />
+    <lib-error-state title="Could not load the indicators" (retry)="loadKpis()" />
   } @else if (kpis(); as k) {
     <div class="kpi-grid">
-      <lib-stat-card label="Libros en catálogo" [value]="k.total_books" [hint]="k.total_copies + ' ejemplares'" />
-      <lib-stat-card label="Disponibles ahora" [value]="k.available_copies" />
-      <lib-stat-card label="Prestados ahora" [value]="k.borrowed_now" [hint]="'Socios: ' + k.total_members" />
-      <lib-stat-card label="Vencidos" [value]="k.overdue_now" tone="alert" hint="Requieren seguimiento" />
+      <lib-stat-card label="Books in the catalogue" [value]="k.total_books" [hint]="k.total_copies + ' copies'" />
+      <lib-stat-card label="Available now" [value]="k.available_copies" />
+      <lib-stat-card label="On loan now" [value]="k.borrowed_now" [hint]="'Members: ' + k.total_members" />
+      <lib-stat-card label="Overdue" [value]="k.overdue_now" tone="alert" hint="Need chasing" />
     </div>
 
     <div class="kpi-grid month-row">
-      <lib-stat-card label="Libros añadidos (mes)" [value]="k.books_added_this_month" />
-      <lib-stat-card label="Préstamos (mes)" [value]="k.loans_this_month" />
-      <lib-stat-card label="Devoluciones (mes)" [value]="k.returns_this_month" />
+      <lib-stat-card label="Books added (month)" [value]="k.books_added_this_month" />
+      <lib-stat-card label="Loans (month)" [value]="k.loans_this_month" />
+      <lib-stat-card label="Returns (month)" [value]="k.returns_this_month" />
       <lib-stat-card label="Socios" [value]="k.total_members" />
     </div>
   }
 
   <div class="two-col section">
-    <!-- Actividad reciente -->
+    <!-- Recent activity -->
     <section class="card" aria-labelledby="activity-title">
-      <h2 id="activity-title" class="widget-title">Actividad reciente</h2>
+      <h2 id="activity-title" class="widget-title">Recent activity</h2>
       <ol class="activity">
         @for (item of activity(); track item.id) {
           <li>
@@ -44,15 +44,15 @@
             </div>
           </li>
         } @empty {
-          <lib-empty-state icon="history" title="Sin actividad todavía"
-                           message="Los préstamos y altas de libros aparecerán aquí." />
+          <lib-empty-state icon="history" title="No activity yet"
+                           message="Loans and new titles will show up here." />
         }
       </ol>
     </section>
 
-    <!-- Libros por categoría (barras CSS accesibles, sin dependencia de gráficos) -->
+    <!-- Books by category: accessible CSS bars, no charting dependency -->
     <section class="card" aria-labelledby="cats-title">
-      <h2 id="cats-title" class="widget-title">Libros por categoría</h2>
+      <h2 id="cats-title" class="widget-title">Books by category</h2>
       <ul class="bars">
         @for (c of byCategory(); track c.name) {
           <li>
@@ -68,11 +68,11 @@
   </div>
 
   <div class="two-col section">
-    <!-- Autores populares -->
+    <!-- Authors populares -->
     <section class="card" aria-labelledby="authors-title">
-      <h2 id="authors-title" class="widget-title">Autores más prestados <span class="faint">(30 días)</span></h2>
+      <h2 id="authors-title" class="widget-title">Most borrowed authors <span class="faint">(30 days)</span></h2>
       <table class="lib-table">
-        <thead><tr><th>Autor</th><th class="num">Préstamos</th></tr></thead>
+        <thead><tr><th>Autor</th><th class="num">Loans</th></tr></thead>
         <tbody>
           @for (a of popularAuthors(); track a.name) {
             <tr><td>{{ a.name }}</td><td class="num mono">{{ a.loans }}</td></tr>
@@ -81,9 +81,9 @@
       </table>
     </section>
 
-    <!-- Añadidos recientemente -->
+    <!-- Recently added -->
     <section class="card" aria-labelledby="recent-title">
-      <h2 id="recent-title" class="widget-title">Añadidos recientemente</h2>
+      <h2 id="recent-title" class="widget-title">Recently added</h2>
       <ul class="recent-books">
         @for (b of recentBooks(); track b.id) {
           <li>

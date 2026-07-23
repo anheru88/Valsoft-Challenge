@@ -1,7 +1,7 @@
 <div class="page">
-  <lib-page-header title="Autores" [subtitle]="authors().length + ' autores en el catálogo'">
+  <lib-page-header title="Authors" [subtitle]="authors().length + ' authors in the catalogue'">
     <button mat-flat-button color="primary" (click)="openForm()">
-      <mat-icon>add</mat-icon> Añadir autor
+      <mat-icon>add</mat-icon> Add author
     </button>
   </lib-page-header>
 
@@ -13,12 +13,12 @@
     @if (loading()) {
       <lib-skeleton variant="rows" [rows]="5" />
     } @else if (authors().length === 0) {
-      <lib-empty-state icon="history_edu" title="Aún no hay autores"
+      <lib-empty-state icon="history_edu" title="No authors yet"
                        message="Los autores se asignan a los libros al darlos de alta."
-                       actionLabel="Añadir autor" (action)="openForm()" />
+                       actionLabel="Add author" (action)="openForm()" />
     } @else {
       <table class="lib-table" aria-label="Listado de autores">
-        <thead><tr><th>Nombre</th><th>Año de nacimiento</th><th class="num">Libros</th><th class="actions-col"></th></tr></thead>
+        <thead><tr><th>Name</th><th>Year of birth</th><th class="num">Books</th><th class="actions-col"></th></tr></thead>
         <tbody>
           @for (a of authors(); track a.id) {
             <tr>
@@ -26,8 +26,8 @@
               <td class="mono muted">{{ a.birth_year ?? '—' }}</td>
               <td class="num mono">{{ a.books_count ?? 0 }}</td>
               <td class="actions-col">
-                <button mat-icon-button (click)="openForm(a)" [attr.aria-label]="'Editar ' + a.name"><mat-icon>edit</mat-icon></button>
-                <button mat-icon-button (click)="confirmDelete(a)" [attr.aria-label]="'Eliminar ' + a.name"><mat-icon>delete</mat-icon></button>
+                <button mat-icon-button (click)="openForm(a)" [attr.aria-label]="'Edit ' + a.name"><mat-icon>edit</mat-icon></button>
+                <button mat-icon-button (click)="confirmDelete(a)" [attr.aria-label]="'Delete ' + a.name"><mat-icon>delete</mat-icon></button>
               </td>
             </tr>
           }

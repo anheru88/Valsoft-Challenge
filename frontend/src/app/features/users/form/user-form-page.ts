@@ -44,7 +44,7 @@ export class UserFormPage {
     this.saving.set(true);
     // TODO API: POST /users | PUT /users/{id}
     //  422 email duplicado → fieldErrors['email']
-    //  409 LAST_ADMIN_PROTECTED (al degradar al único admin) → serverError con el mensaje.
+    //  409 LAST_ADMIN_PROTECTED (demoting the only admin) → serverError with the message.
     this.saving.set(false);
     this.snack.open(this.isEdit() ? 'Cambios guardados' : 'Usuario creado', undefined, { duration: 4000 });
     this.router.navigate(['/users']);

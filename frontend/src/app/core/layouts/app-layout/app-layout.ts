@@ -34,7 +34,7 @@ export class AppLayout {
     { initialValue: false },
   );
 
-  /** Atajo de teclado "/" → foco en la búsqueda global */
+  /** Keyboard shortcut "/" focuses the global search. */
   @HostListener('document:keydown./', ['$event'])
   focusSearch(ev: Event): void {
     const target = ev.target as HTMLElement;

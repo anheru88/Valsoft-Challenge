@@ -1,22 +1,22 @@
 <div class="page">
-  <lib-page-header title="Categorías" [subtitle]="categories().length + ' categorías'">
+  <lib-page-header title="Categories" [subtitle]="categories().length + ' categories'">
     <button mat-flat-button color="primary" (click)="openForm()">
-      <mat-icon>add</mat-icon> Añadir categoría
+      <mat-icon>add</mat-icon> Add category
     </button>
   </lib-page-header>
 
   <div class="toolbar">
-    <lib-search-input placeholder="Buscar categorías…" (changed)="onSearch($event)" />
+    <lib-search-input placeholder="Search categories…" (changed)="onSearch($event)" />
   </div>
 
   <div class="card">
     @if (categories().length === 0) {
-      <lib-empty-state icon="category" title="Aún no hay categorías"
-                       message="Las categorías hacen el catálogo navegable por materias."
-                       actionLabel="Añadir categoría" (action)="openForm()" />
+      <lib-empty-state icon="category" title="No categories yet"
+                       message="Categories make the catalogue browsable by subject."
+                       actionLabel="Add category" (action)="openForm()" />
     } @else {
-      <table class="lib-table" aria-label="Listado de categorías">
-        <thead><tr><th>Nombre</th><th>Slug</th><th class="num">Libros</th><th class="actions-col"></th></tr></thead>
+      <table class="lib-table" aria-label="Category list">
+        <thead><tr><th>Name</th><th>Slug</th><th class="num">Books</th><th class="actions-col"></th></tr></thead>
         <tbody>
           @for (c of categories(); track c.id) {
             <tr>
@@ -24,8 +24,8 @@
               <td class="mono muted">{{ c.slug }}</td>
               <td class="num mono">{{ c.books_count ?? 0 }}</td>
               <td class="actions-col">
-                <button mat-icon-button (click)="openForm(c)" [attr.aria-label]="'Editar ' + c.name"><mat-icon>edit</mat-icon></button>
-                <button mat-icon-button (click)="confirmDelete(c)" [attr.aria-label]="'Eliminar ' + c.name"><mat-icon>delete</mat-icon></button>
+                <button mat-icon-button (click)="openForm(c)" [attr.aria-label]="'Edit ' + c.name"><mat-icon>edit</mat-icon></button>
+                <button mat-icon-button (click)="confirmDelete(c)" [attr.aria-label]="'Delete ' + c.name"><mat-icon>delete</mat-icon></button>
               </td>
             </tr>
           }

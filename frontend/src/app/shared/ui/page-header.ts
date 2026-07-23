@@ -1,6 +1,6 @@
 import { Component, input } from '@angular/core';
 
-/** Cabecera estándar de página: título + subtítulo + acciones (ng-content). */
+/** Standard page header: title, subtitle and actions via ng-content. */
 @Component({
   selector: 'lib-page-header',
   standalone: true,

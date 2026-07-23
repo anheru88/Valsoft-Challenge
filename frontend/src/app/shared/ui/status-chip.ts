@@ -2,7 +2,7 @@ import { Component, computed, input } from '@angular/core';
 import { LoanStatus } from '../../core/models';
 
 const META: Record<LoanStatus, { label: string; icon: string }> = {
-  active:   { label: 'Activo',   icon: '●' },
+  active:   { label: 'Active',   icon: '●' },
   overdue:  { label: 'Vencido',  icon: '▲' },
   returned: { label: 'Devuelto', icon: '✓' },
 };

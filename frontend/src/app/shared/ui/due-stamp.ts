@@ -3,8 +3,8 @@ import { DatePipe, UpperCasePipe } from '@angular/common';
 import { LoanStatus } from '../../core/models';
 
 /**
- * Sello de fecha estilo ficha de préstamo: monoespaciada, mayúsculas,
- * borde entintado y ligera rotación. Es el elemento distintivo del sistema.
+ * A due-date stamp in the style of a loan card: monospaced, uppercase, inked
+ * border and a slight rotation. The signature element of the system.
  *  - active   → verde  "DEVOLVER 24 JUL"
  *  - overdue  → rojo   "VENCIDO · 3 DÍAS"
  *  - returned → gris   "DEVUELTO 12 JUL"

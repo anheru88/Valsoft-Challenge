@@ -21,9 +21,9 @@ export class CategoriesListPage {
   private readonly dialog = inject(MatDialog);
   private readonly snack = inject(MatSnackBar);
 
-  // Demostración — GET /api/v1/categories
+  // Demo data — GET /api/v1/categories
   readonly categories = signal<Category[]>([
-    { id: 1, name: 'Narrativa', slug: 'narrativa', books_count: 412 },
+    { id: 1, name: 'Fiction', slug: 'fiction', books_count: 412 },
     { id: 2, name: 'Historia', slug: 'historia', books_count: 268 },
     { id: 3, name: 'Infantil', slug: 'infantil', books_count: 231 },
   ]);
@@ -33,17 +33,17 @@ export class CategoriesListPage {
   openForm(category?: Category): void {
     this.dialog.open(CategoryFormDialog, { width: '440px', data: category ?? null })
       .afterClosed().subscribe(changed => {
-        if (changed) this.snack.open(category ? 'Categoría actualizada' : 'Categoría creada', undefined, { duration: 4000 });
+        if (changed) this.snack.open(category ? 'Category actualizada' : 'Category creada', undefined, { duration: 4000 });
       });
   }
 
   confirmDelete(c: Category): void {
     this.dialog.open(ConfirmDialog, { data: {
-      title: '¿Eliminar «' + c.name + '»?',
+      title: 'Delete «' + c.name + '»?',
       message: (c.books_count ?? 0) > 0
-        ? 'Hay ' + c.books_count + ' libros en esta categoría: primero hay que recategorizarlos.'
-        : 'La categoría se eliminará.',
-      confirmLabel: 'Eliminar categoría', destructive: true,
+        ? 'This category holds ' + c.books_count + ' books: they need recategorising first.'
+        : 'The category will be deleted.',
+      confirmLabel: 'Delete category', destructive: true,
     } }).afterClosed().subscribe(ok => {
       if (!ok) return;
       // TODO API: DELETE /categories/{id}; en 409 CATEGORY_IN_USE mostrar motivo.

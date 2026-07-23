@@ -1,20 +1,20 @@
 <div class="page">
-  <lib-page-header [title]="isStaff() ? 'Libros' : 'Catálogo'"
+  <lib-page-header [title]="isStaff() ? 'Books' : 'Catalogue'"
                    [subtitle]="totalLabel()">
     @if (isStaff()) {
       <button mat-flat-button color="primary" routerLink="/books/new">
-        <mat-icon>add</mat-icon> Añadir libro
+        <mat-icon>add</mat-icon> Add book
       </button>
     }
   </lib-page-header>
 
   <!-- Barra de filtros: se sincroniza con la URL (enlaces compartibles) -->
   <div class="toolbar" role="search">
-    <lib-search-input placeholder="Título, ISBN, autor…" [initial]="filters().q"
+    <lib-search-input placeholder="Title, ISBN, autor…" [initial]="filters().q"
                       (changed)="setFilter({ q: $event })" />
 
     <mat-form-field appearance="outline" class="compact">
-      <mat-label>Categoría</mat-label>
+      <mat-label>Category</mat-label>
       <mat-select [value]="filters().categoryId" (selectionChange)="setFilter({ categoryId: $event.value })">
         <mat-option [value]="null">Todas</mat-option>
         @for (c of categories(); track c.id) { <mat-option [value]="c.id">{{ c.name }}</mat-option> }
@@ -23,11 +23,11 @@
 
     <mat-slide-toggle [checked]="filters().onlyAvailable"
                       (change)="setFilter({ onlyAvailable: $event.checked })">
-      Solo disponibles
+      Available only
     </mat-slide-toggle>
 
     @if (hasActiveFilters()) {
-      <button mat-button (click)="clearFilters()">Limpiar filtros</button>
+      <button mat-button (click)="clearFilters()">Clear filters</button>
     }
   </div>
 
@@ -35,27 +35,27 @@
     @if (loading()) {
       <lib-skeleton variant="rows" [rows]="6" />
     } @else if (error()) {
-      <lib-error-state title="No se pudieron cargar los libros" (retry)="load()" />
+      <lib-error-state title="Could not load the books" (retry)="load()" />
     } @else if (books().length === 0) {
       @if (hasActiveFilters()) {
-        <lib-empty-state icon="filter_alt_off" title="Sin resultados con estos filtros"
-                         message="Prueba a ampliar la búsqueda o limpia los filtros activos."
-                         actionLabel="Limpiar filtros" (action)="clearFilters()" />
+        <lib-empty-state icon="filter_alt_off" title="No results for these filters"
+                         message="Try widening the search, or clear the active filters."
+                         actionLabel="Clear filters" (action)="clearFilters()" />
       } @else if (isStaff()) {
-        <lib-empty-state icon="menu_book" title="Aún no hay libros"
-                         message="Añade tu primer libro para empezar a construir el catálogo."
-                         actionLabel="Añadir libro" (action)="goNew()" />
+        <lib-empty-state icon="menu_book" title="No books yet"
+                         message="Add your first book and start building the catalogue."
+                         actionLabel="Add book" (action)="goNew()" />
       } @else {
-        <lib-empty-state icon="menu_book" title="El catálogo está vacío"
-                         message="Vuelve pronto: la biblioteca está incorporando títulos." />
+        <lib-empty-state icon="menu_book" title="The catalogue is empty"
+                         message="Come back soon: the library is still adding titles." />
       }
     } @else {
       <table class="lib-table" aria-label="Listado de libros">
         <thead>
           <tr>
-            <th><button class="sort-btn" (click)="toggleSort('title')">Título {{ sortIndicator('title') }}</button></th>
-            <th>Autores</th>
-            <th>Categorías</th>
+            <th><button class="sort-btn" (click)="toggleSort('title')">Title {{ sortIndicator('title') }}</button></th>
+            <th>Authors</th>
+            <th>Categories</th>
             <th>ISBN</th>
             <th><button class="sort-btn" (click)="toggleSort('available_copies')">Disponibilidad {{ sortIndicator('available_copies') }}</button></th>
             <th class="actions-col"><span class="cdk-visually-hidden">Acciones</span></th>
@@ -78,12 +78,12 @@
                     <mat-icon>more_vert</mat-icon>
                   </button>
                   <mat-menu #rowMenu="matMenu">
-                    <button mat-menu-item [routerLink]="['/books', b.id, 'edit']"><mat-icon>edit</mat-icon> Editar</button>
+                    <button mat-menu-item [routerLink]="['/books', b.id, 'edit']"><mat-icon>edit</mat-icon> Edit</button>
                     <button mat-menu-item routerLink="/loans/checkout" [queryParams]="{ bookId: b.id }"
                             [disabled]="b.available_copies === 0">
                       <mat-icon>swap_horiz</mat-icon> Prestar
                     </button>
-                    <button mat-menu-item class="danger-text" (click)="confirmDelete(b)"><mat-icon>delete</mat-icon> Eliminar</button>
+                    <button mat-menu-item class="danger-text" (click)="confirmDelete(b)"><mat-icon>delete</mat-icon> Delete</button>
                   </mat-menu>
                 }
               </td>
@@ -94,7 +94,7 @@
 
       <mat-paginator [length]="meta().total" [pageIndex]="meta().current_page - 1"
                      [pageSize]="meta().per_page" [pageSizeOptions]="[15, 30, 50]"
-                     (page)="onPage($event)" aria-label="Paginación de libros" />
+                     (page)="onPage($event)" aria-label="Book pagination" />
     }
   </div>
 </div>

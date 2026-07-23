@@ -24,7 +24,7 @@ export class AuthorsListPage {
 
   readonly loading = signal(false);
 
-  // Demostración — GET /api/v1/authors?q&sort
+  // Demo data — GET /api/v1/authors?q&sort
   readonly authors = signal<Author[]>([
     { id: 3, name: 'Gabriel García Márquez', birth_year: 1927, books_count: 6 },
     { id: 5, name: 'Irene Vallejo', birth_year: 1979, books_count: 2 },
@@ -42,11 +42,11 @@ export class AuthorsListPage {
 
   confirmDelete(a: Author): void {
     this.dialog.open(ConfirmDialog, { data: {
-      title: '¿Eliminar a ' + a.name + '?',
+      title: 'Delete a ' + a.name + '?',
       message: (a.books_count ?? 0) > 0
         ? 'Este autor tiene ' + a.books_count + ' libros asociados: primero hay que reasignarlos.'
-        : 'El autor se eliminará del catálogo.',
-      confirmLabel: 'Eliminar autor', destructive: true,
+        : 'The author will be removed from the catalogue.',
+      confirmLabel: 'Delete autor', destructive: true,
     } }).afterClosed().subscribe(ok => {
       if (!ok) return;
       // TODO API: DELETE /authors/{id}; en 409 AUTHOR_IN_USE mostrar el motivo del servidor.

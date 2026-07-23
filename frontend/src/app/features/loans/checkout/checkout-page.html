@@ -1,5 +1,5 @@
 <div class="page narrow">
-  <lib-page-header title="Prestar libro"
+  <lib-page-header title="Lend a book"
                    subtitle="Flujo de mostrador: socio, libro y fecha en menos de 30 segundos" />
 
   <form class="card card-pad" [formGroup]="form" (ngSubmit)="submit()" novalidate>
@@ -7,7 +7,7 @@
     <!-- 1 · Socio -->
     <h2 class="step">1 · Socio</h2>
     <mat-form-field appearance="outline" class="full">
-      <mat-label>Buscar socio por nombre o correo</mat-label>
+      <mat-label>Find a member por nombre o correo</mat-label>
       <input matInput formControlName="memberQuery" [matAutocomplete]="memberAuto" />
       <mat-icon matSuffix>person_search</mat-icon>
       <mat-autocomplete #memberAuto="matAutocomplete" (optionSelected)="selectMember($event.option.value)"
@@ -22,18 +22,18 @@
       <div class="member-summary" [class.blocked]="memberBlocked()">
         <div class="row">
           <strong>{{ m.name }}</strong>
-          <span class="mono muted">{{ m.active_loans_count }}/5 préstamos</span>
+          <span class="mono muted">{{ m.active_loans_count }}/5 loans</span>
         </div>
         @if (memberOverdue()) {
           <lib-inline-alert tone="danger">
-            Este socio tiene préstamos vencidos. Debe devolverlos antes de llevarse otro libro.
+            Este socio tiene loans vencidos. Debe devolverlos antes de llevarse otro libro.
           </lib-inline-alert>
         } @else if (memberAtLimit()) {
           <lib-inline-alert tone="danger">
-            Este socio ya tiene 5 préstamos activos (límite 5). Debe devolver un libro antes de llevarse otro.
+            This member already holds 5 active loans (the limit). They must return one before taking another.
           </lib-inline-alert>
         } @else if (m.active_loans_count === 4) {
-          <lib-inline-alert tone="warn">Le queda 1 préstamo disponible.</lib-inline-alert>
+          <lib-inline-alert tone="warn">One loan left before they reach the limit.</lib-inline-alert>
         }
       </div>
     }
@@ -41,7 +41,7 @@
     <!-- 2 · Libro -->
     <h2 class="step">2 · Libro</h2>
     <mat-form-field appearance="outline" class="full">
-      <mat-label>Buscar por título o ISBN (compatible con lector de códigos)</mat-label>
+      <mat-label>Search by title or ISBN (barcode scanner friendly)</mat-label>
       <input matInput formControlName="bookQuery" [matAutocomplete]="bookAuto" class="mono-input" />
       <mat-icon matSuffix>qr_code_scanner</mat-icon>
       <mat-autocomplete #bookAuto="matAutocomplete" (optionSelected)="selectBook($event.option.value)"
@@ -67,20 +67,20 @@
       </div>
       @if (duplicateTitle()) {
         <lib-inline-alert tone="danger">
-          El socio ya tiene un ejemplar de este título en préstamo. No puede llevarse dos iguales.
+          The member already has a copy of this title on loan. They cannot take two of the same.
         </lib-inline-alert>
       }
     }
 
-    <!-- 3 · Fecha de devolución -->
-    <h2 class="step">3 · Devolución</h2>
+    <!-- 3 · Due date -->
+    <h2 class="step">3 · Due date</h2>
     <div class="row wrap">
       <mat-form-field appearance="outline">
-        <mat-label>Fecha de devolución</mat-label>
+        <mat-label>Due date</mat-label>
         <input matInput [matDatepicker]="dp" formControlName="dueDate" [min]="minDate" [max]="maxDate" />
         <mat-datepicker-toggle matSuffix [for]="dp" />
         <mat-datepicker #dp />
-        <mat-hint>Por defecto 14 días · máximo 60</mat-hint>
+        <mat-hint>14 days by default · 60 at most</mat-hint>
       </mat-form-field>
       <lib-due-stamp status="active" [dueDate]="dueDateIso()" />
     </div>
@@ -91,7 +91,7 @@
       <button mat-button type="button" (click)="reset()">Limpiar</button>
       <button mat-flat-button color="primary" type="submit"
               [disabled]="!canSubmit() || saving()">
-        Registrar préstamo
+        Record the loan
       </button>
     </div>
   </form>

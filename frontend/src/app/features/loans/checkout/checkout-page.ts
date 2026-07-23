@@ -18,7 +18,7 @@ import { AvailabilityBadge } from '../../../shared/ui/availability-badge';
 const DAY = 86_400_000;
 
 /** Pantalla de mostrador. Las validaciones de negocio se muestran ANTES de
- *  enviar cuando es posible; el servidor es la última palabra (códigos LOAN_*). */
+ *  before submitting where it can; the server has the last word (LOAN_* codes). */
 @Component({
   selector: 'lib-checkout-page',
   standalone: true,
@@ -42,7 +42,7 @@ export class CheckoutPage {
   readonly member = signal<(User & { has_overdue?: boolean; active_titles?: number[] }) | null>(null);
   readonly book = signal<Book | null>(null);
 
-  // Resultados de autocompletar — sustituir por búsquedas al API con debounce
+  // Autocomplete results — replace with debounced API searches
   readonly memberResults = signal<(User & { has_overdue?: boolean; active_titles?: number[] })[]>([
     { id: 34, name: 'Marta Ruiz', email: 'marta@example.com', roles: ['member'], permissions: [], is_active: true,
       active_loans_count: 2, has_overdue: false, active_titles: [7], created_at: '2025-01-10' },
@@ -50,7 +50,7 @@ export class CheckoutPage {
       active_loans_count: 3, has_overdue: true, active_titles: [2], created_at: '2024-11-02' },
   ]);
   readonly bookResults = signal<Book[]>([
-    { id: 1, title: 'Cien años de soledad', isbn: '9780307474728', total_copies: 5, available_copies: 3,
+    { id: 1, title: 'One Hundred Years of Solitude', isbn: '9780307474728', total_copies: 5, available_copies: 3,
       is_available: true, authors: [{ id: 3, name: 'G. García Márquez' }], categories: [], created_at: '' },
     { id: 2, title: 'El infinito en un junco', isbn: '9788417860790', total_copies: 2, available_copies: 0,
       is_available: false, authors: [{ id: 5, name: 'Irene Vallejo' }], categories: [], created_at: '' },
@@ -78,12 +78,12 @@ export class CheckoutPage {
   });
 
   constructor() {
-    // Preselección desde detalle de libro: /loans/checkout?bookId=1
+    // Preselected from the book detail page: /loans/checkout?bookId=1
     const bookId = Number(this.route.snapshot.queryParamMap.get('bookId'));
     if (bookId) {
       const found = this.bookResults().find(b => b.id === bookId);
       if (found) this.book.set(found);
-      // TODO API: GET /books/{bookId} si no está en memoria
+      // TODO API: GET /books/{bookId} when it is not already in memory
     }
   }
 
@@ -92,7 +92,7 @@ export class CheckoutPage {
 
   selectMember(m: User & { has_overdue?: boolean }): void {
     this.member.set(m);
-    // TODO API: GET /users/{id} con contadores frescos (préstamos activos, vencidos, títulos)
+    // TODO API: GET /users/{id} with fresh counters (active loans, overdue, titles)
   }
   selectBook(b: Book): void { this.book.set(b); }
 
@@ -101,14 +101,14 @@ export class CheckoutPage {
     this.serverError.set(null);
     this.saving.set(true);
     // TODO API: POST /api/v1/loans { user_id, book_id, due_date }
-    //  201 → snack '«Título» prestado a Nombre · devolver el d MMM' y reiniciar el formulario.
-    //  409 → mapear code a mensaje en línea:
-    //    LOAN_NO_COPIES        'No quedan ejemplares disponibles de este libro.'
-    //    LOAN_LIMIT_REACHED    'El socio ya tiene 5 préstamos activos.'
-    //    LOAN_MEMBER_OVERDUE   'El socio tiene préstamos vencidos.'
-    //    LOAN_DUPLICATE_TITLE  'El socio ya tiene este título en préstamo.'
+    //  201 → toast '«Title» lent to Name · due d MMM', then reset the form.
+    //  409 → map the code to an inline message:
+    //    LOAN_NO_COPIES        'No copies of this book are left.'
+    //    LOAN_LIMIT_REACHED    'This member already holds 5 active loans.'
+    //    LOAN_MEMBER_OVERDUE   'This member has overdue loans.'
+    //    LOAN_DUPLICATE_TITLE  'This member already has this title on loan.'
     const b = this.book()!; const m = this.member()!;
-    this.snack.open('«' + b.title + '» prestado a ' + m.name, undefined, { duration: 5000 });
+    this.snack.open('«' + b.title + '» lent to ' + m.name, undefined, { duration: 5000 });
     this.saving.set(false);
     this.reset();
   }

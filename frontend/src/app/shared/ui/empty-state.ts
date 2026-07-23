@@ -2,7 +2,7 @@ import { Component, input, output } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 
-/** Estado vacío con dirección: qué pasa y qué hacer a continuación. */
+/** An empty state with direction: what happened, and what to do next. */
 @Component({
   selector: 'lib-empty-state',
   standalone: true,

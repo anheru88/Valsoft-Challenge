@@ -33,7 +33,7 @@ export class UsersListPage {
   readonly roleFilter = signal<Role | null>(null);
   readonly q = signal('');
 
-  // Demostración — GET /api/v1/users?role&q&page
+  // Demo data — GET /api/v1/users?role&q&page
   readonly users = signal<User[]>([
     { id: 1,  name: 'Alicia Ferrer', email: 'alicia@biblioteca.org', roles: ['admin'], permissions: [], is_active: true, active_loans_count: 0, created_at: '2024-01-05' },
     { id: 9,  name: 'Luis Prado', email: 'luis@biblioteca.org', roles: ['librarian'], permissions: [], is_active: true, active_loans_count: 1, created_at: '2024-06-12' },
@@ -52,17 +52,17 @@ export class UsersListPage {
 
   toggleActive(u: User): void {
     // TODO API: PATCH /users/{id}/status { is_active }
-    // 409 LAST_ADMIN_PROTECTED → 'No puedes desactivar al único administrador.'
+    // 409 LAST_ADMIN_PROTECTED → 'You cannot deactivate the only administrator.'
     this.snack.open(u.is_active ? 'Cuenta desactivada' : 'Cuenta reactivada', undefined, { duration: 4000 });
   }
 
   confirmDelete(u: User): void {
     this.dialog.open(ConfirmDialog, { data: {
-      title: '¿Eliminar la cuenta de ' + u.name + '?',
+      title: 'Delete la cuenta de ' + u.name + '?',
       message: (u.active_loans_count ?? 0) > 0
-        ? 'Tiene ' + u.active_loans_count + ' préstamos activos: hay que registrarlos como devueltos antes.'
-        : 'La cuenta se desactivará y dejará de poder iniciar sesión. El historial de préstamos se conserva.',
-      confirmLabel: 'Eliminar cuenta', destructive: true,
+        ? 'Tiene ' + u.active_loans_count + ' loans activos: hay que registrarlos como devueltos antes.'
+        : 'The account will be deactivated and can no longer sign in. Its loan history is kept.',
+      confirmLabel: 'Delete cuenta', destructive: true,
     } }).afterClosed().subscribe(ok => {
       if (!ok) return;
       // TODO API: DELETE /users/{id}

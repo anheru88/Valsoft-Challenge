@@ -22,7 +22,7 @@ export class DashboardPage {
   readonly loadingKpis = signal(false);
   readonly kpisError = signal(false);
 
-  // Datos de demostración — sustituir por GET /api/v1/dashboard y widgets asociados
+  // Demo data — replace with GET /api/v1/dashboard and its companion widgets
   readonly kpis = signal<DashboardKpis>({
     total_books: 1240, total_copies: 3480, available_copies: 2960,
     borrowed_now: 520, overdue_now: 34, total_members: 812,
@@ -30,16 +30,16 @@ export class DashboardPage {
   });
 
   readonly activity = signal([
-    { id: 1, type: 'loan_created',  summary: 'Marta Ruiz se llevó «El nombre del viento»', occurred_at: '2026-07-22T10:24:00Z' },
-    { id: 2, type: 'loan_returned', summary: 'Jorge Peña devolvió «Sapiens»',              occurred_at: '2026-07-22T09:58:00Z' },
+    { id: 1, type: 'loan_created',  summary: 'Marta Ruiz borrowed «The Name of the Wind»', occurred_at: '2026-07-22T10:24:00Z' },
+    { id: 2, type: 'loan_returned', summary: 'Jorge Peña returned «Sapiens»',              occurred_at: '2026-07-22T09:58:00Z' },
     { id: 3, type: 'book_created',  summary: 'Alta de «La ciudad y sus muros inciertos»',  occurred_at: '2026-07-21T17:31:00Z' },
-    { id: 4, type: 'loan_created',  summary: 'Lucía Gómez se llevó «Cien años de soledad»', occurred_at: '2026-07-21T12:05:00Z' },
+    { id: 4, type: 'loan_created',  summary: 'Lucía Gómez borrowed «One Hundred Years of Solitude»', occurred_at: '2026-07-21T12:05:00Z' },
   ]);
 
   readonly byCategory = signal([
-    { name: 'Narrativa',   count: 412 }, { name: 'Historia', count: 268 },
+    { name: 'Fiction',   count: 412 }, { name: 'Historia', count: 268 },
     { name: 'Infantil',    count: 231 }, { name: 'Ciencia',  count: 175 },
-    { name: 'Poesía',      count: 96 },
+    { name: 'Poetry',      count: 96 },
   ]);
   readonly maxCategoryCount = computed(() => Math.max(...this.byCategory().map(c => c.count), 1));
 

@@ -35,11 +35,11 @@ export class SearchPage {
 
   private search(q: string): void {
     if (q.length < 2) { this.results.set([]); return; }
-    // TODO API: GET /api/v1/books?q= — de momento, demostración:
+    // TODO API: GET /api/v1/books?q= — demo data for now:
     this.results.set([
-      { id: 1, title: 'Cien años de soledad', isbn: '9780307474728', total_copies: 5, available_copies: 3,
+      { id: 1, title: 'One Hundred Years of Solitude', isbn: '9780307474728', total_copies: 5, available_copies: 3,
         is_available: true, authors: [{ id: 3, name: 'Gabriel García Márquez' }],
-        categories: [{ id: 1, name: 'Narrativa', slug: 'narrativa' }], created_at: '' },
+        categories: [{ id: 1, name: 'Fiction', slug: 'fiction' }], created_at: '' },
     ]);
   }
 }

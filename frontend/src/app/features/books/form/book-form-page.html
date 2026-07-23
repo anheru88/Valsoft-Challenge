@@ -1,15 +1,15 @@
 <div class="page narrow">
-  <lib-page-header [title]="isEdit() ? 'Editar libro' : 'Nuevo libro'"
-                   [subtitle]="isEdit() ? currentTitle() : 'Da de alta un título en el catálogo'" />
+  <lib-page-header [title]="isEdit() ? 'Edit book' : 'New book'"
+                   [subtitle]="isEdit() ? currentTitle() : 'Add a title to the catalogue'" />
 
   @if (serverError()) { <lib-inline-alert tone="danger">{{ serverError() }}</lib-inline-alert> }
 
   <form class="card card-pad" [formGroup]="form" (ngSubmit)="submit()" novalidate>
     <div class="form-grid">
       <mat-form-field appearance="outline" class="span-2">
-        <mat-label>Título</mat-label>
+        <mat-label>Title</mat-label>
         <input matInput formControlName="title" maxlength="255" />
-        @if (form.controls.title.hasError('required')) { <mat-error>El título es obligatorio.</mat-error> }
+        @if (form.controls.title.hasError('required')) { <mat-error>The title is required.</mat-error> }
       </mat-form-field>
 
       <mat-form-field appearance="outline">
@@ -17,12 +17,12 @@
         <input matInput formControlName="isbn" class="mono" placeholder="978-0-06-088328-7" />
         <mat-hint>ISBN-10 o ISBN-13; los guiones se normalizan.</mat-hint>
         @if (form.controls.isbn.hasError('required')) { <mat-error>El ISBN es obligatorio.</mat-error> }
-        @if (form.controls.isbn.hasError('isbn')) { <mat-error>El dígito de control del ISBN no es válido.</mat-error> }
+        @if (form.controls.isbn.hasError('isbn')) { <mat-error>The ISBN check digit is not valid.</mat-error> }
         @if (fieldErrors()['isbn']) { <mat-error>{{ fieldErrors()['isbn'] }}</mat-error> }
       </mat-form-field>
 
       <mat-form-field appearance="outline">
-        <mat-label>Ejemplares totales</mat-label>
+        <mat-label>Copies totales</mat-label>
         <input matInput type="number" formControlName="total_copies" min="1" />
         @if (form.controls.total_copies.hasError('min')) { <mat-error>Debe haber al menos 1 ejemplar.</mat-error> }
         @if (fieldErrors()['total_copies']) { <mat-error>{{ fieldErrors()['total_copies'] }}</mat-error> }
@@ -30,14 +30,14 @@
 
       @if (isEdit()) {
         <mat-form-field appearance="outline">
-          <mat-label>Ejemplares disponibles</mat-label>
+          <mat-label>Copies available</mat-label>
           <input matInput [value]="availableCopies()" disabled />
-          <mat-hint>Lo gestiona el sistema con los préstamos; no se edita a mano.</mat-hint>
+          <mat-hint>Lo gestiona el sistema con los loans; no se edita a mano.</mat-hint>
         </mat-form-field>
       }
 
       <mat-form-field appearance="outline">
-        <mat-label>Autores</mat-label>
+        <mat-label>Authors</mat-label>
         <mat-select formControlName="author_ids" multiple>
           @for (a of authors(); track a.id) { <mat-option [value]="a.id">{{ a.name }}</mat-option> }
         </mat-select>
@@ -45,20 +45,20 @@
       </mat-form-field>
 
       <mat-form-field appearance="outline">
-        <mat-label>Categorías</mat-label>
+        <mat-label>Categories</mat-label>
         <mat-select formControlName="category_ids" multiple>
           @for (c of categories(); track c.id) { <mat-option [value]="c.id">{{ c.name }}</mat-option> }
         </mat-select>
-        @if (form.controls.category_ids.hasError('required')) { <mat-error>Elige al menos una categoría.</mat-error> }
+        @if (form.controls.category_ids.hasError('required')) { <mat-error>Pick at least one category.</mat-error> }
       </mat-form-field>
 
       <mat-form-field appearance="outline">
-        <mat-label>Editorial</mat-label>
+        <mat-label>Publisher</mat-label>
         <input matInput formControlName="publisher" maxlength="255" />
       </mat-form-field>
 
       <mat-form-field appearance="outline">
-        <mat-label>Año de publicación</mat-label>
+        <mat-label>Year of publication</mat-label>
         <input matInput type="number" formControlName="publication_year" min="1450" [max]="currentYear" />
       </mat-form-field>
 
@@ -68,15 +68,15 @@
       </mat-form-field>
 
       <mat-form-field appearance="outline" class="span-2">
-        <mat-label>Descripción</mat-label>
+        <mat-label>Description</mat-label>
         <textarea matInput formControlName="description" rows="4" maxlength="5000"></textarea>
       </mat-form-field>
     </div>
 
     <div class="form-actions">
-      <button mat-button type="button" (click)="cancel()">Cancelar</button>
+      <button mat-button type="button" (click)="cancel()">Cancel</button>
       <button mat-flat-button color="primary" type="submit" [disabled]="saving()">
-        {{ isEdit() ? 'Guardar cambios' : 'Crear libro' }}
+        {{ isEdit() ? 'Save cambios' : 'Create libro' }}
       </button>
     </div>
   </form>

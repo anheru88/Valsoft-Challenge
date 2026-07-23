@@ -11,25 +11,25 @@ import { Category } from '../../core/models';
   standalone: true,
   imports: [ReactiveFormsModule, MatDialogModule, MatFormFieldModule, MatInputModule, MatButtonModule],
   template: `
-    <h2 mat-dialog-title>{{ data ? 'Editar categoría' : 'Nueva categoría' }}</h2>
+    <h2 mat-dialog-title>{{ data ? 'Edit category' : 'New category' }}</h2>
     <mat-dialog-content>
       <form [formGroup]="form" id="cat-form" (ngSubmit)="save()" class="grid">
         <mat-form-field appearance="outline">
-          <mat-label>Nombre</mat-label>
+          <mat-label>Name</mat-label>
           <input matInput formControlName="name" maxlength="100" cdkFocusInitial />
-          <mat-hint>El slug se genera automáticamente.</mat-hint>
+          <mat-hint>The slug is generated automatically.</mat-hint>
           @if (form.controls.name.hasError('required')) { <mat-error>El nombre es obligatorio.</mat-error> }
         </mat-form-field>
         <mat-form-field appearance="outline">
-          <mat-label>Descripción</mat-label>
+          <mat-label>Description</mat-label>
           <textarea matInput formControlName="description" rows="3" maxlength="500"></textarea>
         </mat-form-field>
       </form>
     </mat-dialog-content>
     <mat-dialog-actions align="end">
-      <button mat-button (click)="ref.close(false)">Cancelar</button>
+      <button mat-button (click)="ref.close(false)">Cancel</button>
       <button mat-flat-button color="primary" type="submit" form="cat-form">
-        {{ data ? 'Guardar cambios' : 'Crear categoría' }}
+        {{ data ? 'Save changes' : 'Create category' }}
       </button>
     </mat-dialog-actions>
   `,

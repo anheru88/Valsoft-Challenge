@@ -3,13 +3,13 @@ import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/materia
 import { MatButtonModule } from '@angular/material/button';
 
 export interface ConfirmDialogData {
-  title: string;          // p. ej. '¿Eliminar «Dune»?'
+  title: string;          // p. ej. 'Delete «Dune»?'
   message: string;        // consecuencia en lenguaje llano
-  confirmLabel?: string;  // p. ej. 'Eliminar libro'
+  confirmLabel?: string;  // p. ej. 'Delete libro'
   destructive?: boolean;
 }
 
-/** Diálogo de confirmación para acciones destructivas.
+/** Confirmation dialog for destructive actions.
  *  Uso: dialog.open(ConfirmDialog, { data: {...} }).afterClosed() → boolean */
 @Component({
   selector: 'lib-confirm-dialog',
@@ -19,7 +19,7 @@ export interface ConfirmDialogData {
     <h2 mat-dialog-title>{{ data.title }}</h2>
     <mat-dialog-content><p>{{ data.message }}</p></mat-dialog-content>
     <mat-dialog-actions align="end">
-      <button mat-button (click)="ref.close(false)">Cancelar</button>
+      <button mat-button (click)="ref.close(false)">Cancel</button>
       <button mat-flat-button [color]="data.destructive ? 'warn' : 'primary'"
               cdkFocusInitial (click)="ref.close(true)">
         {{ data.confirmLabel ?? 'Confirmar' }}

@@ -9,7 +9,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { PageHeader } from '../../../shared/ui/page-header';
 import { InlineAlert } from '../../../shared/ui/inline-alert';
 
-/** Validación de checksum ISBN-10/13 en cliente (el servidor revalida). */
+/** Client-side ISBN-10/13 checksum validation; the server validates again. */
 export function isbnValidator(control: AbstractControl): ValidationErrors | null {
   const raw = String(control.value ?? '').replace(/[-\s]/g, '');
   if (!raw) return null;
@@ -44,12 +44,12 @@ export class BookFormPage {
   readonly saving = signal(false);
   readonly serverError = signal<string | null>(null);
   readonly fieldErrors = signal<Record<string, string>>({});
-  readonly currentTitle = signal('');       // título cargado en modo edición
-  readonly availableCopies = signal(0);     // solo lectura en edición
+  readonly currentTitle = signal('');       // title loaded when editing
+  readonly availableCopies = signal(0);     // read-only when editing
 
-  // Catálogos para selects — sustituir por GET /authors y GET /categories
+  // Catalogues para selects — sustituir por GET /authors y GET /categories
   readonly authors = signal([{ id: 3, name: 'Gabriel García Márquez' }, { id: 5, name: 'Irene Vallejo' }, { id: 8, name: 'Roald Dahl' }]);
-  readonly categories = signal([{ id: 1, name: 'Narrativa' }, { id: 2, name: 'Historia' }, { id: 3, name: 'Infantil' }]);
+  readonly categories = signal([{ id: 1, name: 'Fiction' }, { id: 2, name: 'Historia' }, { id: 3, name: 'Infantil' }]);
 
   readonly form = this.fb.nonNullable.group({
     title: ['', Validators.required],

@@ -2,10 +2,10 @@
   @if (loading()) {
     <lib-skeleton variant="card" />
   } @else if (error()) {
-    <lib-error-state title="No se pudo cargar el libro" (retry)="load()" />
+    <lib-error-state title="Could not load the book" (retry)="load()" />
   } @else if (book(); as b) {
     <nav class="breadcrumb" aria-label="Miga de pan">
-      <a routerLink="/books">{{ isStaff() ? 'Libros' : 'Catálogo' }}</a>
+      <a routerLink="/books">{{ isStaff() ? 'Books' : 'Catalogue' }}</a>
       <span aria-hidden="true">/</span>
       <span>{{ b.title }}</span>
     </nav>
@@ -38,10 +38,10 @@
 
         <dl class="meta">
           <div><dt>ISBN</dt><dd class="mono">{{ b.isbn }}</dd></div>
-          @if (b.publisher) { <div><dt>Editorial</dt><dd>{{ b.publisher }}</dd></div> }
-          @if (b.publication_year) { <div><dt>Año</dt><dd class="mono">{{ b.publication_year }}</dd></div> }
+          @if (b.publisher) { <div><dt>Publisher</dt><dd>{{ b.publisher }}</dd></div> }
+          @if (b.publication_year) { <div><dt>Year</dt><dd class="mono">{{ b.publication_year }}</dd></div> }
           <div>
-            <dt>Categorías</dt>
+            <dt>Categories</dt>
             <dd>
               @for (c of b.categories; track c.id) {
                 <a class="cat-chip" [routerLink]="['/books']" [queryParams]="{ category_id: c.id }">{{ c.name }}</a>
@@ -49,29 +49,29 @@
             </dd>
           </div>
           @if (isStaff() && b.active_loans_count !== undefined) {
-            <div><dt>Préstamos activos</dt><dd class="mono">{{ b.active_loans_count }}</dd></div>
+            <div><dt>Loans activos</dt><dd class="mono">{{ b.active_loans_count }}</dd></div>
           }
         </dl>
 
         @if (b.description) {
-          <h2 class="sect">Descripción</h2>
+          <h2 class="sect">Description</h2>
           <p class="desc">{{ b.description }}</p>
         }
 
         @if (isStaff()) {
           <div class="form-actions">
             <button mat-stroked-button [routerLink]="['/books', b.id, 'edit']">
-              <mat-icon>edit</mat-icon> Editar
+              <mat-icon>edit</mat-icon> Edit
             </button>
             <button mat-flat-button color="primary" routerLink="/loans/checkout"
                     [queryParams]="{ bookId: b.id }" [disabled]="b.available_copies === 0">
               <mat-icon>swap_horiz</mat-icon>
-              {{ b.available_copies === 0 ? 'Sin ejemplares disponibles' : 'Prestar este libro' }}
+              {{ b.available_copies === 0 ? 'Sin ejemplares available' : 'Prestar este libro' }}
             </button>
           </div>
         } @else if (b.available_copies === 0) {
           <lib-inline-alert tone="info">
-            Ahora mismo no hay ejemplares disponibles. Consulta en el mostrador cuándo se espera la próxima devolución.
+            No copies are available right now. Ask at the desk when the next one is due back.
           </lib-inline-alert>
         }
       </div>

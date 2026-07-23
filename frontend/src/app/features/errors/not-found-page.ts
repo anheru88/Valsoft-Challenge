@@ -9,9 +9,9 @@ import { MatButtonModule } from '@angular/material/button';
   template: `
     <div class="err">
       <span class="code mono">404</span>
-      <h1>Página fuera de catálogo</h1>
-      <p class="muted">La dirección no existe o el recurso fue retirado. Prueba desde el inicio.</p>
-      <a mat-flat-button color="primary" routerLink="/">Volver al inicio</a>
+      <h1>This page is not in the catalogue</h1>
+      <p class="muted">The address does not exist, or the record was withdrawn. Try again from the start.</p>
+      <a mat-flat-button color="primary" routerLink="/">Back to the start</a>
     </div>
   `,
   styleUrl: './error-pages.scss',

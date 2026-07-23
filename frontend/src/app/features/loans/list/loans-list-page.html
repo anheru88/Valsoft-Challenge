@@ -1,11 +1,11 @@
 <div class="page">
-  <lib-page-header title="Préstamos" subtitle="Gestiona los libros en circulación">
+  <lib-page-header title="Loans" subtitle="Manage the books in circulation">
     <button mat-flat-button color="primary" routerLink="/loans/checkout">
-      <mat-icon>swap_horiz</mat-icon> Prestar libro
+      <mat-icon>swap_horiz</mat-icon> Lend a book
     </button>
   </lib-page-header>
 
-  <!-- Filtro por estado (tabs) + búsqueda por socio/libro -->
+  <!-- Status tabs, plus a search by member or book -->
   <nav mat-tab-nav-bar [tabPanel]="panel" aria-label="Filtrar por estado">
     @for (t of tabs; track t.value) {
       <a mat-tab-link [active]="statusFilter() === t.value" (click)="setStatus(t.value)">
@@ -19,36 +19,36 @@
   <mat-tab-nav-panel #panel />
 
   <div class="toolbar">
-    <lib-search-input placeholder="Socio, título o ISBN…" (changed)="onSearch($event)" />
+    <lib-search-input placeholder="Member, title or ISBN…" (changed)="onSearch($event)" />
   </div>
 
   <div class="card">
     @if (loading()) {
       <lib-skeleton variant="rows" [rows]="6" />
     } @else if (error()) {
-      <lib-error-state title="No se pudieron cargar los préstamos" (retry)="load()" />
+      <lib-error-state title="Could not load the loans" (retry)="load()" />
     } @else if (loans().length === 0) {
       @switch (statusFilter()) {
         @case ('overdue') {
           <lib-empty-state icon="task_alt" title="Nada vencido"
-                           message="Todos los préstamos están al día. Buen trabajo." />
+                           message="Every loan is up to date. Good work." />
         }
         @case ('active') {
-          <lib-empty-state icon="swap_horiz" title="No hay préstamos activos"
-                           message="Cuando prestes un libro aparecerá aquí."
-                           actionLabel="Prestar libro" (action)="goCheckout()" />
+          <lib-empty-state icon="swap_horiz" title="No loans activos"
+                           message="Once you lend a book it will show up here."
+                           actionLabel="Lend a book" (action)="goCheckout()" />
         }
         @default {
-          <lib-empty-state icon="swap_horiz" title="Todavía no hay préstamos"
-                           message="Registra el primer préstamo desde el mostrador."
-                           actionLabel="Prestar libro" (action)="goCheckout()" />
+          <lib-empty-state icon="swap_horiz" title="No loans yet"
+                           message="Record the first loan from the desk."
+                           actionLabel="Lend a book" (action)="goCheckout()" />
         }
       }
     } @else {
-      <table class="lib-table" aria-label="Listado de préstamos">
+      <table class="lib-table" aria-label="Listado de loans">
         <thead>
           <tr>
-            <th>Socio</th><th>Libro</th><th>Prestado</th><th>Devolución</th><th>Estado</th>
+            <th>Member</th><th>Book</th><th>Lent</th><th>Due</th><th>Status</th>
             <th class="actions-col"><span class="cdk-visually-hidden">Acciones</span></th>
           </tr>
         </thead>
@@ -70,7 +70,7 @@
               <td class="actions-col">
                 @if (l.status !== 'returned') {
                   <button mat-stroked-button (click)="checkIn(l)" [disabled]="returningId() === l.id">
-                    Registrar devolución
+                    Check the book in
                   </button>
                 }
               </td>
@@ -81,7 +81,7 @@
 
       <mat-paginator [length]="meta().total" [pageIndex]="meta().current_page - 1"
                      [pageSize]="meta().per_page" [pageSizeOptions]="[15, 30, 50]"
-                     (page)="onPage($event)" aria-label="Paginación de préstamos" />
+                     (page)="onPage($event)" aria-label="Loan pagination" />
     }
   </div>
 </div>

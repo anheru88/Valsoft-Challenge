@@ -5,7 +5,7 @@ import { debounceTime, distinctUntilChanged } from 'rxjs';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 
-/** Búsqueda con debounce para barras de filtro de listados. */
+/** Debounced search for the filter bars of list screens. */
 @Component({
   selector: 'lib-search-input',
   standalone: true,
@@ -16,7 +16,7 @@ import { MatButtonModule } from '@angular/material/button';
       <input type="search" [formControl]="control"
              [placeholder]="placeholder()" [attr.aria-label]="placeholder()" />
       @if (control.value) {
-        <button mat-icon-button (click)="control.setValue('')" aria-label="Limpiar búsqueda">
+        <button mat-icon-button (click)="control.setValue('')" aria-label="Clear the search">
           <mat-icon>close</mat-icon>
         </button>
       }

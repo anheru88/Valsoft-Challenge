@@ -1,6 +1,6 @@
 import { Component, input } from '@angular/core';
 
-/** Esqueletos que replican la geometría real (evitan CLS).
+/** Skeletons that mirror the real geometry, so nothing shifts when data lands.
  *  Variantes: 'rows' (tabla), 'stat' (KPI), 'card' (detalle). */
 @Component({
   selector: 'lib-skeleton',

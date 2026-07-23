@@ -1,5 +1,5 @@
 <div class="page narrow">
-  <lib-page-header [title]="isEdit() ? 'Editar usuario' : 'Nuevo usuario'"
+  <lib-page-header [title]="isEdit() ? 'Edit user' : 'New user'"
                    [subtitle]="isAdmin() ? 'Cualquier rol' : 'Como bibliotecario solo puedes dar de alta socios'" />
 
   @if (serverError()) { <lib-inline-alert tone="danger">{{ serverError() }}</lib-inline-alert> }
@@ -7,21 +7,21 @@
   <form class="card card-pad" [formGroup]="form" (ngSubmit)="submit()" novalidate>
     <div class="form-grid">
       <mat-form-field appearance="outline">
-        <mat-label>Nombre completo</mat-label>
+        <mat-label>Full name</mat-label>
         <input matInput formControlName="name" />
         @if (form.controls.name.hasError('required')) { <mat-error>El nombre es obligatorio.</mat-error> }
       </mat-form-field>
 
       <mat-form-field appearance="outline">
-        <mat-label>Correo electrónico</mat-label>
+        <mat-label>Email</mat-label>
         <input matInput type="email" formControlName="email" />
-        @if (form.controls.email.hasError('email')) { <mat-error>El correo no es válido.</mat-error> }
+        @if (form.controls.email.hasError('email')) { <mat-error>That email is not valid.</mat-error> }
         @if (fieldErrors()['email']) { <mat-error>{{ fieldErrors()['email'] }}</mat-error> }
       </mat-form-field>
 
       @if (isAdmin()) {
         <mat-form-field appearance="outline">
-          <mat-label>Rol</mat-label>
+          <mat-label>Role</mat-label>
           <mat-select formControlName="role">
             <mat-option value="member">Socio</mat-option>
             <mat-option value="librarian">Bibliotecario</mat-option>
@@ -33,18 +33,18 @@
 
       @if (!isEdit()) {
         <mat-form-field appearance="outline">
-          <mat-label>Contraseña inicial</mat-label>
+          <mat-label>Password inicial</mat-label>
           <input matInput type="password" formControlName="password" autocomplete="new-password" />
-          <mat-hint>La persona podrá cambiarla al entrar.</mat-hint>
-          @if (form.controls.password.hasError('minlength')) { <mat-error>Mínimo 8 caracteres.</mat-error> }
+          <mat-hint>They can change it once they sign in.</mat-hint>
+          @if (form.controls.password.hasError('minlength')) { <mat-error>At least 8 characters.</mat-error> }
         </mat-form-field>
       }
     </div>
 
     <div class="form-actions">
-      <button mat-button type="button" (click)="cancel()">Cancelar</button>
+      <button mat-button type="button" (click)="cancel()">Cancel</button>
       <button mat-flat-button color="primary" type="submit" [disabled]="saving()">
-        {{ isEdit() ? 'Guardar cambios' : 'Crear usuario' }}
+        {{ isEdit() ? 'Save cambios' : 'Create usuario' }}
       </button>
     </div>
   </form>

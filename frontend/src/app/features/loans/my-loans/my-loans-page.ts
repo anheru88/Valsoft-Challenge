@@ -24,11 +24,11 @@ export class MyLoansPage {
   private readonly router = inject(Router);
 
   // TODO API: GET /api/v1/loans — el API lo limita al socio autenticado
-  // (FR-LOAN-5), y ?status=returned da el historial. Demostración por ahora:
+  // (FR-LOAN-5), and ?status=returned gives the history. Demo data for now:
   readonly loans = signal<Loan[]>([
     { id: 601, status: 'active', loaned_at: '2026-07-14', due_date: '2026-07-28', returned_at: null, days_overdue: 0,
       user: { id: 34, name: 'Marta Ruiz', email: 'marta@example.com' },
-      book: { id: 1, title: 'Cien años de soledad', isbn: '9780307474728' } },
+      book: { id: 1, title: 'One Hundred Years of Solitude', isbn: '9780307474728' } },
     { id: 600, status: 'overdue', loaned_at: '2026-06-30', due_date: '2026-07-14', returned_at: null, days_overdue: 8,
       user: { id: 34, name: 'Marta Ruiz', email: 'marta@example.com' },
       book: { id: 7, title: 'La ciudad y sus muros inciertos', isbn: '9788411074278' } },

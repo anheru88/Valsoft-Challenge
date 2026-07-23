@@ -14,7 +14,7 @@ import { MatIconModule } from '@angular/material/icon';
         <strong>{{ title() }}</strong>
         <p class="muted">{{ message() }}</p>
         @if (traceId()) {
-          <details><summary class="faint">Detalles técnicos</summary>
+          <details><summary class="faint">Technical details</summary>
             <code class="mono">trace_id: {{ traceId() }}</code>
           </details>
         }
@@ -30,7 +30,7 @@ import { MatIconModule } from '@angular/material/icon';
 })
 export class ErrorState {
   readonly title = input('No se pudo cargar');
-  readonly message = input('Comprueba tu conexión y vuelve a intentarlo.');
+  readonly message = input('Check your connection and try again.');
   readonly traceId = input<string>();
   readonly retry = output<void>();
 }

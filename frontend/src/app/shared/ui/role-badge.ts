@@ -1,7 +1,7 @@
 import { Component, computed, input } from '@angular/core';
 import { Role } from '../../core/models';
 
-const LABELS: Record<Role, string> = { admin: 'Admin', librarian: 'Bibliotecario', member: 'Socio' };
+const LABELS: Record<Role, string> = { admin: 'Admin', librarian: 'Librarian', member: 'Member' };
 
 @Component({
   selector: 'lib-role-badge',

@@ -83,13 +83,13 @@ export class LoginPage {
     switch (apiErrorCode(error)) {
       case 'INVALID_CREDENTIALS':
       case 'VALIDATION_FAILED':
-        return 'El correo o la contraseña no son correctos.';
+        return 'That email and password do not match.';
       case 'USER_INACTIVE':
-        return 'Tu cuenta está desactivada. Contacta con la biblioteca.';
+        return 'Your account has been deactivated. Please contact the library.';
       case 'RATE_LIMITED':
         return 'Demasiados intentos. Espera un minuto y vuelve a probar.';
       default:
-        return 'No se pudo iniciar sesión. Inténtalo de nuevo.';
+        return 'Could not sign you in. Please try again.';
     }
   }
 }

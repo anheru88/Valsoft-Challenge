@@ -46,17 +46,17 @@ export class BooksListPage {
 
   readonly hasActiveFilters = computed(() =>
     this.filters().q !== '' || this.filters().categoryId !== null || this.filters().onlyAvailable);
-  readonly totalLabel = computed(() => this.meta().total + ' títulos en catálogo');
+  readonly totalLabel = computed(() => this.meta().total + ' titles in the catalogue');
 
-  // Datos de demostración — sustituir por GET /api/v1/books con filtros/orden/página
+  // Demo data — replace with GET /api/v1/books with filters, sorting and paging
   readonly categories = signal<Pick<Category, 'id' | 'name'>[]>([
-    { id: 1, name: 'Narrativa' }, { id: 2, name: 'Historia' }, { id: 3, name: 'Infantil' },
+    { id: 1, name: 'Fiction' }, { id: 2, name: 'Historia' }, { id: 3, name: 'Infantil' },
   ]);
 
   readonly books = signal<Book[]>([
-    { id: 1, title: 'Cien años de soledad', isbn: '9780307474728', publisher: 'Vintage', publication_year: 1967,
+    { id: 1, title: 'One Hundred Years of Solitude', isbn: '9780307474728', publisher: 'Vintage', publication_year: 1967,
       total_copies: 5, available_copies: 3, is_available: true, created_at: '2026-06-01',
-      authors: [{ id: 3, name: 'Gabriel García Márquez' }], categories: [{ id: 1, name: 'Narrativa', slug: 'narrativa' }] },
+      authors: [{ id: 3, name: 'Gabriel García Márquez' }], categories: [{ id: 1, name: 'Fiction', slug: 'fiction' }] },
     { id: 2, title: 'El infinito en un junco', isbn: '9788417860790', publisher: 'Siruela', publication_year: 2019,
       total_copies: 2, available_copies: 0, is_available: false, created_at: '2026-06-10',
       authors: [{ id: 5, name: 'Irene Vallejo' }], categories: [{ id: 2, name: 'Historia', slug: 'historia' }] },
@@ -69,7 +69,7 @@ export class BooksListPage {
 
   setFilter(patch: Partial<BookFilters>): void {
     this.filters.update(f => ({ ...f, ...patch }));
-    this.load(); // TODO: sincronizar también con queryParams del router
+    this.load(); // TODO: keep the router query params in sync as well
   }
 
   clearFilters(): void {
@@ -97,14 +97,14 @@ export class BooksListPage {
 
   confirmDelete(b: Book): void {
     this.dialog.open(ConfirmDialog, { data: {
-      title: '¿Eliminar «' + b.title + '»?',
-      message: 'El libro se retirará del catálogo. Los préstamos ya devueltos conservan su historial.',
-      confirmLabel: 'Eliminar libro', destructive: true,
+      title: 'Delete «' + b.title + '»?',
+      message: 'The book will be withdrawn from the catalogue. Returned loans keep their history.',
+      confirmLabel: 'Delete libro', destructive: true,
     } }).afterClosed().subscribe(ok => {
       if (!ok) return;
       // TODO API: DELETE /api/v1/books/{id}
       // 204 → this.snack.open('Libro eliminado', undefined, { duration: 4000 }); this.load();
-      // 409 BOOK_HAS_ACTIVE_LOANS → diálogo/alerta con el motivo y enlace a los préstamos activos.
+      // 409 BOOK_HAS_ACTIVE_LOANS → alert with the reason and a link to the open loans.
       this.snack.open('Libro eliminado', undefined, { duration: 4000 });
     });
   }

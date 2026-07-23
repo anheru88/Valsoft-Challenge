@@ -21,24 +21,24 @@ class UserSeeder extends Seeder
      * @var list<string>
      */
     private const MEMBER_NAMES = [
-        'Marta Ruiz', 'Iván Costa', 'Lucía Gómez', 'Andrés Vidal', 'Nuria Sanz',
-        'Pablo Herrera', 'Elena Márquez', 'Diego Salas', 'Carmen Ortiz', 'Javier Peña',
-        'Sofía Ibáñez', 'Marcos Delgado', 'Irene Cabrera', 'Raúl Moya', 'Alba Serrano',
-        'Tomás Ferrer', 'Rocío Bravo', 'Hugo Nieto', 'Clara Pardo', 'Sergio Lozano',
-        'Beatriz Cano', 'Adrián Gil', 'Natalia Prieto', 'Óscar Rey', 'Silvia Mena',
-        'Guillermo Arias', 'Paula Duarte', 'Rubén Castaño', 'Laura Vega', 'Emilio Rosas',
-        'Teresa Blanco', 'Nicolás Ramos', 'Marina Soler', 'Álvaro Cuevas', 'Inés Otero',
+        'Martha Reed', 'Ivan Costa', 'Lucy Gordon', 'Andrew Vidal', 'Nora Sands',
+        'Paul Herrera', 'Helen Marks', 'Diego Sallow', 'Carmen Ortiz', 'Javier Payne',
+        'Sophie Bannister', 'Mark Delgado', 'Irene Cabrera', 'Ralph Moya', 'Alba Sherwood',
+        'Thomas Ferrer', 'Rosie Bravo', 'Hugh Nieto', 'Clara Pardue', 'Sergio Lozano',
+        'Beatrice Cannon', 'Adrian Gill', 'Natalie Priestly', 'Oscar Rey', 'Sylvia Mena',
+        'William Arias', 'Paula Duarte', 'Ruben Chestnut', 'Laura Vega', 'Emily Rose',
+        'Teresa Blank', 'Nicholas Ramos', 'Marina Solar', 'Alvaro Cuevas', 'Ines Otero',
     ];
 
     public function run(): void
     {
-        $this->staff('Alicia Ferrer', 'admin@librarium.test', UserRole::Admin);
-        $this->staff('Luis Prado', 'librarian@librarium.test', UserRole::Librarian);
-        $this->staff('Rosa Mendoza', 'librarian2@librarium.test', UserRole::Librarian);
+        $this->staff('Alice Ferrer', 'admin@librarium.test', UserRole::Admin);
+        $this->staff('Louis Prado', 'librarian@librarium.test', UserRole::Librarian);
+        $this->staff('Rose Mendoza', 'librarian2@librarium.test', UserRole::Librarian);
 
         // The named member is the account a reviewer logs in with to see the
         // borrower side; the rest fill the list.
-        $this->member('Marta Ruiz', 'member@librarium.test', active: true);
+        $this->member('Martha Reed', 'member@librarium.test', active: true);
 
         foreach (array_slice(self::MEMBER_NAMES, 1) as $index => $name) {
             $this->member(

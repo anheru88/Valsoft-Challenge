@@ -1,16 +1,16 @@
 <div class="page">
-  <lib-page-header title="Usuarios" subtitle="Cuentas y roles del sistema">
+  <lib-page-header title="Users" subtitle="Cuentas y roles del sistema">
     <button mat-flat-button color="primary" routerLink="/users/new">
-      <mat-icon>person_add</mat-icon> Nuevo usuario
+      <mat-icon>person_add</mat-icon> New user
     </button>
   </lib-page-header>
 
   <div class="toolbar">
-    <lib-search-input placeholder="Nombre o correo…" (changed)="onSearch($event)" />
+    <lib-search-input placeholder="Name o correo…" (changed)="onSearch($event)" />
     <mat-form-field appearance="outline" class="compact">
-      <mat-label>Rol</mat-label>
+      <mat-label>Role</mat-label>
       <mat-select [value]="roleFilter()" (selectionChange)="roleFilter.set($event.value)">
-        <mat-option [value]="null">Todos</mat-option>
+        <mat-option [value]="null">All</mat-option>
         <mat-option value="admin">Admin</mat-option>
         <mat-option value="librarian">Bibliotecario</mat-option>
         <mat-option value="member">Socio</mat-option>
@@ -21,7 +21,7 @@
   <div class="card">
     <table class="lib-table" aria-label="Listado de usuarios">
       <thead>
-        <tr><th>Nombre</th><th>Correo</th><th>Rol</th><th>Préstamos activos</th><th>Estado</th><th class="actions-col"></th></tr>
+        <tr><th>Name</th><th>Correo</th><th>Role</th><th>Loans activos</th><th>Estado</th><th class="actions-col"></th></tr>
       </thead>
       <tbody>
         @for (u of filteredUsers(); track u.id) {
@@ -39,12 +39,12 @@
                 <mat-icon>more_vert</mat-icon>
               </button>
               <mat-menu #menu="matMenu">
-                <button mat-menu-item [routerLink]="['/users', u.id, 'edit']"><mat-icon>edit</mat-icon> Editar</button>
+                <button mat-menu-item [routerLink]="['/users', u.id, 'edit']"><mat-icon>edit</mat-icon> Edit</button>
                 <button mat-menu-item (click)="toggleActive(u)">
                   <mat-icon>{{ u.is_active ? 'person_off' : 'person' }}</mat-icon>
-                  {{ u.is_active ? 'Desactivar cuenta' : 'Reactivar cuenta' }}
+                  {{ u.is_active ? 'Deactivate cuenta' : 'Reactivar cuenta' }}
                 </button>
-                <button mat-menu-item class="danger-text" (click)="confirmDelete(u)"><mat-icon>delete</mat-icon> Eliminar</button>
+                <button mat-menu-item class="danger-text" (click)="confirmDelete(u)"><mat-icon>delete</mat-icon> Delete</button>
               </mat-menu>
             </td>
           </tr>

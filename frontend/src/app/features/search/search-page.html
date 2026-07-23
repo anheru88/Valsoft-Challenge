@@ -1,10 +1,10 @@
 <div class="page">
-  <lib-page-header title="Resultados de búsqueda"
-                   [subtitle]="query() ? results().length + ' resultados para «' + query() + '»' : 'Escribe algo para buscar'" />
+  <lib-page-header title="Search results"
+                   [subtitle]="query() ? results().length + ' resultados para «' + query() + '»' : 'Type something to search'" />
 
   @if (query() && results().length === 0) {
-    <lib-empty-state icon="search_off" title="Nada por aquí"
-                     [message]="'No hay resultados para «' + query() + '». Revisa la ortografía o prueba con el ISBN.'" />
+    <lib-empty-state icon="search_off" title="Nothing here"
+                     [message]="'No results for «' + query() + '». Check the spelling, or try the ISBN.'" />
   } @else {
     <div class="results">
       @for (b of results(); track b.id) {

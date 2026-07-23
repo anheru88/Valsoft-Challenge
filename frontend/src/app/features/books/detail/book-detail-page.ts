@@ -25,14 +25,14 @@ export class BookDetailPage {
   readonly loading = signal(false);
   readonly error = signal(false);
 
-  // Demostración — sustituir por GET /api/v1/books/{id}
+  // Demo data — replace with GET /api/v1/books/{id}
   readonly book = signal<Book>({
-    id: 1, title: 'Cien años de soledad', isbn: '9780307474728',
-    description: 'La saga de la familia Buendía en el mítico pueblo de Macondo: un siglo de amores, guerras y prodigios que fundó el realismo mágico moderno.',
-    publisher: 'Vintage Español', publication_year: 1967, cover_url: undefined,
+    id: 1, title: 'One Hundred Years of Solitude', isbn: '9780307474728',
+    description: 'The Buendía family across a century in the mythical town of Macondo: the novel that founded modern magical realism.',
+    publisher: 'Penguin', publication_year: 1967, cover_url: undefined,
     total_copies: 5, available_copies: 3, is_available: true, active_loans_count: 2,
     authors: [{ id: 3, name: 'Gabriel García Márquez' }],
-    categories: [{ id: 1, name: 'Narrativa', slug: 'narrativa' }],
+    categories: [{ id: 1, name: 'Fiction', slug: 'fiction' }],
     created_at: '2026-06-01',
   });
 
