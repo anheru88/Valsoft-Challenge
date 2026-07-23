@@ -112,15 +112,41 @@ movement before they say anything.
 and tested: authentication, users and roles, catalogue, circulation, search,
 dashboard and reports. 157 tests, PHPStan level 8, Pint clean.
 
-**Frontend — the views exist, the wiring does not.** All sixteen screens are
-built and render, but nothing calls the API yet: every page runs on demo data
-and each integration point is marked `// TODO API:`. Sign-in is the visible
-consequence — `LoginPage.submit()` validates and stops, so no session starts and
-the route guard returns you to the login screen. The Storybook catalogue is the
-useful way to review the interface today.
+**Frontend — complete.** All screens are built and wired to the API — sign-in and
+session, catalogue (books, authors, categories), circulation, search, the
+dashboard and reports, and the profile and change-password screens. Every feature
+has its own API service and signal store; no demo-data stubs remain.
 
-Next: an `AuthApiService`, which alone makes the application navigable, then one
-API service and store per feature (RFC §15.2).
+**Deployment — complete.** The whole stack runs from `./run.sh` (see above).
+
+## What's left
+
+Everything below is additive and lives in this repository: the modular-monolith
+seams — Actions, Contracts, `BookSearchInterface`, the Laravel scheduler — are
+exactly where these features plug in, so none of it needs a rewrite.
+
+**Operational — documented but not yet built.** The nightly reconciliation of
+`books.available_copies` is described as a production job (RFC-001) and performed
+inline by the seeder, but there is no Artisan command or scheduler entry for it
+yet. Next: a `books:reconcile-availability` command on Laravel's scheduler (cron).
+
+**Search at scale — Meilisearch.** DB-native FULLTEXT (MariaDB) and LIKE (SQLite)
+implement `BookSearchInterface` today; the documented trigger to move on is a
+catalogue that outgrows FULLTEXT. Adding a `MeilisearchBookSearch` plus a compose
+service is the whole change — the rest of the app already depends only on the
+interface. Redis caching is a second deferred seam (prepared, dependency absent).
+
+**Shelf location.** Books carry no physical location. A `location` / call-number
+field would let staff and members see where a copy actually sits — the librarian
+pain point the PRD names outright ("no way to know if a copy is available without
+walking to the shelf"). A migration, a Resource field and one catalogue column.
+
+**AI — the next step.** An **MCP server inside Laravel** that exposes the domain
+as tools — search the catalogue, check availability, place or return a loan, list
+overdue — by reusing the existing Actions and Contracts rather than duplicating
+logic. Agents, and in time Librarium's own UI, consume those tools. On top of
+that, **scheduled (cron) agents** on Laravel's scheduler for the recurring work:
+the reconciliation above, overdue notices, popularity recompute.
 
 ## Working on it
 

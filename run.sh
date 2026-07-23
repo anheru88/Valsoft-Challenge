@@ -1,9 +1,12 @@
 #!/usr/bin/env bash
 # Librarium one-shot launcher.
 #
-#   ./run.sh          build + start the whole stack (db, api, spa)
-#   ./run.sh down     stop and remove the containers
-#   ./run.sh logs     follow the container logs
+#   ./run.sh                build + start the whole stack (db, api, spa)
+#   ./run.sh down | --down  stop and remove the containers
+#   ./run.sh logs           follow the container logs
+#
+# To stop the stack without this script: `docker compose down`
+# (add `-v` to also drop the database volume and start fresh next time).
 #
 # It prepares the three .env files from their .env.example templates, fills in a
 # Laravel APP_KEY, maps the public hostname in /etc/hosts, then brings the
@@ -31,8 +34,8 @@ fi
 
 # --- sub-commands ------------------------------------------------------------
 case "${1:-up}" in
-    down) info "Stopping the stack…"; "${COMPOSE[@]}" down; ok "Stopped."; exit 0 ;;
-    logs) exec "${COMPOSE[@]}" logs -f ;;
+    down|--down|-d) info "Stopping the stack…"; "${COMPOSE[@]}" down; ok "Stopped."; exit 0 ;;
+    logs|--logs) exec "${COMPOSE[@]}" logs -f ;;
     up|"") ;;
     *) die "Unknown command '$1' (use: up | down | logs)." ;;
 esac
